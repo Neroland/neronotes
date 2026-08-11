@@ -1,0 +1,44 @@
+{
+  "voice.void_bass": {
+    "subtitle": "subtitles.neronotes.voice.void_bass",
+    "sounds": [
+      {"name": "block.note_block.bass", "type": "event"}
+    ]
+  },
+  "voice.grav_pad": {
+    "subtitle": "subtitles.neronotes.voice.grav_pad",
+    "sounds": [
+      {"name": "block.beacon.ambient", "type": "event"}
+    ]
+  },
+  "voice.reactor_drone": {
+    "subtitle": "subtitles.neronotes.voice.reactor_drone",
+    "sounds": [
+      {"name": "block.conduit.ambient", "type": "event"}
+    ]
+  },
+  "voice.pulse_lead": {
+    "subtitle": "subtitles.neronotes.voice.pulse_lead",
+    "sounds": [
+      {"name": "block.note_block.harp", "type": "event"}
+    ]
+  },
+  "voice.crystal_pluck": {
+    "subtitle": "subtitles.neronotes.voice.crystal_pluck",
+    "sounds": [
+      {"name": "block.note_block.chime", "type": "event"}
+    ]
+  },
+  "voice.plasma_kick": {
+    "subtitle": "subtitles.neronotes.voice.plasma_kick",
+    "sounds": [
+      {"name": "block.note_block.basedrum", "type": "event"}
+    ]
+  },
+  "voice.nebula_texture": {
+    "subtitle": "subtitles.neronotes.voice.nebula_texture",
+    "sounds": [
+      {"name": "block.note_block.bit", "type": "event"}
+    ]
+  }
+}

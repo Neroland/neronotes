@@ -31,6 +31,10 @@ dependencies {
         implementation "net.fabricmc.fabric-api:fabric-api:${fabricApi}"
     }
 
+    // Neroland Core — required foundation (resolved from mavenLocal or GitHub Packages; see the
+    // root stonecutter.gradle repositories). De-obf 26.x Loom needs no modImplementation/include.
+    implementation "za.co.neroland.nerolandcore:nerolandcore-fabric-${mc}:${rootProject.nerolandcore_version}"
+
     // Sentry SDK (telemetry/NeroNotesTelemetry): compile against it + embed it as a jar-in-jar so the
     // shipped Fabric jar carries it. Counterpart to the NeoForge JarJar bundling.
     implementation 'io.sentry:sentry:8.45.0'
@@ -61,6 +65,8 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
         mod_license          : rootProject.mod_license,
         fabric_loader_version: rootProject.fabric_loader_version,
         minecraft_version    : mc,
+        // Core dependency floor DERIVED from the compiled-against version (never a hardcoded [1.0,2.0)).
+        nerolandcore_version : rootProject.nerolandcore_version,
     ]
     inputs.properties(props)
     expand(props)

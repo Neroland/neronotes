@@ -35,6 +35,15 @@ dependencies {
     // another mod also ships Sentry). Adds it to the compile classpath AND the mod jar.
     jarJar(implementation('io.sentry:sentry:8.45.0'))
 
+    // Neroland Core — required foundation (resolved from mavenLocal or GitHub Packages; see the
+    // root stonecutter.gradle repositories).
+    implementation "za.co.neroland.nerolandcore:nerolandcore-neoforge-${mc}:${rootProject.nerolandcore_version}"
+
+    // JUnit 5 for the shared common tests (see the test source-set wiring below).
+    testImplementation platform('org.junit:junit-bom:5.12.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
     // JEI (optional recipe-viewer compat; the compat/jei plugin loads only when JEI is present). The API
     // is compile-time; the full NeoForge artifact is runtime-only (dev/test) so it is never published as a
     // hard dependency. Per-MC-version via jei_version_<mc> (BlameJared maven, inherited from the root).
@@ -58,6 +67,8 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
         mod_authors            : rootProject.mod_authors,
         mod_license            : rootProject.mod_license,
         minecraft_version_range: "[${mc},)",
+        // Core dependency floor DERIVED from the compiled-against version (never a hardcoded [1.0,2.0)).
+        nerolandcore_version_range: "[${rootProject.nerolandcore_version},2.0)",
     ]
     inputs.properties(props)
     expand(props)
@@ -106,6 +117,20 @@ neoForge {
         "${rootProject.mod_id}" {
             sourceSet sourceSets.main
         }
+    }
+
+    // JUnit tests: `common` is not a Gradle project, so the shared tests are wired here (Loom and
+    // ForgeGradle have no equivalent — tests run on the NeoForge nodes only: :neoforge:<mc>:test).
+    addModdingDependenciesTo(sourceSets.test)
+}
+
+// Shared common test sources (plain-JVM JUnit 5; no loader APIs).
+sourceSets.test.java.srcDir "${rootProject.projectDir}/common/src/test/java"
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'skipped', 'failed'
     }
 }
 

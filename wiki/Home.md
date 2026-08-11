@@ -9,8 +9,11 @@ Neroland ecosystem. Built on **Neroland Core**.
 
 ## Contents
 
-_No feature pages yet._ Add one page per block, item, machine, or system as it is built, and link it
-here. Keep this page as the index.
+- [Resonance channels](Resonance-Channels.md) — channel ownership, trust lists, the emit range and
+  the audio-spam cap (server-side foundation; the blocks that use it arrive in a later stage).
+
+Add one page per block, item, machine, or system as it is built, and link it here. Keep this page
+as the index.
 
 ## See also
 

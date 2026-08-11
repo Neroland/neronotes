@@ -1,0 +1,19 @@
+{
+  "neronotes.menu.open_failed": "This screen could not be opened. Please try again.",
+
+  "neronotes.voice_family.deep_bass": "Deep Bass",
+  "neronotes.voice_family.sub_pad": "Sub Pad",
+  "neronotes.voice_family.low_drone": "Low Drone",
+  "neronotes.voice_family.high_lead": "High Lead",
+  "neronotes.voice_family.glassy_pluck": "Glassy Pluck",
+  "neronotes.voice_family.percussion": "Percussion",
+  "neronotes.voice_family.synth_texture": "Synth Texture",
+
+  "subtitles.neronotes.voice.void_bass": "Void Bass thrums",
+  "subtitles.neronotes.voice.grav_pad": "Grav Pad swells",
+  "subtitles.neronotes.voice.reactor_drone": "Reactor Drone hums",
+  "subtitles.neronotes.voice.pulse_lead": "Pulse Lead sings",
+  "subtitles.neronotes.voice.crystal_pluck": "Crystal Pluck chimes",
+  "subtitles.neronotes.voice.plasma_kick": "Plasma Kick strikes",
+  "subtitles.neronotes.voice.nebula_texture": "Nebula Texture shimmers"
+}

@@ -1,0 +1,53 @@
+{
+  "format_version": 1,
+  "voices": {
+    "neronotes:void_bass": {
+      "sound_event": "neronotes:voice.void_bass",
+      "family": "deep_bass",
+      "min_pitch": 24,
+      "max_pitch": 48
+    },
+    "neronotes:grav_pad": {
+      "sound_event": "neronotes:voice.grav_pad",
+      "family": "sub_pad",
+      "min_pitch": 36,
+      "max_pitch": 72
+    },
+    "neronotes:reactor_drone": {
+      "sound_event": "neronotes:voice.reactor_drone",
+      "family": "low_drone",
+      "min_pitch": 24,
+      "max_pitch": 60
+    },
+    "neronotes:pulse_lead": {
+      "sound_event": "neronotes:voice.pulse_lead",
+      "family": "high_lead",
+      "min_pitch": 60,
+      "max_pitch": 96
+    },
+    "neronotes:crystal_pluck": {
+      "sound_event": "neronotes:voice.crystal_pluck",
+      "family": "glassy_pluck",
+      "min_pitch": 66,
+      "max_pitch": 102
+    },
+    "neronotes:plasma_kick": {
+      "sound_event": "neronotes:voice.plasma_kick",
+      "family": "percussion",
+      "min_pitch": 24,
+      "max_pitch": 60
+    },
+    "neronotes:nebula_texture": {
+      "sound_event": "neronotes:voice.nebula_texture",
+      "family": "synth_texture",
+      "min_pitch": 48,
+      "max_pitch": 90
+    },
+    "neronotes:fallback": {
+      "sound_event": "neronotes:voice.pulse_lead",
+      "family": "high_lead",
+      "min_pitch": 0,
+      "max_pitch": 127
+    }
+  }
+}

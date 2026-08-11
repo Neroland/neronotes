@@ -2,7 +2,9 @@
 
 > Part of the Neroland sci-fi Minecraft mod ecosystem, built on **Neroland Core**.
 
-**Status:** barebones multiloader skeleton — version `0.0.1-alpha.1`. No gameplay content yet.
+**Status:** in development — version `0.0.1-alpha.1`. The foundation is in place (Neroland Core
+wiring, platform seams, config, opt-out error reporting — see [`PRIVACY.md`](PRIVACY.md)); no
+gameplay content yet.
 
 ## Build targets
 
@@ -32,7 +34,10 @@ The build is the repo root, with a flattened cross-loader structure driven by St
 
 See [`AGENTS.md`](AGENTS.md) / [`CLAUDE.md`](CLAUDE.md) for agent and contributor context.
 
-## Planning docs
+## Documentation
 
-Design, feature and dependency docs for this mod live in the umbrella planning repo's
-`neronotes/` folder.
+- [`wiki/`](wiki/) — player- and contributor-facing docs for NeroNotes (published to the GitHub
+  wiki); `wiki/Home.md` is the index.
+- `USING-CORE.md` — the Neroland Core APIs this mod consumes (written as features land).
+- [`PRIVACY.md`](PRIVACY.md) — what the optional error reporting does and does not collect, and how
+  gameplay data in your world save is handled.
