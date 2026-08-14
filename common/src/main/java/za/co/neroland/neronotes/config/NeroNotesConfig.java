@@ -49,6 +49,16 @@ public final class NeroNotesConfig {
             "sync.max_latency_compensation_ms", 500, 0, 2000, true,
             "Maximum latency compensation (ms) applied when scheduling against the server timeline anchor.");
 
+    /** Harmonic Gate internal energy buffer capacity in NE (Stage 4). */
+    public static final ConfigValue<Integer> GATE_ENERGY_CAPACITY = SCHEMA.intRange(
+            "gate.energy_capacity", 16000, 1000, 1000000, true,
+            "Energy buffer capacity (NE) of the Harmonic Gate. Applies to gates placed after a change.");
+
+    /** Energy consumed per crossing into the Soundforge (Stage 4). Returning is always free. */
+    public static final ConfigValue<Integer> GATE_TELEPORT_ENERGY_COST = SCHEMA.intRange(
+            "gate.teleport_energy_cost", 8000, 0, 1000000, true,
+            "Energy (NE) one crossing into the Soundforge consumes (clamped to the gate's capacity). Returning from the Soundforge is always free.");
+
     /** Serialised score budget in bytes, enforced at press time and on the wire (Stage 5). */
     public static final ConfigValue<Integer> DISK_SCORE_BUDGET_BYTES = SCHEMA.intRange(
             "disk.score_budget_bytes", 16384, 1024, 65536, true,
@@ -58,6 +68,15 @@ public final class NeroNotesConfig {
     public static final ConfigValue<Integer> DISK_NAME_MAX_LENGTH = SCHEMA.intRange(
             "disk.name_max_length", 48, 8, 128, true,
             "Maximum length of a player-chosen disk/composition name, validated server-side at press and publish time.");
+
+    /**
+     * Moderation word list for player-chosen names (Stage 5, locked
+     * decision 6). Comma-separated, case-insensitive substrings; empty
+     * disables the list.
+     */
+    public static final ConfigValue<String> MODERATION_BLOCKED_WORDS = SCHEMA.string(
+            "moderation.blocked_words", "", true,
+            "Comma-separated, case-insensitive words refused in player-chosen disk/composition names. Empty = no word list.");
 
     /** Library listing page size (Stage 6; paginated from day one). */
     public static final ConfigValue<Integer> LIBRARY_PAGE_SIZE = SCHEMA.intRange(

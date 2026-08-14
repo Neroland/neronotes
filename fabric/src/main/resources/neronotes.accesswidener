@@ -1,1 +1,8 @@
 accessWidener	v2	official
+
+# BlockEntityType construction (26.1.2): vanilla keeps the (BlockEntitySupplier, Set)
+# constructor private and the supplier interface package-private, with no public
+# builder/factory path at all. NeoForge and Forge patch both public; this widens the
+# same two members for Fabric. On 26.2 both are already public and these are no-ops.
+accessible	class	net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
+accessible	method	net/minecraft/world/level/block/entity/BlockEntityType	<init>	(Lnet/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier;Ljava/util/Set;)V

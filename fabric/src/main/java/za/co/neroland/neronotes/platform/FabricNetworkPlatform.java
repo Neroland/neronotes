@@ -4,14 +4,15 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 
-import za.co.neroland.neronotes.NeroNotesCommon;
-import za.co.neroland.neronotes.network.NotesNetwork;
-
 /**
  * Fabric {@link NetworkPlatform}. Payload types are registered on the
- * {@code neronotes:main} channel by {@code NeroNotesFabric} (types) and
- * {@code NeroNotesFabricClient} (client receivers) from the declarations in
- * {@code NotesNetwork}.
+ * {@code neronotes:main} channel by {@code NeroNotesFabric} (types +
+ * serverbound receivers) and {@code NeroNotesFabricClient} (client
+ * receivers) from the declarations in {@code NotesNetwork}.
+ *
+ * <p>{@link #sendToServer} delegates to {@link FabricClientNetworkSender} so
+ * the client-only {@code ClientPlayNetworking} class is only resolved when a
+ * client actually sends — this service itself loads on dedicated servers.</p>
  */
 public final class FabricNetworkPlatform implements NetworkPlatform {
 
@@ -22,11 +23,6 @@ public final class FabricNetworkPlatform implements NetworkPlatform {
 
     @Override
     public void sendToServer(CustomPacketPayload payload) {
-        // No serverbound payloads are declared yet (the first arrive with the
-        // sequencer stage). Dropping here is deliberate: routing through a
-        // client-only class from this common-loaded service would risk
-        // classloading on a dedicated server.
-        NeroNotesCommon.LOGGER.debug("[NeroNotes] dropped client->server payload {} on {} (no serverbound payloads declared)",
-                payload.getClass().getSimpleName(), NotesNetwork.CHANNEL_ID);
+        FabricClientNetworkSender.send(payload);
     }
 }

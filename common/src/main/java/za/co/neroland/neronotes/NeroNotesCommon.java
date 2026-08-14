@@ -3,7 +3,12 @@ package za.co.neroland.neronotes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import za.co.neroland.neronotes.block.NeroNotesBlocks;
+import za.co.neroland.neronotes.block.entity.NeroNotesBlockEntities;
 import za.co.neroland.neronotes.config.NeroNotesConfig;
+import za.co.neroland.neronotes.item.NeroNotesDataComponents;
+import za.co.neroland.neronotes.item.NeroNotesItems;
+import za.co.neroland.neronotes.menu.NeroNotesMenus;
 import za.co.neroland.neronotes.network.NotesNetwork;
 import za.co.neroland.neronotes.platform.Services;
 import za.co.neroland.neronotes.signal.ResonanceService;
@@ -42,13 +47,22 @@ public final class NeroNotesCommon {
         // 2. Telemetry — opt-out Sentry error reporting (see PRIVACY.md).
         NeroNotesTelemetry.init();
 
-        // 3. Blocks + block entities.
-        //    (Stage 3/4/5/6 placeholder: Resonant Blocks, Resonators, Harmonic Gate,
-        //     transport/publish lecterns, Disk Press, Disk Exchanger.)
+        // 3. Blocks + block entities — Resonant Blocks + Resonators (Stage 3),
+        //    the Harmonic Gate machine (Stage 4; Core energy capability is
+        //    registered per loader from each loader entry point), and the
+        //    Stage 5 Soundforge furniture: transport lectern (+ preview BE),
+        //    pattern walls, voice pedestals, Disk Press.
+        //    (Stage 6 placeholder: publish lectern, Disk Exchanger.)
+        NeroNotesBlocks.init();
+        NeroNotesBlockEntities.init();
 
-        // 4. Items + menus.
-        //    (Stage 5 placeholder: blank disks, custom disks; sequencer + exchanger menu types.
-        //     All openMenu call sites route through menu/MenuOpener.)
+        // 4. Items + menus + data components — BlockItems (tooltips live on
+        //    the BlockItem), the Stage 5 blank/custom disks with the
+        //    disk_contents component, and the sequencer + Disk Press menu
+        //    types. All openMenu call sites route through menu/MenuOpener.
+        NeroNotesItems.init();
+        NeroNotesDataComponents.init();
+        NeroNotesMenus.init();
 
         // 5. Sound events + voice registry — SoundEvents via Core's RegistrationProvider
         //    (aliased to vanilla sounds in assets/neronotes/sounds.json; no .ogg ships in 0.1.0),
@@ -56,19 +70,22 @@ public final class NeroNotesCommon {
         NeroNotesSounds.init();
         VoiceRegistry.bootstrap();
 
-        // 6. Creative tab.
-        //    (Stage 3+ placeholder: Core's CoreCreativeTab.add(...) for each item, before tabs build.)
+        // 6. Creative tab — every NeroNotes item into Core's shared Neroland tab, before tabs build.
+        NeroNotesItems.addToCreativeTab();
 
         // 7. Data / PlayerDataErasure registration — EARLY ON PURPOSE: registering late is how an
         //    erasure request silently misses a store.
         //    (Stage 7 registers erasers with Core here. The stores are purge-ready already:
-        //     signal/ChannelStore routes through Core's SavedDataRecovery and exposes
-        //     purgePlayer(UUID) + purgePlayerAndBackup(...) for the erasure hook.)
+        //     signal/ChannelStore and soundforge/SoundforgeSessionStore both route through
+        //     Core's SavedDataRecovery and expose purgePlayer(UUID) + purgePlayerAndBackup(...)
+        //     + hasRow probes for the erasure hook.)
 
         // 8. Network payloads — on NeroNotes' OWN channel (neronotes:main), never Core's CoreNetwork.
         NotesNetwork.registerPayloads();
 
-        // 9. Channel + playback services — the resonance signal (Stage 2); playback sync lands in Stage 3.
+        // 9. Channel + playback services — the resonance signal (Stage 2). The Stage 3 client
+        //    playback engine installs its payload sinks from each loader's CLIENT entry point
+        //    (client/ClientPlaybackEngine.install()), never from common init.
         ResonanceService.init();
 
         // 10. Sibling integrations — feature-detected via Services.platform().isModLoaded(...),

@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=false": { "model": "neronotes:block/resonant_block_deep_bass" },
+    "lit=true": { "model": "neronotes:block/resonant_block_deep_bass_lit" }
+  }
+}

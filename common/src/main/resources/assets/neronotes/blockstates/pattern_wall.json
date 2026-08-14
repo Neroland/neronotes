@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "layer=0,lit=false": { "model": "neronotes:block/pattern_wall_0" },
+    "layer=0,lit=true": { "model": "neronotes:block/pattern_wall_0_lit" },
+    "layer=1,lit=false": { "model": "neronotes:block/pattern_wall_1" },
+    "layer=1,lit=true": { "model": "neronotes:block/pattern_wall_1_lit" },
+    "layer=2,lit=false": { "model": "neronotes:block/pattern_wall_2" },
+    "layer=2,lit=true": { "model": "neronotes:block/pattern_wall_2_lit" },
+    "layer=3,lit=false": { "model": "neronotes:block/pattern_wall_3" },
+    "layer=3,lit=true": { "model": "neronotes:block/pattern_wall_3_lit" }
+  }
+}

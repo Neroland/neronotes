@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=false": { "model": "neronotes:block/resonant_block_synth_texture" },
+    "lit=true": { "model": "neronotes:block/resonant_block_synth_texture_lit" }
+  }
+}

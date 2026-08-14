@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "charged=false": { "model": "neronotes:block/harmonic_gate" },
+    "charged=true": { "model": "neronotes:block/harmonic_gate_charged" }
+  }
+}

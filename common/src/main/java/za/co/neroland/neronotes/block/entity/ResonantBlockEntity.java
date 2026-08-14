@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 import za.co.neroland.neronotes.block.ResonantBlock;
 import za.co.neroland.neronotes.block.ResonantBlockIndex;
@@ -113,7 +114,7 @@ public class ResonantBlockEntity extends BlockEntity {
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
         }
-        ResonanceService.emitLocalNote(serverLevel, source, worldPosition.getCenter(),
+        ResonanceService.emitLocalNote(serverLevel, source, Vec3.atCenterOf(worldPosition),
                 voice().voiceId(), pitch(), INTERACTION_VELOCITY);
         ResonantBlock.flare(serverLevel, worldPosition);
     }

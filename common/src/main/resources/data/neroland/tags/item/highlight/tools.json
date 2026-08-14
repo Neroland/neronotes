@@ -1,0 +1,6 @@
+{
+  "replace": false,
+  "values": [
+    { "id": "neronotes:custom_disk", "required": false }
+  ]
+}

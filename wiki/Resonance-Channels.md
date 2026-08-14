@@ -5,9 +5,9 @@ transport events (`note_on`, `note_off`, `play`, `stop`, `seek`) on a **channel*
 listeners hear them rendered client-side from the mod's registered sounds. Music is data, not
 audio — the server never streams sound.
 
-> **Status:** the channel system (this page) is the server-side foundation. The in-world blocks
-> that use it — Resonant Blocks and Resonators — and synchronised playback arrive in a later
-> stage of 0.1.0.
+> The channel system (this page) is the server-side foundation. The in-world blocks that use it —
+> [Resonant Blocks and Resonators](Resonant-Blocks-and-Resonators.md) — play through it with
+> synchronised playback.
 
 ## Channel identity — owner-scoped, never global
 

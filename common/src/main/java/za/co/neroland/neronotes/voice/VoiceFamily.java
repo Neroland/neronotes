@@ -14,15 +14,29 @@ import java.util.Optional;
  */
 public enum VoiceFamily {
 
-    DEEP_BASS,
-    SUB_PAD,
-    LOW_DRONE,
-    HIGH_LEAD,
-    GLASSY_PLUCK,
-    PERCUSSION,
-    SYNTH_TEXTURE;
+    DEEP_BASS(0xFF8B00FF),
+    SUB_PAD(0xFF2E6BFF),
+    LOW_DRONE(0xFF00B3A4),
+    HIGH_LEAD(0xFF39FF14),
+    GLASSY_PLUCK(0xFF00E5FF),
+    PERCUSSION(0xFFFF2975),
+    SYNTH_TEXTURE(0xFFFF8C00);
 
     private final String id = name().toLowerCase(Locale.ROOT);
+    private final int accentColour;
+
+    VoiceFamily(int accentColour) {
+        this.accentColour = accentColour;
+    }
+
+    /**
+     * The family's neon accent colour (ARGB) — the same palette the generated
+     * placeholder textures use ({@code tools/gen_textures.py}). Stage 5 styles
+     * disk labels and the sequencer grid with it.
+     */
+    public int accentColour() {
+        return accentColour;
+    }
 
     /** Stable snake_case id, as used in voice JSON and config keys ({@code deep_bass}, ...). */
     public String id() {

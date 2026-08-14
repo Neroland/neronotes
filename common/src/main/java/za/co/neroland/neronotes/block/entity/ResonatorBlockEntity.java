@@ -353,6 +353,13 @@ public class ResonatorBlockEntity extends BlockEntity {
         }
     }
 
+    /** Breaking the block stops playback so the channel's play slot frees up. */
+    @Override
+    public void setRemoved() {
+        stopQuietly();
+        super.setRemoved();
+    }
+
     private void stopQuietly() {
         if (!playing) {
             return;
@@ -367,7 +374,7 @@ public class ResonatorBlockEntity extends BlockEntity {
     }
 
     private Vec3 origin() {
-        return worldPosition.getCenter();
+        return Vec3.atCenterOf(worldPosition);
     }
 
     /** Rebuild the per-tick note lookup and the end-of-score tick. */

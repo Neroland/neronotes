@@ -35,9 +35,12 @@ public final class ForgeNetworkPlatform implements NetworkPlatform {
 
     @Override
     public void sendToServer(CustomPacketPayload payload) {
-        // No serverbound payloads are declared yet (the first arrive with the
-        // sequencer stage); dropping is deliberate.
-        NeroNotesCommon.LOGGER.debug("[NeroNotes] dropped client->server payload {} on {} (no serverbound payloads declared)",
-                payload.getClass().getSimpleName(), NotesNetwork.CHANNEL_ID);
+        Channel<CustomPacketPayload> ch = channel;
+        if (ch == null) {
+            NeroNotesCommon.LOGGER.warn("[NeroNotes] dropped client->server payload {} — {} channel not built yet",
+                    payload.getClass().getSimpleName(), NotesNetwork.CHANNEL_ID);
+            return;
+        }
+        ch.send(payload, PacketDistributor.SERVER.noArg());
     }
 }

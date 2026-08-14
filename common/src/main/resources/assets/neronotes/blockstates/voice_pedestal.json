@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "family=0": { "model": "neronotes:block/voice_pedestal_deep_bass" },
+    "family=1": { "model": "neronotes:block/voice_pedestal_sub_pad" },
+    "family=2": { "model": "neronotes:block/voice_pedestal_low_drone" },
+    "family=3": { "model": "neronotes:block/voice_pedestal_high_lead" },
+    "family=4": { "model": "neronotes:block/voice_pedestal_glassy_pluck" },
+    "family=5": { "model": "neronotes:block/voice_pedestal_percussion" },
+    "family=6": { "model": "neronotes:block/voice_pedestal_synth_texture" }
+  }
+}

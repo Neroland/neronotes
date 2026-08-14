@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    { "id": "neronotes:resonator", "required": false },
+    { "id": "neronotes:harmonic_gate", "required": false },
+    { "id": "neronotes:transport_lectern", "required": false },
+    { "id": "neronotes:disk_press", "required": false }
+  ]
+}

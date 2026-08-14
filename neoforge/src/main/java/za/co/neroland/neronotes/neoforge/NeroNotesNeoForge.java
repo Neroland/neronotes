@@ -1,14 +1,18 @@
 package za.co.neroland.neronotes.neoforge;
 
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.neronotes.NeroNotesCommon;
+import za.co.neroland.neronotes.command.NeroNotesCommands;
 import za.co.neroland.neronotes.network.NotesNetwork;
 
 /** NeoForge entry point for NeroNotes. */
@@ -23,6 +27,11 @@ public final class NeroNotesNeoForge {
         RegistrationProvider.attach(modEventBus);
         // Wire the declared neronotes:main payloads (declared during init() step 8).
         modEventBus.addListener(NeroNotesNeoForge::onRegisterPayloadHandlers);
+        // Stage 4: Harmonic Gate energy on Core's shared capability.
+        NeoForgeCapabilities.register(modEventBus);
+        // Stage 4: /neronotes soundforge return (game-bus command registration).
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) ->
+                NeroNotesCommands.register(event.getDispatcher()));
     }
 
     private static void onRegisterPayloadHandlers(RegisterPayloadHandlersEvent event) {
@@ -30,11 +39,24 @@ public final class NeroNotesNeoForge {
         for (NotesNetwork.ClientboundPayloadSpec<?> spec : NotesNetwork.clientboundPayloads()) {
             registerClientbound(registrar, spec);
         }
+        for (NotesNetwork.ServerboundPayloadSpec<?> spec : NotesNetwork.serverboundPayloads()) {
+            registerServerbound(registrar, spec);
+        }
     }
 
     private static <T extends CustomPacketPayload> void registerClientbound(
             PayloadRegistrar registrar, NotesNetwork.ClientboundPayloadSpec<T> spec) {
         registrar.playToClient(spec.type(), spec.codec(),
                 (payload, context) -> context.enqueueWork(() -> spec.handler().accept(payload)));
+    }
+
+    private static <T extends CustomPacketPayload> void registerServerbound(
+            PayloadRegistrar registrar, NotesNetwork.ServerboundPayloadSpec<T> spec) {
+        registrar.playToServer(spec.type(), spec.codec(),
+                (payload, context) -> context.enqueueWork(() -> {
+                    if (context.player() instanceof ServerPlayer serverPlayer) {
+                        spec.handler().accept(payload, serverPlayer);
+                    }
+                }));
     }
 }

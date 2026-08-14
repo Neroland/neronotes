@@ -80,7 +80,7 @@ public final class ResonantBlockIndex {
             if (block.family() != voice.family()) {
                 continue;
             }
-            if (entry.getKey().getCenter().distanceToSqr(origin) > radiusSq) {
+            if (Vec3.atCenterOf(entry.getKey()).distanceToSqr(origin) > radiusSq) {
                 continue;
             }
             block.receiveResonance(pitch);

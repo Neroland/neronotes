@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "G": "#nerolandcore:materials/plasma_glass",
+    "A": "minecraft:amethyst_shard"
+  },
+  "pattern": [
+    " C ",
+    "CGC",
+    " A "
+  ],
+  "result": {
+    "id": "neronotes:blank_disk",
+    "count": 2
+  }
+}

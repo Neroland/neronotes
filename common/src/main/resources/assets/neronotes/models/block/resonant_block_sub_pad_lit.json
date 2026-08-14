@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": { "all": "neronotes:block/resonant_block_sub_pad_lit" }
+}

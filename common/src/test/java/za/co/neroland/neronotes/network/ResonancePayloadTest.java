@@ -7,10 +7,13 @@ import org.junit.jupiter.api.Test;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
+import net.minecraft.core.BlockPos;
+
 import za.co.neroland.neronotes.signal.ChannelNames;
 import za.co.neroland.neronotes.signal.TransportAction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,13 +27,15 @@ class ResonancePayloadTest {
 
     private static final UUID OWNER = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
+    private static final BlockPos ORIGIN = new BlockPos(10, 64, -20);
+
     /** Generous ceiling for a "tiny" event payload — far below any score budget. */
     private static final int TINY_PAYLOAD_CEILING_BYTES = 128;
 
     @Test
     void notePayloadRoundTripsExactly() {
         ResonanceNotePayload payload = new ResonanceNotePayload(
-                OWNER, "atrium", true, "neronotes:void_bass", 64, 100);
+                OWNER, "atrium", true, "neronotes:void_bass", 64, 100, ORIGIN, 42L);
         ByteBuf buf = Unpooled.buffer();
         try {
             ResonanceNotePayload.STREAM_CODEC.encode(buf, payload);
@@ -39,6 +44,23 @@ class ResonancePayloadTest {
                     "note event must stay tiny, was " + size + " bytes");
             assertEquals(payload, ResonanceNotePayload.STREAM_CODEC.decode(buf));
             assertEquals(0, buf.readableBytes(), "decode consumed everything");
+            assertFalse(payload.isLive());
+        } finally {
+            buf.release();
+        }
+    }
+
+    @Test
+    void liveNotePayloadRoundTripsExactly() {
+        ResonanceNotePayload payload = new ResonanceNotePayload(
+                OWNER, "atrium", true, "neronotes:void_bass", 64, 100,
+                ORIGIN, ResonanceNotePayload.LIVE_NOTE);
+        ByteBuf buf = Unpooled.buffer();
+        try {
+            ResonanceNotePayload.STREAM_CODEC.encode(buf, payload);
+            ResonanceNotePayload decoded = ResonanceNotePayload.STREAM_CODEC.decode(buf);
+            assertEquals(payload, decoded);
+            assertTrue(decoded.isLive());
         } finally {
             buf.release();
         }
@@ -48,7 +70,7 @@ class ResonancePayloadTest {
     void transportPayloadRoundTripsExactly() {
         for (TransportAction action : TransportAction.values()) {
             ResonanceTransportPayload payload = new ResonanceTransportPayload(
-                    OWNER, "atrium", action, 1234L, 987654321L);
+                    OWNER, "atrium", action, 1234L, 987654321L, 7, 120, 10);
             ByteBuf buf = Unpooled.buffer();
             try {
                 ResonanceTransportPayload.STREAM_CODEC.encode(buf, payload);
@@ -65,25 +87,37 @@ class ResonancePayloadTest {
     @Test
     void notePayloadValidatesItsFields() {
         assertThrows(IllegalArgumentException.class, () -> new ResonanceNotePayload(
-                OWNER, "a".repeat(ChannelNames.MAX_LENGTH + 1), true, "neronotes:void_bass", 64, 100));
+                OWNER, "a".repeat(ChannelNames.MAX_LENGTH + 1), true, "neronotes:void_bass",
+                64, 100, ORIGIN, 42L));
         assertThrows(IllegalArgumentException.class, () -> new ResonanceNotePayload(
-                OWNER, "atrium", true, "v".repeat(ResonanceNotePayload.MAX_VOICE_ID_LENGTH + 1), 64, 100));
+                OWNER, "atrium", true, "v".repeat(ResonanceNotePayload.MAX_VOICE_ID_LENGTH + 1),
+                64, 100, ORIGIN, 42L));
         assertThrows(IllegalArgumentException.class, () -> new ResonanceNotePayload(
-                OWNER, "atrium", true, "neronotes:void_bass", 128, 100));
+                OWNER, "atrium", true, "neronotes:void_bass", 128, 100, ORIGIN, 42L));
         assertThrows(IllegalArgumentException.class, () -> new ResonanceNotePayload(
-                OWNER, "atrium", true, "neronotes:void_bass", 64, -1));
+                OWNER, "atrium", true, "neronotes:void_bass", 64, -1, ORIGIN, 42L));
         assertThrows(IllegalArgumentException.class, () -> new ResonanceNotePayload(
-                null, "atrium", true, "neronotes:void_bass", 64, 100));
+                null, "atrium", true, "neronotes:void_bass", 64, 100, ORIGIN, 42L));
+        assertThrows(IllegalArgumentException.class, () -> new ResonanceNotePayload(
+                OWNER, "atrium", true, "neronotes:void_bass", 64, 100, null, 42L));
+        assertThrows(IllegalArgumentException.class, () -> new ResonanceNotePayload(
+                OWNER, "atrium", true, "neronotes:void_bass", 64, 100, ORIGIN, -2L));
     }
 
     @Test
     void transportPayloadValidatesItsFields() {
         assertThrows(IllegalArgumentException.class, () -> new ResonanceTransportPayload(
-                OWNER, "atrium", null, 0L, 0L));
+                OWNER, "atrium", null, 0L, 0L, 0, 0, 0));
         assertThrows(IllegalArgumentException.class, () -> new ResonanceTransportPayload(
-                OWNER, "atrium", TransportAction.PLAY, -1L, 0L));
+                OWNER, "atrium", TransportAction.PLAY, -1L, 0L, 0, 0, 0));
         assertThrows(IllegalArgumentException.class, () -> new ResonanceTransportPayload(
-                OWNER, "", TransportAction.PLAY, 0L, 0L));
+                OWNER, "", TransportAction.PLAY, 0L, 0L, 0, 0, 0));
+        assertThrows(IllegalArgumentException.class, () -> new ResonanceTransportPayload(
+                OWNER, "atrium", TransportAction.PLAY, 0L, -1L, 0, 0, 0));
+        assertThrows(IllegalArgumentException.class, () -> new ResonanceTransportPayload(
+                OWNER, "atrium", TransportAction.PLAY, 0L, 0L, -1, 0, 0));
+        assertThrows(IllegalArgumentException.class, () -> new ResonanceTransportPayload(
+                OWNER, "atrium", TransportAction.PLAY, 0L, 0L, 0, -1, 0));
     }
 
     @Test

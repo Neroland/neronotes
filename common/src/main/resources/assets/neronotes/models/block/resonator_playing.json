@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "neronotes:block/resonator_top",
+    "bottom": "neronotes:block/resonator_bottom",
+    "side": "neronotes:block/resonator_side_playing"
+  }
+}

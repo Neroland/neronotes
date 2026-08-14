@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=false": { "model": "neronotes:block/resonant_block_high_lead" },
+    "lit=true": { "model": "neronotes:block/resonant_block_high_lead_lit" }
+  }
+}

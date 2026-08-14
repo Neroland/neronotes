@@ -2,12 +2,14 @@ package za.co.neroland.neronotes.network;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import io.netty.buffer.ByteBuf;
 
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 
 import za.co.neroland.neronotes.NeroNotesCommon;
 import za.co.neroland.neronotes.score.Score;
@@ -80,16 +82,31 @@ public final class NotesNetwork {
             Consumer<T> handler) {
     }
 
+    /**
+     * A serverbound payload declaration: wire type + codec + the common
+     * handler the loader receivers invoke <strong>on the server thread</strong>
+     * with the sending player's server-side identity — the handler trusts the
+     * {@link ServerPlayer}, never anything inside the payload.
+     */
+    public record ServerboundPayloadSpec<T extends CustomPacketPayload>(
+            CustomPacketPayload.Type<T> type,
+            StreamCodec<ByteBuf, T> codec,
+            BiConsumer<T, ServerPlayer> handler) {
+    }
+
     private static final List<ClientboundPayloadSpec<?>> CLIENTBOUND = new ArrayList<>();
+    private static final List<ServerboundPayloadSpec<?>> SERVERBOUND = new ArrayList<>();
     private static boolean declared;
 
     /**
      * Payload-declaration seam — step 8 of {@code NeroNotesCommon.init()}.
      * Declares once; per-loader plumbing reads {@link #clientboundPayloads()}
-     * afterwards (all three loader entry points run after
-     * {@code NeroNotesCommon.init()}), so ordering is guaranteed. Stage 2:
-     * the two clientbound resonance payloads. No serverbound payloads exist
-     * yet.
+     * and {@link #serverboundPayloads()} afterwards (all three loader entry
+     * points run after {@code NeroNotesCommon.init()}), so ordering is
+     * guaranteed. Stage 2: the two clientbound resonance payloads. Stage 5:
+     * the sequencer session sync (clientbound, score-carrying and budget-
+     * bounded) plus the first serverbound payloads — sequencer edits and the
+     * Disk Press request.
      */
     public static synchronized void registerPayloads() {
         if (declared) {
@@ -102,12 +119,27 @@ public final class NotesNetwork {
         CLIENTBOUND.add(new ClientboundPayloadSpec<>(
                 ResonanceTransportPayload.TYPE, ResonanceTransportPayload.STREAM_CODEC,
                 ResonanceClientHandlers::handleTransport));
-        NeroNotesCommon.LOGGER.debug("[NeroNotes] network channel {} declared {} clientbound payload(s)",
-                CHANNEL_ID, CLIENTBOUND.size());
+        CLIENTBOUND.add(new ClientboundPayloadSpec<>(
+                SessionScorePayload.TYPE, SessionScorePayload.STREAM_CODEC,
+                SequencerClientHandlers::handleSession));
+        SERVERBOUND.add(new ServerboundPayloadSpec<>(
+                SequencerEditPayload.TYPE, SequencerEditPayload.STREAM_CODEC,
+                SequencerServerHandlers::handleEdit));
+        SERVERBOUND.add(new ServerboundPayloadSpec<>(
+                DiskPressPayload.TYPE, DiskPressPayload.STREAM_CODEC,
+                SequencerServerHandlers::handlePress));
+        NeroNotesCommon.LOGGER.debug(
+                "[NeroNotes] network channel {} declared {} clientbound / {} serverbound payload(s)",
+                CHANNEL_ID, CLIENTBOUND.size(), SERVERBOUND.size());
     }
 
     /** The declared clientbound payloads, for the per-loader channel wiring. */
     public static synchronized List<ClientboundPayloadSpec<?>> clientboundPayloads() {
         return List.copyOf(CLIENTBOUND);
+    }
+
+    /** The declared serverbound payloads, for the per-loader channel wiring. */
+    public static synchronized List<ServerboundPayloadSpec<?>> serverboundPayloads() {
+        return List.copyOf(SERVERBOUND);
     }
 }

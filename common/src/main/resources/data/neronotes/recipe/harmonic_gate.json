@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "#c:plates/nero_alloy",
+    "G": "#nerolandcore:materials/plasma_glass",
+    "A": "minecraft:amethyst_block"
+  },
+  "pattern": [
+    "PGP",
+    "GAG",
+    "PGP"
+  ],
+  "result": {
+    "id": "neronotes:harmonic_gate"
+  }
+}

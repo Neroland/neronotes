@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "neronotes:block/harmonic_gate_top",
+    "bottom": "neronotes:block/harmonic_gate_bottom",
+    "side": "neronotes:block/harmonic_gate_side_charged"
+  }
+}

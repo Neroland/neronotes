@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "neronotes:block/resonant_block_high_lead_lit",
+    "bottom": "neronotes:block/resonator_bottom",
+    "side": "neronotes:block/voice_pedestal_side"
+  }
+}

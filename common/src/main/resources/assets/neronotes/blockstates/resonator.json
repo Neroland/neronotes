@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "playing=false,pulse=false": { "model": "neronotes:block/resonator" },
+    "playing=false,pulse=true": { "model": "neronotes:block/resonator" },
+    "playing=true,pulse=false": { "model": "neronotes:block/resonator_playing" },
+    "playing=true,pulse=true": { "model": "neronotes:block/resonator_pulse" }
+  }
+}
