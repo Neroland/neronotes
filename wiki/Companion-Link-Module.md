@@ -15,7 +15,7 @@ Everything is scoped to **the account that paired the client**. There is no way 
 players' channels, disks, or bases through this module.
 
 | Section | Contents |
-|---|---|
+| --- | --- |
 | `library` | The shared library's **visible** entries — the same public listing every player sees at the Disk Exchanger: title, composer credit (see below), voice palette and the aggregate download count. Paginated (`page` parameter, zero-based), never the whole library at once. Scores never cross this surface. |
 | `disks` | The pressed custom disks **you** are carrying: title, credit, voice palette and score stats. Inventories only exist while you are online, so this list is empty while you are offline (the snapshot says `player_online: false` so the app can explain why). |
 | `channels` | Only the resonance channels **you own or are trusted on** — name, dimension, your role, live playing state, a listener count, and (for your own channels) the size of the trust list. Never a server-wide roster. |
@@ -32,7 +32,7 @@ encode their owner, and trust lists are reported as a count, not a list of peopl
 ## What your companion client can do
 
 | Action | Effect |
-|---|---|
+| --- | --- |
 | `play` | Start the loaded Resonator(s) bound to one of your channels (owned or trusted), from their current position. |
 | `stop` | Stop them. |
 
@@ -62,7 +62,7 @@ you make in the world, not an API call.
 ## Configuration
 
 | Key | Default | Meaning |
-|---|---|---|
+| --- | --- | --- |
 | `link.module_enabled` | `true` | Server-side master switch. When `false`, NeroNotes registers nothing with the link API: companion clients see no NeroNotes data and can perform no NeroNotes actions. |
 
 ## Privacy
