@@ -28,7 +28,7 @@ Step through the **Harmonic Gate** into a dedicated composition dimension: a qui
 
 ## 4. Ecosystem
 
-- **Requires only [Neroland Core](https://github.com/Neroland/neroland-core)** — config, materials, progression and the shared link API.
+- **Requires only [Neroland Core](https://github.com/Neroland/neroland-core)** — config, materials, energy and the shared link API. No progression gates: everything is playable from day one.
 - Soft synergies: **NeroDecor** (ambience), **NeroEvents** (event stingers), **NeroLink** (browse and share compositions from the companion app). None is required.
 
 ## Links

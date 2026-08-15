@@ -7,7 +7,6 @@ import java.util.Map;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 
-import za.co.neroland.nerolandcore.registry.CoreCreativeTab;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.neronotes.NeroNotesCommon;
 import za.co.neroland.neronotes.block.NeroNotesBlocks;
@@ -18,7 +17,7 @@ import za.co.neroland.neronotes.voice.VoiceFamily;
  * {@link RegistrationProvider}. Stage 3 ships the {@link NotesBlockItem}s for
  * the seven Resonant Blocks and the Resonator; disk items arrive in Stage 5.
  *
- * <p>Creative-tab placement is separate ({@link #addToCreativeTab()}, init
+ * <p>Creative-tab placement is separate ({@link NeroNotesCreativeTab}, init
  * step 6) so the numbered ordering stays honest.</p>
  */
 public final class NeroNotesItems {
@@ -119,23 +118,6 @@ public final class NeroNotesItems {
         NeroNotesCommon.LOGGER.debug("[NeroNotes] items queued for registration");
     }
 
-    /**
-     * Init step 6 — add every item to Core's shared Neroland creative tab
-     * (before tabs are built).
-     */
-    public static void addToCreativeTab() {
-        for (VoiceFamily family : VoiceFamily.values()) {
-            CoreCreativeTab.add(RESONANT_BLOCK_ITEMS.get(family));
-        }
-        CoreCreativeTab.add(RESONATOR);
-        CoreCreativeTab.add(HARMONIC_GATE);
-        CoreCreativeTab.add(TRANSPORT_LECTERN);
-        CoreCreativeTab.add(PATTERN_WALL);
-        CoreCreativeTab.add(VOICE_PEDESTAL);
-        CoreCreativeTab.add(DISK_PRESS);
-        CoreCreativeTab.add(PUBLISH_LECTERN);
-        CoreCreativeTab.add(DISK_EXCHANGER);
-        CoreCreativeTab.add(BLANK_DISK);
-        CoreCreativeTab.add(CUSTOM_DISK);
-    }
+    // Creative placement moved to the dedicated NeroNotes tab (NeroNotesCreativeTab, init
+    // step 6) — items no longer join Core's shared Neroland tab.
 }

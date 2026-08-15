@@ -3,7 +3,9 @@ package za.co.neroland.neronotes.neoforge;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
 import za.co.neroland.neronotes.NeroNotesCommon;
 import za.co.neroland.neronotes.client.ClientExchangerState;
@@ -28,6 +30,13 @@ public final class NeroNotesNeoForgeClient {
         ClientSequencerState.install();
         ClientExchangerState.install();
         modEventBus.addListener(NeroNotesNeoForgeClient::onRegisterScreens);
+        // Leaving a world: drop every client-side cache (playheads, sequencer
+        // session, exchanger page) so nothing from one world leaks into the next.
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> {
+            ClientPlaybackEngine.clearClientState();
+            ClientSequencerState.clear();
+            ClientExchangerState.clear();
+        });
     }
 
     private static void onRegisterScreens(RegisterMenuScreensEvent event) {

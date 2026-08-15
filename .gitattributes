@@ -6,3 +6,8 @@ src/generated/**/*.json text eol=lf
 
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Binary assets — never line-ending-normalise (a normalised PNG is a corrupt PNG)
+*.png binary
+*.ogg binary
+*.jar binary

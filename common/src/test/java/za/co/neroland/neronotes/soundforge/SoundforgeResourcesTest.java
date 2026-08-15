@@ -3,6 +3,7 @@ package za.co.neroland.neronotes.soundforge;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -13,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import za.co.neroland.nerolandcore.worldgen.SpaceTags;
@@ -38,16 +38,14 @@ class SoundforgeResourcesTest {
     }
 
     @Test
-    void progressionGateJsonValidatesAndMatchesTheCodeId() {
-        assertEquals("neronotes:soundforge", SoundforgeDimension.PROGRESSION_GATE.toString());
-
-        JsonObject gate = readJson("/data/neronotes/neroland_gates/soundforge.json");
-        assertEquals("player", gate.get("scope").getAsString());
-        JsonArray requires = gate.getAsJsonArray("requires");
-        assertEquals(1, requires.size());
-        assertEquals("nerolandcore:industrial_power", requires.get(0).getAsString(),
-                "the Soundforge lands just after industrialisation — Core's gate id, exactly");
-        assertFalse(gate.get("title").getAsString().isBlank());
+    void noProgressionGateShips() {
+        // Hard gates were removed (standalone-first, 2026-08-15): entering the
+        // Soundforge needs only a charged Harmonic Gate. If a neroland_gates
+        // datapack file ever reappears, this test fails loudly instead of the
+        // gate quietly sealing the dimension again.
+        assertNull(SoundforgeResourcesTest.class
+                        .getResourceAsStream("/data/neronotes/neroland_gates/soundforge.json"),
+                "NeroNotes must not declare progression gates — the Soundforge is ungated");
     }
 
     @Test

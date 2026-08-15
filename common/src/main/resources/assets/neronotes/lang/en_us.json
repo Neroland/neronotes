@@ -1,6 +1,8 @@
 {
   "neronotes.menu.open_failed": "This screen could not be opened. Please try again.",
 
+  "itemGroup.neronotes": "NeroNotes",
+
   "block.neronotes.resonant_block_deep_bass": "Deep Bass Resonant Block",
   "block.neronotes.resonant_block_sub_pad": "Sub Pad Resonant Block",
   "block.neronotes.resonant_block_low_drone": "Low Drone Resonant Block",
@@ -25,7 +27,7 @@
   "neronotes.tooltip.resonator.disk": "Plays a composition to its resonance channel, in sync for every listener.",
   "neronotes.tooltip.resonator.bind": "Binds to its placer's channel; only the owner, trusted players or an operator control it.",
   "neronotes.tooltip.harmonic_gate.energy": "Charges from any Neroland or Forge Energy power source.",
-  "neronotes.tooltip.harmonic_gate.travel": "Once charged — and industrial power is yours — it carries you into the Soundforge.",
+  "neronotes.tooltip.harmonic_gate.travel": "Once charged, it carries you into the Soundforge.",
   "neronotes.tooltip.transport_lectern.sequencer": "Opens the sequencer to compose your session score.",
   "neronotes.tooltip.transport_lectern.place": "Only works inside the Soundforge — composition happens there.",
   "neronotes.tooltip.pattern_wall.select": "Tap to select the shown layer as your active layer.",
@@ -48,11 +50,12 @@
   "neronotes.resonator.no_disk": "This Resonator holds no composition yet.",
   "neronotes.resonator.denied": "Only the channel owner, trusted players or an operator may control this Resonator.",
   "neronotes.resonator.channel_busy": "Too many channels are already playing nearby.",
+  "neronotes.resonator.disk_loaded": "The Resonator adopts \"%s\". The disk stays with you.",
+  "neronotes.resonator.disk_cleared": "The Resonator falls silent — its composition is cleared.",
 
   "neronotes.gate.entered": "The Harmonic Gate carries you into the Soundforge.",
   "neronotes.gate.returned": "The Soundforge releases you — you are back where you started.",
   "neronotes.gate.returned_fallback": "No return anchor was found, so the gate set you down at the world spawn.",
-  "neronotes.gate.sealed": "The Harmonic Gate is sealed — industrial power must flow before the Soundforge opens.",
   "neronotes.gate.not_charged": "The Harmonic Gate hums faintly; it needs more energy for a crossing.",
   "neronotes.gate.unavailable": "The Soundforge is not available in this world.",
   "neronotes.command.soundforge_return.not_inside": "You are not in the Soundforge.",

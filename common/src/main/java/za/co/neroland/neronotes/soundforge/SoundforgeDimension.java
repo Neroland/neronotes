@@ -22,8 +22,9 @@ import za.co.neroland.neronotes.voice.VoiceFamily;
  * ({@code data/neronotes/dimension/soundforge.json} plus
  * {@code dimension_type/soundforge.json}; Core ships no dimension helper and
  * none is needed). This class holds the {@link ResourceKey}s code addresses
- * it by, the progression-gate id that seals it, and the code-built arrival
- * platform (built on first entry — no worldgen, no structure files).
+ * it by and the code-built arrival platform (built on first entry — no
+ * worldgen, no structure files). Entry has no progression requirement
+ * (standalone-first): a charged Harmonic Gate is the only key.
  *
  * <p>The platform is deliberately simple: a matte floor in the void, four
  * inset lights, and a Harmonic Gate at its centre — the way back. Composing
@@ -40,15 +41,6 @@ public final class SoundforgeDimension {
     /** The dimension key — {@code neronotes:soundforge}, declared by datapack JSON. */
     public static final ResourceKey<Level> LEVEL =
             ResourceKey.create(Registries.DIMENSION, id("soundforge"));
-
-    /**
-     * The progression gate sealing entry — {@code neronotes:soundforge},
-     * declared in {@code data/neronotes/neroland_gates/soundforge.json} and
-     * requiring Core's {@code nerolandcore:industrial_power}. Checked
-     * server-side via Core's {@code progression.ProgressionGates} before any
-     * teleport. Everything else in NeroNotes stays ungated.
-     */
-    public static final Identifier PROGRESSION_GATE = id("soundforge");
 
     /** The return Harmonic Gate at the platform centre. */
     public static final BlockPos GATE_POS = new BlockPos(0, 100, 0);

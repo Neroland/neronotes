@@ -125,6 +125,17 @@ public class ResonatorBlockEntity extends BlockEntity {
         setChanged();
     }
 
+    /**
+     * May {@code requester} load or clear this Resonator's disk? The same
+     * server-side rule as transport control: channel owner, trust list or
+     * operator — never proximity, never the client's say-so.
+     */
+    public boolean mayLoad(ServerPlayer requester) {
+        ChannelKey key = channelKey();
+        return key != null && level instanceof ServerLevel serverLevel
+                && ResonanceService.canControl(serverLevel, requester, key);
+    }
+
     /** The server-recorded owner (placer), or {@code null} if placed by no player. */
     public UUID owner() {
         return owner;
@@ -318,6 +329,13 @@ public class ResonatorBlockEntity extends BlockEntity {
         double rate = PlaybackClock.scoreTicksPerGameTick(score.tempoBpm(), score.ticksPerBeat());
         positionTicks += rate;
         long target = currentTick();
+        if (score.hasLoop()) {
+            // The loop end is EXCLUSIVE: tick loopEndTick IS tick
+            // loopStartTick of the next pass, so the outgoing pass must never
+            // emit it — a note sitting exactly on the boundary would double-
+            // fire at the wrap and stutter the downbeat.
+            target = Math.min(target, score.loopEndTick() - 1);
+        }
         if (target - lastEmittedTick > MAX_CATCH_UP_TICKS) {
             lastEmittedTick = target - 1; // lag spike: skip, never burst-emit
         }
@@ -411,18 +429,51 @@ public class ResonatorBlockEntity extends BlockEntity {
         }
     }
 
-    /** Breaking the block stops playback so the channel's play slot frees up. */
+    /**
+     * Breaking the block stops playback so the channel's play slot frees up.
+     * 26.x calls this from {@code LevelChunk.setBlockState} on REAL removal
+     * only — never on chunk unload — so a STOP transport here is safe. No
+     * blockstate write: the block is going away.
+     */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        stopTransportOnly();
+    }
+
+    /**
+     * Fired on BOTH block destruction AND chunk unload
+     * ({@code LevelChunk.clearAllBlockEntities}), including every unload
+     * during {@code MinecraftServer.stopServer}'s has-work drain loop —
+     * so it must stay <strong>world-inert</strong>: index bookkeeping only.
+     * A {@code getBlockState}/{@code setBlock} from here synchronously
+     * re-loads the very chunk being unloaded, and with the persisted
+     * {@code playing} flag re-arming each reloaded copy the drain loop never
+     * empties — the "save and quit hangs on Saving worlds" shutdown freeze.
+     * Destruction side effects belong in {@link #preRemoveSideEffects};
+     * unload keeps its persisted playing state (a reload is a seek, not a
+     * restart) and runtime playback state dies with the server-stopped hook.
+     */
     @Override
     public void setRemoved() {
         if (level instanceof ServerLevel serverLevel) {
             ResonatorIndex.unregister(
                     serverLevel.dimension().identifier().toString(), worldPosition);
         }
-        stopQuietly();
         super.setRemoved();
     }
 
+    /** Stop + STOP transport + ring visual — for in-place stops ({@link #setScore}, {@link #bindChannel}). */
     private void stopQuietly() {
+        if (!playing) {
+            return;
+        }
+        stopTransportOnly();
+        updateRingState();
+    }
+
+    /** Stop + STOP transport, with no blockstate write — safe while the block is being removed. */
+    private void stopTransportOnly() {
         if (!playing) {
             return;
         }
@@ -432,7 +483,6 @@ public class ResonatorBlockEntity extends BlockEntity {
             ResonanceService.transportAs(serverLevel, owner, key, TransportAction.STOP,
                     currentTick(), 0, 0, origin());
         }
-        updateRingState();
     }
 
     private Vec3 origin() {

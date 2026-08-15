@@ -72,9 +72,14 @@ public final class SequencerSessions {
         return Math.max(0, Math.min(stored, layerCount - 1));
     }
 
-    /** A fresh default session score. */
+    /**
+     * A fresh default session score. 150 BPM at 4 ticks per beat is
+     * tick-perfect (one score tick = 100 ms = exactly 2 game ticks — see the
+     * timing note on {@link Score}), so a new composer's notes land exactly
+     * where placed; any tempo remains selectable afterwards.
+     */
     public static Score defaultScore() {
-        return new Score(Score.CURRENT_FORMAT_VERSION, 120, 4, 0, 0,
+        return new Score(Score.CURRENT_FORMAT_VERSION, 150, 4, 0, 0,
                 List.of(new Score.Layer(firstVoiceId(), List.of())));
     }
 

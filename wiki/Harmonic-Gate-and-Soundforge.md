@@ -37,22 +37,24 @@ Two server config keys in `config/neronotes.properties` shape it:
 
 - `gate.energy_capacity` — the gate's internal buffer (default 16,000 NE).
 - `gate.teleport_energy_cost` — energy per crossing *into* the Soundforge (default 8,000 NE).
-  **Returning is always free.**
+  **Returning is always free.** An operator can set the cost to `0` to make crossings free.
 
-## Progression: when does the Soundforge open?
+## No progression requirement
 
-Entry is sealed behind the `neronotes:soundforge` progression gate, which requires Neroland Core's
-**Industrial Power** gate — composition lands just after industrialisation. The check is
-server-side, per player. Until it opens, using a charged gate tells you it is sealed; nothing else
-in NeroNotes is gated.
+Nothing in NeroNotes is progression-gated. Entering the Soundforge needs exactly one thing: a
+**charged** Harmonic Gate — craft it, power it, walk through, from your first day on Earth.
+(Earlier development builds sealed entry behind a Neroland Core progression gate; that was
+removed for standalone-first play.)
 
 ## Crossing over
 
-Right-click a **charged** Harmonic Gate (with the progression gate open) and you arrive on the
+Right-click a **charged** Harmonic Gate and you arrive on the
 Soundforge platform: a polished blackstone deck under a fixed starfield, with four inset lights and
-a Harmonic Gate at its centre. The platform is built by the mod on your first entry — there is no
-worldgen in the void. The composing furniture (transport lectern, pattern walls, voice pedestals)
-arrives in a later release stage.
+a Harmonic Gate at its centre. Around it stands the composing furniture: the **transport lectern**
+(opens the [sequencer](Sequencer-and-Disk-Press.md)), the **Disk Press**, the
+**[Publish Lectern](Publishing-and-the-Disk-Exchanger.md)**, four **pattern walls** along the north
+rim and seven **voice pedestals** along the south rim. The platform is built by the mod on your
+first entry — there is no worldgen in the void — and re-entering heals a vandalised platform.
 
 Your exact position, facing and dimension are saved **before** you leave, server-side.
 
@@ -72,6 +74,6 @@ Three guarantees, so you are never stranded:
 ## Your data
 
 The Soundforge keeps one small server-side record per player who has entered: the return position
-and, in a later stage, your in-progress composing session. It stays inside your world save, is
-never transmitted anywhere, and is erased by NeroNotes' per-player data purge (see
-[PRIVACY.md](https://github.com/Neroland/neronotes/blob/main/PRIVACY.md)).
+and your in-progress composing session (the sequencer's working score). It stays inside your world
+save, is never transmitted anywhere, and is erased by NeroNotes' per-player data purge (see
+[Privacy and your data](Privacy-and-Your-Data.md)).

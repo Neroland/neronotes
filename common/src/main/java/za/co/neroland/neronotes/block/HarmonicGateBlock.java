@@ -32,10 +32,10 @@ import za.co.neroland.neronotes.soundforge.SoundforgeTravel.TravelResult;
  *   <li><strong>Power it</strong> — feed Neroland energy (or standard Forge
  *       Energy on NeoForge/Forge) into any face; the arch lights when a
  *       crossing is affordable.</li>
- *   <li><strong>Use</strong> (right-click) — when the
- *       {@code neronotes:soundforge} progression gate is open for you and the
- *       gate is charged, you cross into the Soundforge. Server-side checks
- *       only; the crossing consumes the charge.</li>
+ *   <li><strong>Use</strong> (right-click) — when the gate is charged, you
+ *       cross into the Soundforge. Server-side checks only; the crossing
+ *       consumes the charge. There is no progression requirement
+ *       (standalone-first).</li>
  *   <li><strong>Inside the Soundforge</strong> — using any Harmonic Gate
  *       returns you to where you entered from, free of charge and checks.</li>
  * </ul>
@@ -77,7 +77,6 @@ public class HarmonicGateBlock extends Block implements EntityBlock {
             case RETURNED -> serverPlayer.sendSystemMessage(Component.translatable("neronotes.gate.returned"));
             case RETURNED_FALLBACK ->
                     serverPlayer.sendSystemMessage(Component.translatable("neronotes.gate.returned_fallback"));
-            case GATE_SEALED -> serverPlayer.sendSystemMessage(Component.translatable("neronotes.gate.sealed"));
             case NOT_CHARGED -> serverPlayer.sendSystemMessage(Component.translatable("neronotes.gate.not_charged"));
             case UNAVAILABLE -> serverPlayer.sendSystemMessage(Component.translatable("neronotes.gate.unavailable"));
             case NOT_INSIDE -> {

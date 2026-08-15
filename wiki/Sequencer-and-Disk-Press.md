@@ -19,11 +19,17 @@ logouts and server restarts.
   octave.
 - **Layers** — up to **4 layers**, each with its own voice. `L1`–`L4` select the active layer,
   `+L`/`-L` add and remove layers, and the voice button cycles the active layer's voice.
-- **Tempo** — `-`/`+` adjust the BPM.
+- **Tempo** — `-`/`+` adjust the BPM. Any tempo plays, but Minecraft schedules audio on its 50 ms
+  game-tick grid: a score tick lasts `60000 / (BPM × 4)` ms (the sequencer uses 4 score ticks per
+  beat), and only tempos where that duration is a whole multiple of 50 ms land every note *exactly*
+  on the grid — **75, 100, 150 and 300 BPM** are the practical tick-perfect choices (200, 150, 100
+  and 50 ms per tick respectively). New sessions default to 150 BPM. Other tempos (like
+  120 BPM, 125 ms per tick) still play, but each note rounds to the nearest game tick — up to
+  ±50 ms, which can be audible as a subtle limp on fast material.
 - **Loop** — `[` sets the loop start at the current page, `]` sets the loop end after it, `×` clears
   the loop. A looping score repeats on a Resonator; a preview always plays once through.
-- **Preview** — plays your session once, in place, through your own resonance channel — synchronised
-  like any other playback, and subject to the same nearby-channel cap.
+- **Preview** — plays your session once, in place, through your own dedicated `preview` channel —
+  synchronised like any other playback, and subject to the same nearby-channel cap.
 - **Size gauge** — shows the serialised size of your session against the server's disk budget, so an
   over-budget press is never a surprise.
 
@@ -67,11 +73,16 @@ A disk holds at most `disk.score_budget_bytes` of serialised score (16 KiB by de
 can raise it to a hard ceiling of 64 KiB). An over-budget score is **refused with a message naming
 both the actual size and the limit** — the press never trims or truncates a composition.
 
-## What's next for a pressed disk
+## What a pressed disk can do
 
-Resonators play a stored score today; publishing to the shared library and the Disk Exchanger are
-planned and not part of this release. There is still no real-audio import, no `.ogg` shipping, no
-MIDI import and no in-world note placement.
+- **Play it at home** — right-click a [Resonator](Resonant-Blocks-and-Resonators.md) with the disk
+  in hand to load its composition (the disk is read, not consumed), then right-click to play.
+- **Publish it** — take it to the [Publish Lectern](Publishing-and-the-Disk-Exchanger.md) to share
+  it in the server-wide library, where other players can copy it through the Disk Exchanger.
+
+Still deliberately out of this release: real-audio import, `.ogg` files (all voices alias vanilla
+sounds), MIDI import, and in-world note placement — the sequencer GUI at the lectern is the
+composing surface, with the walls and pedestals as in-world selection aids.
 
 ## Configuration
 

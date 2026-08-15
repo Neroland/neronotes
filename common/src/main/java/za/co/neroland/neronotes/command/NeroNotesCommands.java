@@ -51,6 +51,11 @@ import za.co.neroland.neronotes.telemetry.NeroNotesTelemetry;
  *       {@code PlayerDataErasure} hook (irreversible; the bare command only
  *       warns). Operators can equally use Core's {@code /neroland data}
  *       commands.</li>
+ *   <li>{@code /neronotes gallery} / {@code gallery clear} — the operator
+ *       showcase (the ecosystem gallery pattern): every NeroNotes block on a
+ *       labelled plaza plus a Resonator playing a looping in-code demo score
+ *       on the sender's own {@code "gallery"} channel. See
+ *       {@link NotesGallery}.</li>
  * </ul>
  *
  * <p>Cross-loader registration: each loader calls {@link #register} from its
@@ -90,6 +95,11 @@ public final class NeroNotesCommands {
                                         .then(Commands.argument("id", IntegerArgumentType.integer(1))
                                                 .executes(ctx -> approve(ctx.getSource(),
                                                         IntegerArgumentType.getInteger(ctx, "id"))))))
+                        .then(Commands.literal("gallery")
+                                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                                .executes(ctx -> NotesGallery.build(ctx.getSource()))
+                                .then(Commands.literal("clear")
+                                        .executes(ctx -> NotesGallery.clear(ctx.getSource()))))
                         .then(Commands.literal("data")
                                 .then(Commands.literal("export")
                                         .executes(ctx -> exportSelf(ctx.getSource()))

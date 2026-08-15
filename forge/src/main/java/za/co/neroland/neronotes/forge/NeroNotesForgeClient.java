@@ -1,6 +1,7 @@
 package za.co.neroland.neronotes.forge;
 
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -38,6 +39,13 @@ public final class NeroNotesForgeClient {
             MenuScreens.register(NeroNotesMenus.SEQUENCER.get(), SequencerScreen::new);
             MenuScreens.register(NeroNotesMenus.DISK_PRESS.get(), DiskPressScreen::new);
             MenuScreens.register(NeroNotesMenus.DISK_EXCHANGER.get(), DiskExchangerScreen::new);
+        });
+        // Leaving a world: drop every client-side cache (playheads, sequencer
+        // session, exchanger page) so nothing from one world leaks into the next.
+        ClientPlayerNetworkEvent.LoggingOut.BUS.addListener(event -> {
+            ClientPlaybackEngine.clearClientState();
+            ClientSequencerState.clear();
+            ClientExchangerState.clear();
         });
     }
 }

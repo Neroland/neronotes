@@ -14,23 +14,22 @@ import net.minecraft.world.level.storage.LevelData;
 
 import org.jetbrains.annotations.Nullable;
 
-import za.co.neroland.nerolandcore.progression.ProgressionGates;
 import za.co.neroland.neronotes.NeroNotesCommon;
 import za.co.neroland.neronotes.block.entity.HarmonicGateBlockEntity;
 
 /**
  * The teleport, session-binding and return-position logic for the Soundforge.
- * Server-authoritative throughout: the progression gate, the energy charge
- * and the return anchor are all checked and recorded here, never asserted by
- * a client.
+ * Server-authoritative throughout: the energy charge and the return anchor
+ * are checked and recorded here, never asserted by a client.
  *
- * <p><strong>Entering</strong> (via a charged Harmonic Gate) requires the
- * {@code neronotes:soundforge} progression gate to be open for the player and
- * consumes the gate's teleport charge. The player's exact position, look and
- * dimension are stored in {@link SoundforgeSessionStore} <em>before</em> the
- * teleport, so a crash mid-trip or a logout inside still leaves a way home.</p>
+ * <p><strong>Entering</strong> (via a charged Harmonic Gate) requires only
+ * the gate's banked teleport charge, which the crossing consumes — no
+ * progression requirement (standalone-first, like the rest of the ecosystem).
+ * The player's exact position, look and dimension are stored in
+ * {@link SoundforgeSessionStore} <em>before</em> the teleport, so a crash
+ * mid-trip or a logout inside still leaves a way home.</p>
  *
- * <p><strong>Returning</strong> is always free — no charge, no gate check:
+ * <p><strong>Returning</strong> is always free — no charge, no checks:
  * use the Harmonic Gate on the arrival platform, or
  * {@code /neronotes soundforge return} (the safety hatch if the platform
  * gate was broken). A missing return anchor falls back to the overworld
@@ -46,8 +45,6 @@ public final class SoundforgeTravel {
         RETURNED,
         /** Teleported back, but the anchor was missing/unresolvable — world spawn fallback. */
         RETURNED_FALLBACK,
-        /** The progression gate is not open for this player. */
-        GATE_SEALED,
         /** The Harmonic Gate lacks the energy for a crossing. */
         NOT_CHARGED,
         /** Used the return path while not inside the Soundforge. */
@@ -61,7 +58,7 @@ public final class SoundforgeTravel {
 
     /**
      * A player used a Harmonic Gate. Inside the Soundforge this is the free
-     * trip home; anywhere else it is a gated, charged crossing in.
+     * trip home; anywhere else it is a charged crossing in.
      */
     public static TravelResult useGate(ServerPlayer player, @Nullable HarmonicGateBlockEntity gate) {
         MinecraftServer server = player.level().getServer();
@@ -77,9 +74,6 @@ public final class SoundforgeTravel {
             // never throw. (Same discipline as Core's SpaceTags: an absent
             // place means "no such place here", not an error.)
             return TravelResult.UNAVAILABLE;
-        }
-        if (!ProgressionGates.isOpen(player, SoundforgeDimension.PROGRESSION_GATE)) {
-            return TravelResult.GATE_SEALED;
         }
         if (gate == null || !gate.hasTeleportCharge()) {
             return TravelResult.NOT_CHARGED;

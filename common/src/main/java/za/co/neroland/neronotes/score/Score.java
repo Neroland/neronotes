@@ -21,6 +21,23 @@ import java.util.List;
  * structurally sound. Serialisation and the size budget live in
  * {@link ScoreCodec}.</p>
  *
+ * <p><strong>Timing grid.</strong> One score tick lasts
+ * {@code 60000 / (tempoBpm * ticksPerBeat)} milliseconds, but Minecraft can
+ * only emit and schedule audio on whole game ticks (50&nbsp;ms, 20&nbsp;TPS)
+ * — on both sides: the server Resonator emits notes on game ticks and the
+ * client schedules them via the sound engine's game-tick delay queue. Any
+ * tempo/resolution combination is <em>valid</em>, but only combinations
+ * whose tick duration is a whole multiple of 50&nbsp;ms play back exactly as
+ * written; anything else quantises each note to the nearest game tick (up to
+ * &plusmn;50&nbsp;ms — an audible limp on fast material). Tick-perfect
+ * combos are exactly those where {@code tempoBpm * ticksPerBeat} divides
+ * 1200: e.g. 150&nbsp;BPM &times; 4 or 120 &times; 5 (product 600 &rarr;
+ * 100&nbsp;ms = 2 game ticks), 100 &times; 4 (400 &rarr; 150&nbsp;ms = 3),
+ * 120 &times; 2 (240 &rarr; 250&nbsp;ms = 5), 300 &times; 4 (1200 &rarr;
+ * 50&nbsp;ms = 1). 120 &times; 4 (480 &rarr; 125&nbsp;ms = 2.5 game ticks)
+ * is the classic near-miss. Documented, not enforced — the sequencer accepts
+ * any tempo in range.</p>
+ *
  * @param formatVersion score format version; {@link #CURRENT_FORMAT_VERSION}
  *                      for scores authored by this release
  * @param tempoBpm      tempo in beats per minute ({@value #MIN_TEMPO_BPM}–{@value #MAX_TEMPO_BPM})

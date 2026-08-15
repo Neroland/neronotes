@@ -308,6 +308,18 @@ public final class ResonanceService {
      * {@code stop}); together with the server game tick they form the
      * timeline anchor clients schedule against.
      */
+    /**
+     * Pure authorisation check: may {@code requester} control (emit on,
+     * transport) this channel? Owner, trust list or operator — the same rule
+     * {@link #transport} applies, with no side effect. Used by the Resonator
+     * to gate loading and clearing its disk.
+     */
+    public static boolean canControl(ServerLevel level, ServerPlayer requester, ChannelKey key) {
+        return ChannelStore.get(level.getServer()).channel(key)
+                .map(channel -> ChannelAccess.canControl(requester, channel))
+                .orElse(false);
+    }
+
     public static SignalResult transport(ServerLevel level, ServerPlayer requester, ChannelKey key,
                                          TransportAction action, long positionTick,
                                          int tempoBpm, int ticksPerBeat, Vec3 origin) {

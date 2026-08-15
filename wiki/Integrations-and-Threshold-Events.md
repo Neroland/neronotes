@@ -36,7 +36,9 @@ NeroNotes side. Useful ids for quest packs:
 - Items: `neronotes:blank_disk` (the natural reward — press- and Exchanger-ready),
   `neronotes:custom_disk` (only meaningful with disk contents; prefer granting blank disks).
 - Threshold channels: the two in the table above.
-- Progression gate: `neronotes:soundforge` (requires Core's `nerolandcore:industrial_power`).
+
+NeroNotes declares no progression gates — the Soundforge needs only a charged Harmonic Gate, so
+there is no gate id for a quest pack to reference.
 
 Because threshold events are server-wide by design, *per-player* objectives ("press your own first
 disk") belong to quest-pack mechanics such as inventory or advancement objectives, not to the
@@ -60,4 +62,5 @@ with NeroEvents installed.
 
 Nothing to configure: resonance channels, Resonators and synchronised playback are per-dimension
 and work anywhere — the overworld, the Soundforge, or any dimension another mod adds. NeroNotes
-never assumes the overworld for playback.
+never assumes the overworld for playback. The flip side is a deliberate scope cut: **there are no
+cross-dimension relays** in 0.1.0 — a channel lives, plays and is heard within one dimension.

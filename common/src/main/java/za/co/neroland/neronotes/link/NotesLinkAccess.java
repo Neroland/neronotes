@@ -60,7 +60,14 @@ final class NotesLinkAccess {
         server = runningServer;
     }
 
-    /** The running server, or {@code null} before the first world load. */
+    /** Drops the handle if it is still {@code stoppedServer} (server-stopped hook; identity-guarded). */
+    static void forgetServer(MinecraftServer stoppedServer) {
+        if (server == stoppedServer) {
+            server = null;
+        }
+    }
+
+    /** The running server, or {@code null} before the first world load / after a server stop. */
     @Nullable
     static MinecraftServer server() {
         return server;

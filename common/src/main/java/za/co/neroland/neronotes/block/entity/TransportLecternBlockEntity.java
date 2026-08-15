@@ -159,10 +159,28 @@ public class TransportLecternBlockEntity extends BlockEntity {
         }
     }
 
-    /** Breaking the lectern ends the preview so the channel's play slot frees up. */
+    /**
+     * Breaking the lectern ends the preview so the channel's play slot frees
+     * up. 26.x calls this on REAL removal only — never on chunk unload.
+     */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        stopPreview();
+    }
+
+    /**
+     * Fired on destruction AND on chunk unload (including every unload in the
+     * shutdown drain loop), so it must stay world-inert — no transports, no
+     * blockstate writes; see the Resonator's {@code setRemoved} javadoc for
+     * the shutdown-freeze lesson. Preview state is runtime-only, so simply
+     * dropping it is enough; the play-slot guard clears with the
+     * server-stopped hook, and {@code serverTick} already ends a preview the
+     * moment its composer leaves.
+     */
     @Override
     public void setRemoved() {
-        stopPreview();
+        clearPreview();
         super.setRemoved();
     }
 

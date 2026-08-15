@@ -126,6 +126,17 @@ public final class NotesLinkModule {
         NotesLinkAccess.rememberServer(runningServer);
     }
 
+    /**
+     * Drops the captured handle when that server stops (each loader's
+     * server-stopped hook, via {@code NeroNotesCommon.onServerStopped}) so a
+     * bridge request arriving between worlds answers "no server" instead of
+     * touching a stopped one. Guarded by identity: a handle already replaced
+     * by a newer world's tick hook is left alone.
+     */
+    public static void forgetServer(MinecraftServer stoppedServer) {
+        NotesLinkAccess.forgetServer(stoppedServer);
+    }
+
     /** This mod's public version string for discovery, or {@code "unknown"} if the seam is unhappy. */
     private static String modVersion() {
         try {

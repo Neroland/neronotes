@@ -21,6 +21,10 @@ players' channels, disks, or bases through this module.
 | `channels` | Only the resonance channels **you own or are trusted on** — name, dimension, your role, live playing state, a listener count, and (for your own channels) the size of the trust list. Never a server-wide roster. |
 | `now_playing` | The currently playing subset of exactly those same channels. |
 
+(In this release the "trusted" role is honoured but not yet grantable in normal play — 0.1.0 ships
+no trust-editing surface, so in practice you will see your own channels. See
+[Resonance channels](Resonance-Channels.md#the-trust-list).)
+
 ### Composer credit and anonymity
 
 Anonymous compositions carry **no author field at all** in any link response — not an empty one.

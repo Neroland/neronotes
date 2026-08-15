@@ -23,7 +23,7 @@ back to a smaller built-in rule subset and says so in its `engine` field.
 ## Tools
 
 | Tool | What it does |
-|------|--------------|
+| ------ | -------------- |
 | `gradle_build` | Start a build async (default task `build`). Returns a `build_id` immediately. |
 | `gradle_run_data` | Convenience for the `runData` datagen task. |
 | `gradle_status` | Poll a build: `status`, `outcome` (SUCCESSFUL/FAILED once known), exit code, elapsed time, log tail. |

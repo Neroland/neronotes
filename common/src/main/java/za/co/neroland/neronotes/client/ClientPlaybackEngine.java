@@ -80,15 +80,31 @@ public final class ClientPlaybackEngine {
 
     private final Map<ChannelId, ChannelState> channels = new HashMap<>();
 
+    /** The installed engine, so the disconnect hook can reach its state. Client main thread only. */
+    private static ClientPlaybackEngine installed;
+
     private ClientPlaybackEngine() {
     }
 
     /** Install the engine as the resonance payload sinks — client init, all loaders. */
     public static void install() {
         ClientPlaybackEngine engine = new ClientPlaybackEngine();
+        installed = engine;
         ResonanceClientHandlers.setNoteSink(engine::handleNote);
         ResonanceClientHandlers.setTransportSink(engine::handleTransport);
         NeroNotesCommon.LOGGER.info("[NeroNotes] client playback engine installed");
+    }
+
+    /**
+     * Forget every tracked playhead — each loader's client disconnect hook.
+     * Without this, anchors from the previous world would survive into the
+     * next one and every first note would mis-schedule against a stale
+     * game-time base until the drift seek caught it.
+     */
+    public static void clearClientState() {
+        if (installed != null) {
+            installed.channels.clear();
+        }
     }
 
     // ------------------------------------------------------------------
@@ -181,7 +197,12 @@ public final class ClientPlaybackEngine {
         if (aheadScoreTicks <= 0.0) {
             return 0;
         }
-        return (int) Math.min(MAX_SCHEDULE_AHEAD_TICKS, Math.ceil(aheadScoreTicks / rate));
+        // The sound engine only schedules on whole game ticks (50 ms), so the
+        // delay must round. The epsilon guards the ceil against float noise:
+        // at a tick-perfect tempo (see the timing note on Score) the quotient
+        // is an exact integer, and without it ceil(n + 1e-13) would schedule a
+        // whole extra game tick — a random 50 ms limp on individual notes.
+        return (int) Math.min(MAX_SCHEDULE_AHEAD_TICKS, Math.ceil(aheadScoreTicks / rate - 1.0e-6));
     }
 
     /**

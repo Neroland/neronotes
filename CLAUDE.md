@@ -7,7 +7,82 @@
 - **NeroNotes** — the music layer of the Neroland sci-fi Minecraft mod ecosystem, built on
   **Neroland Core** (required dependency, `nerolandcore_version` in `gradle.properties`; the
   manifest version ranges are DERIVED from it — never hardcode `[1.0,2.0)`).
-- **Status:** Stage 9 complete (on Stages 0–2: Core wiring, `platform/` seams,
+- **Status:** **Stage 10 complete — 0.1.0-beta.1 is release-ready; only the owner-run Stage 11
+  runtime verification remains.** `mod_version=0.1.0-beta.1` (bumped, rebuilt green, **untagged**
+  — the owner reviews, commits, decides the Sentry DSN and tags `v0.1.0-beta.1`). Docs now
+  describe the shipped source: `CHANGELOG.md` (Keep-a-Changelog, with the explicit
+  "Not in this release" scope-cut list), rewritten `README.md`, `USING-CORE.md` (every Core API
+  actually consumed + the derived-range dependency wiring), `PLAN-0.1.0.md` (the Stage 11 script:
+  13 checks, exact expected log lines), and a wiki completeness pass — new `wiki/Commands.md` +
+  `wiki/Configuration.md`, stale "arrives later" claims fixed, `preview`-channel wording fixed,
+  the trust-surface and `note_on`-one-shots limitations documented, index updated. Stage 10 also
+  closed the loop's one missing wire found in the docs audit: `ResonatorBlock` gained `useItemOn`
+  (right-click with a pressed disk loads its score through the previously call-site-less
+  `ResonatorBlockEntity.setScore`; the disk is read, not consumed) and sneak-use-empty-hand
+  clear, both gated server-side by the new `ResonatorBlockEntity.mayLoad` →
+  `ResonanceService.canControl` (owner / trust / operator) + two new lang keys
+  (`neronotes.resonator.disk_loaded` / `.disk_cleared`); six cells + tests green after.
+  Post-Stage-10 addition: the op-gated **`/neronotes gallery` [+ `clear`]** showcase
+  (`command/NotesGallery` + the plain-JVM `command/GalleryDemoScore`, mirroring
+  `/nerospace gallery`): every block on a labelled plaza (armour-stand labels, fixed strings)
+  with a Resonator playing a looping four-layer in-code demo score on the SENDER's own
+  `gallery` channel via the normal owner-authorised transport path (no bypass, no new
+  SavedData); rebuild-in-place idempotent, clear removes the footprint; the Nerospace client
+  capture harness (`/nsgallery`) was deliberately NOT mirrored. Wiki/CHANGELOG/PLAN updated;
+  tests cover the demo score (round-trip, budget, loop, registered voices in-band).
+  2026-08-15 first-run remediation (after the owner's in-game gallery pass): (1) the reported
+  off-beat demo — root cause score-tick→game-tick quantisation (120 BPM × 4 tpb = 125 ms =
+  2.5 game ticks; both the server Resonator emit and the client `playDelayed` schedule are
+  whole-game-tick, so alternate notes landed 100/150 ms apart) — fixed by rewriting
+  `GalleryDemoScore` tick-perfect (150 × 4 → 100 ms = exactly 2 game ticks) with a stronger
+  groove, making the server treat loopEnd as EXCLUSIVE when emitting, epsilon-guarding the
+  client's delay ceil against float noise, defaulting new sequencer sessions to 150 BPM, and
+  documenting the 50 ms grid rule (Score javadoc + wiki Sequencer page; sequencer NOT
+  restricted). (2) The reported pink block — three byte-corrupt committed PNGs
+  (`transport_lectern_side`/`_top`, latent `pattern_wall_0_lit`), regenerated via
+  `tools/gen_textures.py` (byte-identity sha-verified); new plain-JVM `AssetCompletenessTest`
+  walks blockstate→model→texture + item definitions + sounds.json and CRC/inflate-validates
+  every shipped PNG; `*.png binary` added to `.gitattributes`. (3) All items MOVED off Core's
+  shared Neroland tab into a dedicated NeroNotes creative tab (`item/NeroNotesCreativeTab`,
+  `itemGroup.neronotes`, Resonator icon, vanilla `CreativeModeTab.builder(Row, column)` over
+  Core's `RegistrationProvider` — the no-arg builder is NeoForge-only; init step 6).
+  2026-08-15 (same day, second pass): **all hard progression gates removed** (standalone-first,
+  following Nerotech) — the `neronotes:soundforge` gate JSON (`neroland_gates/` deleted), the
+  `ProgressionGates` check in `SoundforgeTravel`, `SoundforgeDimension.PROGRESSION_GATE`, the
+  `GATE_SEALED` result + `neronotes.gate.sealed` lang key and `QuestContent.GATE_SOUNDFORGE` are
+  all gone; a **charged Harmonic Gate is the only entry requirement** (energy keys unchanged —
+  `gate.teleport_energy_cost` 0 makes entry free); `SoundforgeResourcesTest` now asserts the gate
+  file is ABSENT; wiki/README/USING-CORE/PLAN/CHANGELOG updated to match.
+  2026-08-15 (third pass): **the reported "game won't save and shut down" freeze fixed** — the
+  owner's save-and-quit hung forever at `Saving worlds` (log ends there, no error, no crash
+  report) whenever a Resonator was PLAYING at shutdown. Root cause: on 26.x
+  `BlockEntity.setRemoved` fires on **chunk unload** too (`LevelChunk.clearAllBlockEntities`),
+  including every unload inside `MinecraftServer.stopServer`'s `chunkMap.hasWork()` drain loop,
+  and `ResonatorBlockEntity.setRemoved → stopQuietly → updateRingState` did a
+  `getBlockState`/`setBlock` there — which synchronously RE-LOADS the very chunk being unloaded;
+  the reloaded copy's persisted `playing` flag re-armed the next unload and the loop never
+  emptied. **Gotcha for every future BE: `setRemoved` must be world-inert (index bookkeeping
+  only); destruction-only side effects belong in `preRemoveSideEffects(BlockPos, BlockState)`**,
+  which vanilla calls from `LevelChunk.setBlockState` on real removal only (exists on 26.1.2 AND
+  26.2) — applied to `ResonatorBlockEntity` (STOP transport moved there; new world-write-free
+  `stopTransportOnly`) and `TransportLecternBlockEntity` (stopPreview moved there; unload just
+  drops runtime preview fields), pinned by the plain-JVM `block/RemovalSideEffectsTest`. Same
+  pass wired the missing lifecycle edges on all three loaders: server-stopped (NeoForge/Forge
+  `ServerStoppedEvent`, Fabric `ServerLifecycleEvents.SERVER_STOPPED`) →
+  `NeroNotesCommon.onServerStopped` clearing `ResonanceService.clearRuntime()` (existed, was
+  never wired), `ResonantBlockIndex`/`ResonatorIndex`, the link module's server handle
+  (`NotesLinkModule.forgetServer`, identity-guarded) and the retention tick counter; player
+  logout → `ResonanceService.unsubscribeAll`; client disconnect (NeoForge/Forge
+  `ClientPlayerNetworkEvent.LoggingOut`, Fabric `ClientPlayConnectionEvents.DISCONNECT`) →
+  `ClientPlaybackEngine.clearClientState()` + sequencer/exchanger cache clears. Audited clean in
+  the same pass: `ResonantBlockEntity`/`HarmonicGateBlockEntity` setRemoved paths (inert), all
+  five stores' 4-arg `SavedDataType` with null DataFixTypes (matches Nerospace's runtime-proven
+  stores — NOT a bug; the stores saved fine in the owner's logs), no chunk tickets anywhere, and
+  the shutdown drain loop runs no NeroNotes tick hooks. PLAN-0.1.0.md gained check 13 (save &
+  quit while the gallery plays; relaunch; resume-from-position). Known
+  documented limitations: channel trust/rename/delete have no in-game surface in 0.1.0 (enforced
+  server-side only), and notes voice as `note_on` one-shots. Stage history: Stage 9 complete (on
+  Stages 0–2: Core wiring, `platform/` seams,
   `config/NeroNotesConfig`, `telemetry/NeroNotesTelemetry` + `PRIVACY.md`, `menu/MenuOpener`,
   own channel `neronotes:main`, numbered `init()`; versioned `score/Score` + `ScoreCodec`;
   data-driven `voice/VoiceRegistry` + `sound/NeroNotesSounds` — **no `.ogg` ships**, vanilla sound
@@ -31,10 +106,10 @@
   `entity/HarmonicGateBlockEntity` (extends Core's `machine.AbstractMachineBlockEntity`; `charged`
   blockstate; energy exposed on Core's shared `nerolandcore:energy` capability per loader —
   NeoForge `NeoForgeCapabilities`, Forge `ForgeCapabilities`, Fabric `FabricEnergyLookup`
-  registration in the entry point — so FE sources like Energized Power charge it); the
-  `neronotes:soundforge` progression gate (datapack `neroland_gates/soundforge.json`, requires
-  `nerolandcore:industrial_power`, checked server-side via Core `ProgressionGates` — everything
-  from Stages 1–3 stays ungated); the Soundforge void dimension by datapack
+  registration in the entry point — so FE sources like Energized Power charge it); originally
+  also a `neronotes:soundforge` progression gate, **removed 2026-08-15** (standalone-first —
+  nothing in NeroNotes is progression-gated; a charged gate is the only key); the Soundforge
+  void dimension by datapack
   (`dimension/soundforge.json` + `dimension_type/soundforge.json`, tagged optionally into
   `neroland:space/dimensions` — never `orElseThrow` on SpaceTags, empty is normal) with a
   code-built platform on first entry (`soundforge/SoundforgeDimension`); teleport/session/return
@@ -142,7 +217,8 @@
   channel identity** — Core's contract and ours). That bus IS the NeroQuests pairing: its
   `custom_event` objective consumes the crossings with no compile edge in either direction;
   `integration/QuestContent` documents every id a quest pack can reference (disk items, both
-  channels, the `neronotes:soundforge` gate; per-player "first disk" triggers are quests-side
+  channels; no gate ids — NeroNotes declares no progression gates since 2026-08-15; per-player
+  "first disk" triggers are quests-side
   content — threshold scopes may not identify players; voice unlocks don't exist in 0.1.0).
   NeroEconomy seam: `integration/ExchangerPricing` (UUID-based so plain-JVM testable, like
   `ChannelAccess`; default `FREE`) consulted LAST in `DiskExchangerMenu.tryCopy` — after every
@@ -189,7 +265,7 @@
   `wiki/Companion-Link-Module.md`.
 - Mod id: **`neronotes`** (matches the registry namespace + every loader manifest). Package root:
   `za.co.neroland.neronotes`. Author: **Neroland**.
-- Version: **0.0.1-alpha.1**.
+- Version: **0.1.0-beta.1** (in `gradle.properties`; untagged — the owner tags after Stage 11).
 - Targets **MC 26.1.2 AND 26.2** on **NeoForge, MinecraftForge/Forge, and Fabric** → the **"6 cells"**.
   **Java 25.** Mappings = official Mojang names (26.x ships de-obfuscated; no Parchment).
 

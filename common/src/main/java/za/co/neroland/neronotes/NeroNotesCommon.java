@@ -3,11 +3,17 @@ package za.co.neroland.neronotes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.minecraft.server.MinecraftServer;
+
 import za.co.neroland.neronotes.block.NeroNotesBlocks;
+import za.co.neroland.neronotes.block.ResonantBlockIndex;
+import za.co.neroland.neronotes.block.ResonatorIndex;
+import za.co.neroland.neronotes.data.RetentionSweep;
 import za.co.neroland.neronotes.block.entity.NeroNotesBlockEntities;
 import za.co.neroland.neronotes.config.NeroNotesConfig;
 import za.co.neroland.neronotes.data.NeroNotesData;
 import za.co.neroland.neronotes.integration.NeroNotesIntegrations;
+import za.co.neroland.neronotes.item.NeroNotesCreativeTab;
 import za.co.neroland.neronotes.item.NeroNotesDataComponents;
 import za.co.neroland.neronotes.item.NeroNotesItems;
 import za.co.neroland.neronotes.link.NotesLinkModule;
@@ -73,8 +79,9 @@ public final class NeroNotesCommon {
         NeroNotesSounds.init();
         VoiceRegistry.bootstrap();
 
-        // 6. Creative tab — every NeroNotes item into Core's shared Neroland tab, before tabs build.
-        NeroNotesItems.addToCreativeTab();
+        // 6. Creative tab — the dedicated NeroNotes tab (itemGroup.neronotes), registered
+        //    before tabs build. Items moved here from Core's shared Neroland tab.
+        NeroNotesCreativeTab.init();
 
         // 7. Data / PlayerDataErasure registration — EARLY ON PURPOSE: registering late is how an
         //    erasure request silently misses a store. One eraser covers the library ("sever the
@@ -104,5 +111,24 @@ public final class NeroNotesCommon {
         //     section is scoped to the requesting player's UUID; there is no
         //     server-wide channel roster on any path.
         NotesLinkModule.init();
+    }
+
+    /**
+     * Server-stopped hook — every loader entry point registers this against
+     * its server-lifecycle event (NeoForge {@code ServerStoppedEvent}, Forge
+     * {@code ServerStoppedEvent}, Fabric
+     * {@code ServerLifecycleEvents.SERVER_STOPPED}). All server-side runtime
+     * state is static (singleplayer re-enters a new integrated server in the
+     * same JVM), so everything must be dropped here: stale
+     * {@code ServerPlayer}/{@code BlockEntity} references surviving into the
+     * next world are use-after-unload bugs waiting to fire.
+     */
+    public static void onServerStopped(MinecraftServer server) {
+        ResonanceService.clearRuntime();
+        ResonantBlockIndex.clear();
+        ResonatorIndex.clear();
+        NotesLinkModule.forgetServer(server);
+        RetentionSweep.onServerStopped();
+        LOGGER.debug("[NeroNotes] server runtime state cleared on server stop");
     }
 }

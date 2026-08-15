@@ -1,9 +1,11 @@
 # Resonance channels
 
 The **resonance signal** is how NeroNotes carries music around a base: emitters broadcast note and
-transport events (`note_on`, `note_off`, `play`, `stop`, `seek`) on a **channel**, and nearby
-listeners hear them rendered client-side from the mod's registered sounds. Music is data, not
-audio — the server never streams sound.
+transport events (`note_on`, and `play` / `stop` / `seek`) on a **channel**, and nearby listeners
+hear them rendered client-side from the mod's registered sounds (all of which alias vanilla sound
+events in this release — no custom audio ships yet). Music is data, not audio — the server never
+streams sound. Note lengths are carried in every score, but this release voices notes as
+`note_on` one-shots; sustained `note_off` pairs are a later release.
 
 > The channel system (this page) is the server-side foundation. The in-world blocks that use it —
 > [Resonant Blocks and Resonators](Resonant-Blocks-and-Resonators.md) — play through it with
@@ -33,6 +35,11 @@ Each channel carries a **trust list** — players its owner has granted control.
 emit and drive the transport; only the **owner or an operator** can edit the trust list itself,
 rename in their stead, or delete the channel. The owner is implicitly trusted and never appears on
 the list.
+
+**An honest limitation of this release:** the trust list, renaming and deletion are enforced
+server-side and cleared correctly by data erasure, but **0.1.0 ships no command or GUI to edit
+them** — so in practice a channel answers to its owner and operators, and the "trusted" role is
+not yet reachable in normal play. A channel-management surface is a later release.
 
 ## The audio-spam cap
 

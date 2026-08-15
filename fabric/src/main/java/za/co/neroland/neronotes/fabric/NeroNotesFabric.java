@@ -2,6 +2,7 @@ package za.co.neroland.neronotes.fabric;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -16,6 +17,7 @@ import za.co.neroland.neronotes.command.NeroNotesCommands;
 import za.co.neroland.neronotes.data.RetentionSweep;
 import za.co.neroland.neronotes.link.NotesLinkModule;
 import za.co.neroland.neronotes.network.NotesNetwork;
+import za.co.neroland.neronotes.signal.ResonanceService;
 
 /** Fabric entry point for NeroNotes. */
 public final class NeroNotesFabric implements ModInitializer {
@@ -53,6 +55,16 @@ public final class NeroNotesFabric implements ModInitializer {
             NotesLinkModule.rememberServer(server);
             RetentionSweep.onServerTick(server);
         });
+        // Logout housekeeping: drop the player's channel subscriptions so the
+        // server-tracked subscriber map never accumulates departed players.
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
+                ResonanceService.unsubscribeAll(handler.player.getUUID()));
+        // Server lifecycle: clear ALL static server-side runtime state (the
+        // resonance guard/subscribers, both block-entity indexes, the link
+        // module's server handle, the retention tick counter) once the server
+        // is fully stopped — singleplayer re-enters a new integrated server in
+        // the same JVM.
+        ServerLifecycleEvents.SERVER_STOPPED.register(NeroNotesCommon::onServerStopped);
     }
 
     private static <T extends CustomPacketPayload> void registerClientboundType(

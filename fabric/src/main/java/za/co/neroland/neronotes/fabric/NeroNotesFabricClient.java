@@ -1,6 +1,7 @@
 package za.co.neroland.neronotes.fabric;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -36,6 +37,13 @@ public final class NeroNotesFabricClient implements ClientModInitializer {
         MenuScreens.register(NeroNotesMenus.SEQUENCER.get(), SequencerScreen::new);
         MenuScreens.register(NeroNotesMenus.DISK_PRESS.get(), DiskPressScreen::new);
         MenuScreens.register(NeroNotesMenus.DISK_EXCHANGER.get(), DiskExchangerScreen::new);
+        // Leaving a world: drop every client-side cache (playheads, sequencer
+        // session, exchanger page) so nothing from one world leaks into the next.
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            ClientPlaybackEngine.clearClientState();
+            ClientSequencerState.clear();
+            ClientExchangerState.clear();
+        });
     }
 
     private static <T extends CustomPacketPayload> void registerReceiver(

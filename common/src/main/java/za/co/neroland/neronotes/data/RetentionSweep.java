@@ -50,6 +50,17 @@ public final class RetentionSweep {
         }
     }
 
+    /**
+     * Server-stopped hook (via {@code NeroNotesCommon.onServerStopped}): drop
+     * the counted server and its tick count. The tick hook's identity check
+     * self-corrects anyway; this just guarantees no reference to a stopped
+     * server outlives it.
+     */
+    public static void onServerStopped() {
+        currentServer = new WeakReference<>(null);
+        ticksThisServer = 0;
+    }
+
     /** Server-tick hook (all three loaders): sweep on schedule. Server thread only. */
     public static void onServerTick(MinecraftServer server) {
         if (currentServer.get() != server) {

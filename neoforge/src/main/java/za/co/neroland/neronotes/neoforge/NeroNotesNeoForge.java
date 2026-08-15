@@ -8,6 +8,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -18,6 +19,7 @@ import za.co.neroland.neronotes.command.NeroNotesCommands;
 import za.co.neroland.neronotes.data.RetentionSweep;
 import za.co.neroland.neronotes.link.NotesLinkModule;
 import za.co.neroland.neronotes.network.NotesNetwork;
+import za.co.neroland.neronotes.signal.ResonanceService;
 
 /** NeoForge entry point for NeroNotes. */
 @Mod(NeroNotesCommon.MOD_ID)
@@ -48,6 +50,20 @@ public final class NeroNotesNeoForge {
             NotesLinkModule.rememberServer(event.getServer());
             RetentionSweep.onServerTick(event.getServer());
         });
+        // Logout housekeeping: drop the player's channel subscriptions so the
+        // server-tracked subscriber map never accumulates departed players.
+        NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedOutEvent event) -> {
+            if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                ResonanceService.unsubscribeAll(serverPlayer.getUUID());
+            }
+        });
+        // Server lifecycle: clear ALL static server-side runtime state (the
+        // resonance guard/subscribers, both block-entity indexes, the link
+        // module's server handle, the retention tick counter) once the server
+        // is fully stopped — singleplayer re-enters a new integrated server in
+        // the same JVM.
+        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event) ->
+                NeroNotesCommon.onServerStopped(event.getServer()));
     }
 
     private static void onRegisterPayloadHandlers(RegisterPayloadHandlersEvent event) {

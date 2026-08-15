@@ -8,6 +8,9 @@ to one voice family — and the **Resonator**, a disk player that performs a who
 > near-black base with a neon accent per voice family), not final art. All sounds are aliases of
 > vanilla sound events — no custom audio ships yet.
 
+In creative mode, every NeroNotes block and item lives in the dedicated **NeroNotes** creative
+tab.
+
 ## Resonant Blocks
 
 One block per voice family, each with that family's neon accent:
@@ -41,15 +44,23 @@ playing and pulses on each burst of notes.
 
 - **Placement** — whoever places a Resonator becomes its owner, recorded server-side. It binds to
   the owner's `base` resonance channel (created automatically if it does not exist yet).
-- **Use** (right-click) — toggles play/stop of the composition it holds. Control follows the
-  channel's rules: the owner, players on the channel's trust list, or an operator. Anyone else
-  gets a quiet refusal message — and machines get no shortcuts: a Resonator emits with exactly
-  its owner's authority.
+- **Use with a pressed disk in hand** — loads the disk's composition onto the Resonator. The disk
+  is **read, not consumed** — it stays in your hand, so one disk can seed as many Resonators as
+  you like.
+- **Use** (right-click, otherwise) — toggles play/stop of the composition it holds.
+- **Sneak-use** (empty hand) — clears the stored composition and stops playback.
+- All of the above follow the channel's rules: the owner, players on the channel's trust list, or
+  an operator. Anyone else gets a quiet refusal message — and machines get no shortcuts: a
+  Resonator emits with exactly its owner's authority, and it keeps playing while its owner is
+  offline.
 - The [audio-spam cap](Resonance-Channels.md#the-audio-spam-cap) applies: if too many channels
   are already playing nearby, pressing play answers with a polite "too busy" message.
 
-Resonators currently play a composition stored on the block itself; the craftable disks that
-carry compositions between machines arrive in a later stage of 0.1.0.
+Pressed [custom disks](Sequencer-and-Disk-Press.md) are how compositions travel between machines;
+the Resonator stores the loaded composition on the block itself, so it survives restarts and
+chunk reloads (resuming at the position it left off — a reload is a seek, not a restart). One
+honest limitation: note **lengths** are stored in every score, but this release voices notes as
+one-shots only — sustained note-off pairs are a later release.
 
 ## Synchronised playback
 
@@ -84,6 +95,10 @@ These keys in `config/neronotes.properties` are yours locally — the server nev
 `client.mute_other_bases` is the comfort switch for shared servers: enable it and other players'
 synced base audio goes silent for you, while your own channels keep playing. It is a local audio
 preference only — it grants and removes no permissions.
+
+The fourth and last client-local key, `client.telemetry_opt_out`, is covered in
+[Privacy and your data](Privacy-and-Your-Data.md); every key is listed on the
+[Configuration](Configuration.md) page.
 
 Two related **server-authoritative** keys tune the sync engine for everyone:
 

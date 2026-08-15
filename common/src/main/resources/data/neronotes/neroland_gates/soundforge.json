@@ -1,5 +1,0 @@
-{
-  "scope": "player",
-  "requires": ["nerolandcore:industrial_power"],
-  "title": "The Soundforge"
-}

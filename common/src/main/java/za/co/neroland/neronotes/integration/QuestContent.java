@@ -44,10 +44,9 @@ package za.co.neroland.neronotes.integration;
  * unlocked and the voice registry has no lock concept; a pack must not
  * pretend otherwise.</p>
  *
- * <p>The one progression touchpoint: the Soundforge sits behind the
- * {@value #GATE_SOUNDFORGE} progression gate (requires Core's
- * {@code nerolandcore:industrial_power}), so quest lines can reference the
- * gate id directly through Core's gate system.</p>
+ * <p>NeroNotes declares no progression gates (standalone-first): the
+ * Soundforge needs only a charged Harmonic Gate, so there is no gate id for
+ * a quest pack to reference.</p>
  */
 public final class QuestContent {
 
@@ -62,9 +61,6 @@ public final class QuestContent {
 
     /** The pressed custom disk item id (needs a {@code disk_contents} component to play). */
     public static final String ITEM_CUSTOM_DISK = "neronotes:custom_disk";
-
-    /** The Soundforge progression gate id (datapack-declared, requires Industrial Power). */
-    public static final String GATE_SOUNDFORGE = "neronotes:soundforge";
 
     private QuestContent() {
     }
