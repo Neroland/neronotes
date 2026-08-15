@@ -2,8 +2,10 @@ package za.co.neroland.neronotes.fabric;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -11,6 +13,8 @@ import za.co.neroland.nerolandcore.platform.FabricEnergyLookup;
 import za.co.neroland.neronotes.NeroNotesCommon;
 import za.co.neroland.neronotes.block.entity.NeroNotesBlockEntities;
 import za.co.neroland.neronotes.command.NeroNotesCommands;
+import za.co.neroland.neronotes.data.RetentionSweep;
+import za.co.neroland.neronotes.link.NotesLinkModule;
 import za.co.neroland.neronotes.network.NotesNetwork;
 
 /** Fabric entry point for NeroNotes. */
@@ -40,6 +44,15 @@ public final class NeroNotesFabric implements ModInitializer {
         // Stage 4: /neronotes soundforge return.
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 NeroNotesCommands.register(dispatcher));
+        // Stage 7: last-seen touch on join + the daily retention sweep.
+        // Stage 9: the same tick hook hands the link module its server handle
+        // (Core's link SPI delivers only a UUID; the module needs the server).
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
+                RetentionSweep.onPlayerJoin(handler.player));
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            NotesLinkModule.rememberServer(server);
+            RetentionSweep.onServerTick(server);
+        });
     }
 
     private static <T extends CustomPacketPayload> void registerClientboundType(

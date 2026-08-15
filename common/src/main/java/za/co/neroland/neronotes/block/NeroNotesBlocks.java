@@ -122,6 +122,35 @@ public final class NeroNotesBlocks {
                             .sound(SoundType.NETHERITE_BLOCK)
                             .lightLevel(state -> 5)));
 
+    /**
+     * The publish lectern (Stage 6) — the Soundforge's release desk: tap it
+     * with a pressed disk to publish the composition to the shared library.
+     * Placed on the platform by {@code SoundforgeDimension.ensurePlatform};
+     * only functional inside the Soundforge.
+     */
+    public static final RegistrationProvider.RegistryEntry<Block> PUBLISH_LECTERN =
+            BLOCKS.register("publish_lectern", key -> new PublishLecternBlock(
+                    BlockBehaviour.Properties.of()
+                            .setId(key)
+                            .mapColor(MapColor.COLOR_BLACK)
+                            .strength(2.0f, 6.0f)
+                            .sound(SoundType.NETHERITE_BLOCK)
+                            .lightLevel(state -> 5)));
+
+    /**
+     * The Disk Exchanger (Stage 6) — the overworld-side library machine:
+     * browse the published catalogue (paginated), copy an entry onto a blank
+     * disk, duplicate a disk you hold. Craftable in survival.
+     */
+    public static final RegistrationProvider.RegistryEntry<Block> DISK_EXCHANGER =
+            BLOCKS.register("disk_exchanger", key -> new DiskExchangerBlock(
+                    BlockBehaviour.Properties.of()
+                            .setId(key)
+                            .mapColor(MapColor.COLOR_BLACK)
+                            .strength(2.5f, 6.0f)
+                            .sound(SoundType.NETHERITE_BLOCK)
+                            .lightLevel(state -> 5)));
+
     private NeroNotesBlocks() {
     }
 

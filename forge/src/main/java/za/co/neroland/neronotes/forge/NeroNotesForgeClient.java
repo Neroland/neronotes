@@ -4,8 +4,10 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
+import za.co.neroland.neronotes.client.ClientExchangerState;
 import za.co.neroland.neronotes.client.ClientPlaybackEngine;
 import za.co.neroland.neronotes.client.ClientSequencerState;
+import za.co.neroland.neronotes.client.DiskExchangerScreen;
 import za.co.neroland.neronotes.client.DiskPressScreen;
 import za.co.neroland.neronotes.client.SequencerScreen;
 import za.co.neroland.neronotes.menu.NeroNotesMenus;
@@ -31,9 +33,11 @@ public final class NeroNotesForgeClient {
     public static void install(BusGroup modBusGroup) {
         ClientPlaybackEngine.install();
         ClientSequencerState.install();
+        ClientExchangerState.install();
         FMLClientSetupEvent.getBus(modBusGroup).addListener(event -> {
             MenuScreens.register(NeroNotesMenus.SEQUENCER.get(), SequencerScreen::new);
             MenuScreens.register(NeroNotesMenus.DISK_PRESS.get(), DiskPressScreen::new);
+            MenuScreens.register(NeroNotesMenus.DISK_EXCHANGER.get(), DiskExchangerScreen::new);
         });
     }
 }

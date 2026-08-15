@@ -28,6 +28,11 @@ public final class NeroNotesMenus {
             MENUS.register("disk_press",
                     key -> new MenuType<>(DiskPressMenu::new, FeatureFlags.VANILLA_SET));
 
+    /** The Disk Exchanger (Stage 6). */
+    public static final RegistrationProvider.RegistryEntry<MenuType<DiskExchangerMenu>> DISK_EXCHANGER =
+            MENUS.register("disk_exchanger",
+                    key -> new MenuType<>(DiskExchangerMenu::new, FeatureFlags.VANILLA_SET));
+
     private NeroNotesMenus() {
     }
 

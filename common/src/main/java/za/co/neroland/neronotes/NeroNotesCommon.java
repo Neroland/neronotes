@@ -6,8 +6,11 @@ import org.slf4j.LoggerFactory;
 import za.co.neroland.neronotes.block.NeroNotesBlocks;
 import za.co.neroland.neronotes.block.entity.NeroNotesBlockEntities;
 import za.co.neroland.neronotes.config.NeroNotesConfig;
+import za.co.neroland.neronotes.data.NeroNotesData;
+import za.co.neroland.neronotes.integration.NeroNotesIntegrations;
 import za.co.neroland.neronotes.item.NeroNotesDataComponents;
 import za.co.neroland.neronotes.item.NeroNotesItems;
+import za.co.neroland.neronotes.link.NotesLinkModule;
 import za.co.neroland.neronotes.menu.NeroNotesMenus;
 import za.co.neroland.neronotes.network.NotesNetwork;
 import za.co.neroland.neronotes.platform.Services;
@@ -51,8 +54,8 @@ public final class NeroNotesCommon {
         //    the Harmonic Gate machine (Stage 4; Core energy capability is
         //    registered per loader from each loader entry point), and the
         //    Stage 5 Soundforge furniture: transport lectern (+ preview BE),
-        //    pattern walls, voice pedestals, Disk Press.
-        //    (Stage 6 placeholder: publish lectern, Disk Exchanger.)
+        //    pattern walls, voice pedestals, Disk Press. Stage 6: the publish
+        //    lectern (Soundforge) and the Disk Exchanger (overworld machine).
         NeroNotesBlocks.init();
         NeroNotesBlockEntities.init();
 
@@ -74,11 +77,11 @@ public final class NeroNotesCommon {
         NeroNotesItems.addToCreativeTab();
 
         // 7. Data / PlayerDataErasure registration — EARLY ON PURPOSE: registering late is how an
-        //    erasure request silently misses a store.
-        //    (Stage 7 registers erasers with Core here. The stores are purge-ready already:
-        //     signal/ChannelStore and soundforge/SoundforgeSessionStore both route through
-        //     Core's SavedDataRecovery and expose purgePlayer(UUID) + purgePlayerAndBackup(...)
-        //     + hasRow probes for the erasure hook.)
+        //    erasure request silently misses a store. One eraser covers the library ("sever the
+        //    link, keep the work"), Soundforge sessions, channels + trust lists, the activity
+        //    record and live subscriptions; the retention sweep (data/RetentionSweep) reuses the
+        //    same purge path from each loader's join + server-tick hooks.
+        NeroNotesData.init();
 
         // 8. Network payloads — on NeroNotes' OWN channel (neronotes:main), never Core's CoreNetwork.
         NotesNetwork.registerPayloads();
@@ -89,12 +92,17 @@ public final class NeroNotesCommon {
         ResonanceService.init();
 
         // 10. Sibling integrations — feature-detected via Services.platform().isModLoaded(...),
-        //     compileOnly + runtime guard, no reflection.
-        //     (Stage 8 placeholder: NeroQuests rewards/triggers, NeroEconomy pricing seam,
-        //      Core ThresholdEvents crossings.)
+        //     compileOnly + runtime guard, no reflection. Core ThresholdEvents crossings
+        //     (integration/NotesThresholds), the NeroEconomy ExchangerPricing seam (default =
+        //     free), the documented NeroEvents ChannelTakeover stub and the NeroQuests
+        //     QuestContent contract all live in integration/.
+        NeroNotesIntegrations.init();
 
-        // 11. Link module — LAST, wrapped in try/catch so a link failure can never take the mod down.
-        //     (Stage 9 placeholder:
-        //      try { NotesLinkModule.register(); } catch (RuntimeException e) { LOGGER.warn(...); })
+        // 11. Link module — LAST. NotesLinkModule.init() wraps its whole body in
+        //     try/catch (RuntimeException | LinkageError), swallowed with a warning:
+        //     a link failure may cost the companion surface, never the mod. Every
+        //     section is scoped to the requesting player's UUID; there is no
+        //     server-wide channel roster on any path.
+        NotesLinkModule.init();
     }
 }

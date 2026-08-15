@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "neronotes:block/disk_exchanger_top",
+    "bottom": "neronotes:block/resonator_bottom",
+    "side": "neronotes:block/disk_exchanger_side"
+  }
+}

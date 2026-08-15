@@ -128,6 +128,20 @@ public final class ChannelTable {
         return result;
     }
 
+    /**
+     * All channels on whose trust list {@code player} appears (not ownership).
+     * A data-subject-access read: the rows carrying this player's UUID.
+     */
+    public List<ResonanceChannel> channelsTrusting(UUID player) {
+        List<ResonanceChannel> result = new ArrayList<>();
+        for (ResonanceChannel channel : channels.values()) {
+            if (channel.isTrusted(player)) {
+                result.add(channel);
+            }
+        }
+        return result;
+    }
+
     /** Whether {@code player} owns any channel — the erasure-conformance probe for this store. */
     public boolean hasOwnerRow(UUID player) {
         for (ResonanceChannel channel : channels.values()) {

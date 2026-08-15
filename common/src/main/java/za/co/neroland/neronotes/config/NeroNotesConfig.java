@@ -118,6 +118,11 @@ public final class NeroNotesConfig {
             "data.action_logging_enabled", false, true,
             "Whether non-essential action logging (press/publish/download events) is enabled. Never logs player-authored strings at info level.");
 
+    /** Companion (NeroLink) module master toggle (Stage 9). */
+    public static final ConfigValue<Boolean> LINK_MODULE_ENABLED = SCHEMA.bool(
+            "link.module_enabled", true, true,
+            "Whether NeroNotes registers its companion (NeroLink) module. When false, companion clients see no NeroNotes data and can perform no NeroNotes actions.");
+
     // ------------------------------------------------------------------
     // Client-local keys (serverAuthoritative = false) — EXACTLY these:
     // telemetry opt-out, per-voice-family volume, glow intensity,

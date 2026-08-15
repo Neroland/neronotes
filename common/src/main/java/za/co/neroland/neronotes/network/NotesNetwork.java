@@ -122,12 +122,20 @@ public final class NotesNetwork {
         CLIENTBOUND.add(new ClientboundPayloadSpec<>(
                 SessionScorePayload.TYPE, SessionScorePayload.STREAM_CODEC,
                 SequencerClientHandlers::handleSession));
+        // Stage 6: the library page is METADATA ONLY (titles/authors/counts,
+        // never a score) — Exchanger copies happen entirely server-side.
+        CLIENTBOUND.add(new ClientboundPayloadSpec<>(
+                LibraryPagePayload.TYPE, LibraryPagePayload.STREAM_CODEC,
+                ExchangerClientHandlers::handlePage));
         SERVERBOUND.add(new ServerboundPayloadSpec<>(
                 SequencerEditPayload.TYPE, SequencerEditPayload.STREAM_CODEC,
                 SequencerServerHandlers::handleEdit));
         SERVERBOUND.add(new ServerboundPayloadSpec<>(
                 DiskPressPayload.TYPE, DiskPressPayload.STREAM_CODEC,
                 SequencerServerHandlers::handlePress));
+        SERVERBOUND.add(new ServerboundPayloadSpec<>(
+                ExchangerActionPayload.TYPE, ExchangerActionPayload.STREAM_CODEC,
+                ExchangerServerHandlers::handleAction));
         NeroNotesCommon.LOGGER.debug(
                 "[NeroNotes] network channel {} declared {} clientbound / {} serverbound payload(s)",
                 CHANNEL_ID, CLIENTBOUND.size(), SERVERBOUND.size());

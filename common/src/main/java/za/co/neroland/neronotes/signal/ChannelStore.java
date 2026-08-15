@@ -140,6 +140,11 @@ public final class ChannelStore extends SavedData {
         return table.channelsOwnedBy(player);
     }
 
+    /** All channels on whose trust list {@code player} appears (data-subject-access read). */
+    public List<ResonanceChannel> channelsTrusting(UUID player) {
+        return table.channelsTrusting(player);
+    }
+
     /** Erasure-conformance probe: does {@code player} still own any channel? */
     public boolean hasOwnerRow(UUID player) {
         return table.hasOwnerRow(player);

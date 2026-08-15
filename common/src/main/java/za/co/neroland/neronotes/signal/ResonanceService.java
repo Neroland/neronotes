@@ -17,6 +17,8 @@ import net.minecraft.world.phys.Vec3;
 import za.co.neroland.neronotes.NeroNotesCommon;
 import za.co.neroland.neronotes.block.ResonantBlockIndex;
 import za.co.neroland.neronotes.config.NeroNotesConfig;
+import za.co.neroland.neronotes.integration.NotesThresholds;
+import za.co.neroland.neronotes.link.NotesLinkEvents;
 import za.co.neroland.neronotes.network.ResonanceNotePayload;
 import za.co.neroland.neronotes.network.ResonanceTransportPayload;
 import za.co.neroland.neronotes.platform.Services;
@@ -199,7 +201,15 @@ public final class ResonanceService {
 
     /** Subscribe a player to a channel's events. Anyone may listen; range still applies per event. */
     public static void subscribe(ChannelKey key, ServerPlayer player) {
-        SUBSCRIBERS.computeIfAbsent(key, ignored -> new HashSet<>()).add(player.getUUID());
+        Set<UUID> subs = SUBSCRIBERS.computeIfAbsent(key, ignored -> new HashSet<>());
+        int before = subs.size();
+        if (subs.add(player.getUUID())) {
+            // Stage 8: listener-milestone crossings on Core's ThresholdEvents.
+            // Scope is the channel's DIMENSION id only — a place key; the
+            // owner UUID and channel name never leave this method. Server
+            // thread: subscribe is only ever called from server-side hooks.
+            NotesThresholds.listenerCountChanged(key.dimension(), before, subs.size());
+        }
     }
 
     public static void unsubscribe(ChannelKey key, ServerPlayer player) {
@@ -363,6 +373,7 @@ public final class ResonanceService {
 
     private static SignalResult applyTransport(ServerLevel level, ChannelKey key, TransportAction action,
                                                long positionTick, int tempoBpm, int ticksPerBeat, Vec3 origin) {
+        boolean wasPlaying = GUARD.isPlaying(key);
         switch (action) {
             case PLAY -> {
                 if (!GUARD.tryStartPlaying(key, anchorOf(level, origin), capChunkRadius())) {
@@ -371,7 +382,7 @@ public final class ResonanceService {
             }
             case STOP -> GUARD.stopPlaying(key);
             case SEEK -> {
-                if (!GUARD.isPlaying(key)) {
+                if (!wasPlaying) {
                     return SignalResult.NOT_PLAYING;
                 }
             }
@@ -379,6 +390,15 @@ public final class ResonanceService {
         long anchorGameTick = level.getGameTime();
         broadcast(level, origin, key, new ResonanceTransportPayload(
                 key.owner(), key.name(), action, positionTick, anchorGameTick, 0, tempoBpm, ticksPerBeat));
+        // Stage 9: owner-scoped now_playing link events, on GENUINE transitions
+        // only — a re-anchor, seek or repeated play/stop never fires one. The
+        // event goes to the channel owner; NotesLinkEvents no-ops when the link
+        // module is disabled or absent.
+        if (action == TransportAction.PLAY && !wasPlaying) {
+            NotesLinkEvents.nowPlayingChanged(key, true, subscriberCount(key));
+        } else if (action == TransportAction.STOP && wasPlaying) {
+            NotesLinkEvents.nowPlayingChanged(key, false, subscriberCount(key));
+        }
         return SignalResult.OK;
     }
 

@@ -59,6 +59,9 @@ public final class SoundforgeDimension {
     /** The Disk Press (Stage 5) — west of the gate. */
     public static final BlockPos PRESS_POS = new BlockPos(-3, 100, 0);
 
+    /** The publish lectern (Stage 6) — the release desk, south of the gate beside the arrival spot. */
+    public static final BlockPos PUBLISH_POS = new BlockPos(-3, 100, 3);
+
     /** Where an arriving player stands (facing the return gate). */
     public static final BlockPos ARRIVAL_POS = new BlockPos(0, 100, 3);
 
@@ -90,7 +93,8 @@ public final class SoundforgeDimension {
      */
     public static void ensurePlatform(ServerLevel soundforge) {
         if (soundforge.getBlockState(GATE_POS).is(NeroNotesBlocks.HARMONIC_GATE.get())
-                && soundforge.getBlockState(LECTERN_POS).is(NeroNotesBlocks.TRANSPORT_LECTERN.get())) {
+                && soundforge.getBlockState(LECTERN_POS).is(NeroNotesBlocks.TRANSPORT_LECTERN.get())
+                && soundforge.getBlockState(PUBLISH_POS).is(NeroNotesBlocks.PUBLISH_LECTERN.get())) {
             return;
         }
         NeroNotesCommon.LOGGER.info("[NeroNotes] building the Soundforge arrival platform");
@@ -116,6 +120,9 @@ public final class SoundforgeDimension {
         // Console and press flank the gate.
         soundforge.setBlockAndUpdate(LECTERN_POS, NeroNotesBlocks.TRANSPORT_LECTERN.get().defaultBlockState());
         soundforge.setBlockAndUpdate(PRESS_POS, NeroNotesBlocks.DISK_PRESS.get().defaultBlockState());
+        // Stage 6 — the publish lectern (guarded above, so pre-Stage-6
+        // platforms gain it on the next arrival).
+        soundforge.setBlockAndUpdate(PUBLISH_POS, NeroNotesBlocks.PUBLISH_LECTERN.get().defaultBlockState());
         // Four pattern walls along the north rim, one per layer slot.
         for (int layer = 0; layer < 4; layer++) {
             soundforge.setBlockAndUpdate(new BlockPos(layer - 2, 100, -6),

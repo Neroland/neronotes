@@ -12,6 +12,7 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -20,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 
 import za.co.neroland.neronotes.NeroNotesCommon;
 import za.co.neroland.neronotes.block.ResonatorBlock;
+import za.co.neroland.neronotes.block.ResonatorIndex;
 import za.co.neroland.neronotes.config.NeroNotesConfig;
 import za.co.neroland.neronotes.score.Score;
 import za.co.neroland.neronotes.score.ScoreCodec;
@@ -207,6 +209,49 @@ public class ResonatorBlockEntity extends BlockEntity {
         return result;
     }
 
+    /**
+     * Start playback for a server-verified UUID (the Stage 9 link module's
+     * {@code play} action). Same flow as {@link #startPlayback(ServerPlayer)}
+     * but authorised through the UUID transport path — owner or trust list
+     * only, <strong>no operator bypass</strong> (a UUID arriving over a
+     * bridge is not an op).
+     */
+    public SignalResult startPlaybackAs(UUID requester) {
+        ChannelKey key = channelKey();
+        if (key == null || score == null || !(level instanceof ServerLevel serverLevel)) {
+            return SignalResult.NOT_PLAYING;
+        }
+        SignalResult result = ResonanceService.transportAs(serverLevel, requester, key,
+                TransportAction.PLAY, currentTick(), score.tempoBpm(), score.ticksPerBeat(), origin());
+        if (result == SignalResult.OK) {
+            playing = true;
+            lastEmittedTick = currentTick() - 1;
+            anchorCooldown = ANCHOR_INTERVAL_TICKS;
+            setChanged();
+            updateRingState();
+        }
+        return result;
+    }
+
+    /** Stop playback for a server-verified UUID — see {@link #startPlaybackAs(UUID)}. */
+    public SignalResult stopPlaybackAs(UUID requester) {
+        ChannelKey key = channelKey();
+        if (key == null || !(level instanceof ServerLevel serverLevel)) {
+            return SignalResult.NOT_PLAYING;
+        }
+        if (!playing) {
+            return SignalResult.NOT_PLAYING;
+        }
+        SignalResult result = ResonanceService.transportAs(serverLevel, requester, key,
+                TransportAction.STOP, currentTick(), 0, 0, origin());
+        if (result == SignalResult.OK) {
+            playing = false;
+            setChanged();
+            updateRingState();
+        }
+        return result;
+    }
+
     public boolean isPlayingBack() {
         return playing;
     }
@@ -353,9 +398,26 @@ public class ResonatorBlockEntity extends BlockEntity {
         }
     }
 
+    // ------------------------------------------------------------------
+    // Index registration (chunk load tracking — Stage 9 link module lookup)
+    // ------------------------------------------------------------------
+
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
+        if (level instanceof ServerLevel serverLevel) {
+            ResonatorIndex.register(
+                    serverLevel.dimension().identifier().toString(), worldPosition, this);
+        }
+    }
+
     /** Breaking the block stops playback so the channel's play slot frees up. */
     @Override
     public void setRemoved() {
+        if (level instanceof ServerLevel serverLevel) {
+            ResonatorIndex.unregister(
+                    serverLevel.dimension().identifier().toString(), worldPosition);
+        }
         stopQuietly();
         super.setRemoved();
     }

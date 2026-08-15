@@ -6,8 +6,10 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 import za.co.neroland.neronotes.NeroNotesCommon;
+import za.co.neroland.neronotes.client.ClientExchangerState;
 import za.co.neroland.neronotes.client.ClientPlaybackEngine;
 import za.co.neroland.neronotes.client.ClientSequencerState;
+import za.co.neroland.neronotes.client.DiskExchangerScreen;
 import za.co.neroland.neronotes.client.DiskPressScreen;
 import za.co.neroland.neronotes.client.SequencerScreen;
 import za.co.neroland.neronotes.menu.NeroNotesMenus;
@@ -24,11 +26,13 @@ public final class NeroNotesNeoForgeClient {
     public NeroNotesNeoForgeClient(IEventBus modEventBus) {
         ClientPlaybackEngine.install();
         ClientSequencerState.install();
+        ClientExchangerState.install();
         modEventBus.addListener(NeroNotesNeoForgeClient::onRegisterScreens);
     }
 
     private static void onRegisterScreens(RegisterMenuScreensEvent event) {
         event.register(NeroNotesMenus.SEQUENCER.get(), SequencerScreen::new);
         event.register(NeroNotesMenus.DISK_PRESS.get(), DiskPressScreen::new);
+        event.register(NeroNotesMenus.DISK_EXCHANGER.get(), DiskExchangerScreen::new);
     }
 }

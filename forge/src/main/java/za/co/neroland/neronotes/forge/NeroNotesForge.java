@@ -6,6 +6,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -16,6 +18,8 @@ import net.minecraftforge.network.payload.PayloadFlow;
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.neronotes.NeroNotesCommon;
 import za.co.neroland.neronotes.command.NeroNotesCommands;
+import za.co.neroland.neronotes.data.RetentionSweep;
+import za.co.neroland.neronotes.link.NotesLinkModule;
 import za.co.neroland.neronotes.network.NotesNetwork;
 import za.co.neroland.neronotes.platform.ForgeNetworkPlatform;
 
@@ -36,6 +40,18 @@ public final class NeroNotesForge {
         // Stage 4: /neronotes soundforge return (game-bus command registration).
         RegisterCommandsEvent.BUS.addListener(event ->
                 NeroNotesCommands.register(event.getDispatcher()));
+        // Stage 7: last-seen touch on join + the daily retention sweep.
+        PlayerEvent.PlayerLoggedInEvent.BUS.addListener(event -> {
+            if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                RetentionSweep.onPlayerJoin(serverPlayer);
+            }
+        });
+        // Stage 9: the same tick hook hands the link module its server handle
+        // (Core's link SPI delivers only a UUID; the module needs the server).
+        TickEvent.ServerTickEvent.Post.BUS.addListener(event -> {
+            NotesLinkModule.rememberServer(event.server());
+            RetentionSweep.onServerTick(event.server());
+        });
         // Stage 3/5: client-only playback engine + screens, behind the dist
         // guard so client classes never load on a dedicated server.
         if (FMLEnvironment.dist == Dist.CLIENT) {

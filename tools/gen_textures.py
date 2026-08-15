@@ -217,6 +217,73 @@ def disk_press_top(image_module):
     return img
 
 
+def publish_lectern_side(image_module):
+    rng = random.Random(0x9B15)
+    img = image_module.new("RGB", (SIZE, SIZE))
+    matte_base(img, rng)
+    px = img.load()
+    accent = scale(HARMONIC_ACCENT, 0.85)
+    dim = scale(HARMONIC_ACCENT, 0.35)
+    # A release desk: a bright beacon column rising from a readout strip.
+    for x in range(2, 14):
+        px[x, 10] = accent
+        px[x, 11] = dim
+    for y in range(3, 10):
+        px[7, y] = dim
+        px[8, y] = dim
+    px[7, 3] = accent
+    px[8, 3] = accent
+    return img
+
+
+def publish_lectern_top(image_module):
+    rng = random.Random(0x9B16)
+    img = image_module.new("RGB", (SIZE, SIZE))
+    matte_base(img, rng)
+    px = img.load()
+    edge_glow(img, HARMONIC_ACCENT, 0.4, 0.3)
+    # An upward arrow: publishing sends the work out into the library.
+    dim = scale(HARMONIC_ACCENT, 0.6)
+    for x, y in ((7, 3), (8, 3), (6, 4), (9, 4), (5, 5), (10, 5)):
+        px[x, y] = dim
+    for y in range(4, 13):
+        px[7, y] = dim
+        px[8, y] = dim
+    return img
+
+
+def disk_exchanger_side(image_module):
+    rng = random.Random(0xE8C4)
+    img = image_module.new("RGB", (SIZE, SIZE))
+    matte_base(img, rng)
+    px = img.load()
+    accent = scale(RESONATOR_ACCENT, 0.8)
+    dim = scale(RESONATOR_ACCENT, 0.35)
+    # Two exchange slots with opposing arrows: give a blank, take a copy.
+    for x in range(2, 14):
+        px[x, 4] = accent
+        px[x, 11] = accent
+    for x, y in ((4, 6), (5, 6), (6, 6), (6, 5), (6, 7),
+                 (9, 9), (10, 9), (11, 9), (9, 8), (9, 10)):
+        px[x, y] = dim
+    return img
+
+
+def disk_exchanger_top(image_module):
+    rng = random.Random(0xE8C5)
+    img = image_module.new("RGB", (SIZE, SIZE))
+    matte_base(img, rng)
+    px = img.load()
+    edge_glow(img, RESONATOR_ACCENT, 0.4, 0.3)
+    # Two half-discs trading places.
+    dim = scale(RESONATOR_ACCENT, 0.55)
+    for x, y in ((4, 4), (5, 3), (6, 3), (7, 4), (3, 5), (3, 6), (4, 7),
+                 (11, 8), (12, 9), (12, 10), (11, 11), (10, 12), (9, 12), (8, 11)):
+        px[x, y] = dim
+    center_dot(img, RESONATOR_ACCENT, 0.8)
+    return img
+
+
 def pattern_wall(image_module, layer, lit):
     rng = random.Random(0x9A77 + layer)
     img = image_module.new("RGB", (SIZE, SIZE))
@@ -301,6 +368,11 @@ def main():
     for layer in range(4):
         jobs[f"pattern_wall_{layer}.png"] = lambda l=layer: pattern_wall(Image, l, False)
         jobs[f"pattern_wall_{layer}_lit.png"] = lambda l=layer: pattern_wall(Image, l, True)
+    # Stage 6 — publishing + the shared library.
+    jobs["publish_lectern_side.png"] = lambda: publish_lectern_side(Image)
+    jobs["publish_lectern_top.png"] = lambda: publish_lectern_top(Image)
+    jobs["disk_exchanger_side.png"] = lambda: disk_exchanger_side(Image)
+    jobs["disk_exchanger_top.png"] = lambda: disk_exchanger_top(Image)
 
     # Stage 5 — disk item textures (RGBA, transparent background).
     ITEM_TEXTURES.mkdir(parents=True, exist_ok=True)

@@ -7,12 +7,16 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.neronotes.NeroNotesCommon;
 import za.co.neroland.neronotes.command.NeroNotesCommands;
+import za.co.neroland.neronotes.data.RetentionSweep;
+import za.co.neroland.neronotes.link.NotesLinkModule;
 import za.co.neroland.neronotes.network.NotesNetwork;
 
 /** NeoForge entry point for NeroNotes. */
@@ -32,6 +36,18 @@ public final class NeroNotesNeoForge {
         // Stage 4: /neronotes soundforge return (game-bus command registration).
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) ->
                 NeroNotesCommands.register(event.getDispatcher()));
+        // Stage 7: last-seen touch on join + the daily retention sweep.
+        NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) -> {
+            if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                RetentionSweep.onPlayerJoin(serverPlayer);
+            }
+        });
+        // Stage 9: the same tick hook hands the link module its server handle
+        // (Core's link SPI delivers only a UUID; the module needs the server).
+        NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post event) -> {
+            NotesLinkModule.rememberServer(event.getServer());
+            RetentionSweep.onServerTick(event.getServer());
+        });
     }
 
     private static void onRegisterPayloadHandlers(RegisterPayloadHandlersEvent event) {

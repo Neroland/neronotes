@@ -7,7 +7,7 @@
 - **NeroNotes** — the music layer of the Neroland sci-fi Minecraft mod ecosystem, built on
   **Neroland Core** (required dependency, `nerolandcore_version` in `gradle.properties`; the
   manifest version ranges are DERIVED from it — never hardcode `[1.0,2.0)`).
-- **Status:** Stage 5 complete (on Stages 0–2: Core wiring, `platform/` seams,
+- **Status:** Stage 9 complete (on Stages 0–2: Core wiring, `platform/` seams,
   `config/NeroNotesConfig`, `telemetry/NeroNotesTelemetry` + `PRIVACY.md`, `menu/MenuOpener`,
   own channel `neronotes:main`, numbered `init()`; versioned `score/Score` + `ScoreCodec`;
   data-driven `voice/VoiceRegistry` + `sound/NeroNotesSounds` — **no `.ogg` ships**, vanilla sound
@@ -78,6 +78,115 @@
   recipe (copper + plasma-glass tag + amethyst). Preview plays the session once on the player's
   own `preview` channel through the normal resonance auth path (no operator bypass). Lectern,
   walls, pedestals and press all refuse politely outside the Soundforge (locked decision 2).
+  Stage 6 adds **publishing, the shared library and the Disk Exchanger**: the server-wide library
+  in `library/LibraryStore` (`"neronotes:library"`, behind Core's `SavedDataRecovery`; all row
+  logic + policy in the plain-JVM `library/LibraryTable`) — entry = int id, title, author UUID +
+  display choice, family, score bytes, pending flag and an **aggregate download count ONLY** (no
+  listening history, no per-download identity/timestamps, no play logs — a design constraint).
+  Erasure seams pre-wired for Stage 7: `hasRow(UUID)` probe + `anonymiseAuthor(UUID)` /
+  `anonymiseAuthorAndBackup` implementing "sever the link, keep the work" (strip UUID + name, mark
+  anonymous, keep the score; already-copied disks keep playing; copies of severed entries carry the
+  nil UUID). Publishing (`library/LibraryService.publishHeldDisk`, shared by the new
+  `block/PublishLecternBlock` on the Soundforge platform — `ensurePlatform` guard now also checks
+  it, so old platforms heal — and by `/neronotes library publish`) enforces
+  `library.publishing_enabled`, author-only ("only a disk's composer may publish it"), publish-time
+  `DiskNames` re-validation, a budget re-check, `library.size_cap`, `library.per_player_quota` and
+  `library.op_approval_required` (entry hidden until `approve`; pending rows still occupy quota).
+  The **Disk Exchanger** (`block/DiskExchangerBlock`, overworld machine, survival recipe,
+  `exchanger.enabled`; no BE) opens `menu/DiskExchangerMenu` via `MenuOpener` →
+  `client/DiskExchangerScreen`: source/blank/output slots, data-slot page gauges, and the listing
+  as the metadata-only clientbound `LibraryPagePayload` (titles/authors/families/counts, hard cap
+  `LibraryTable.MAX_PAGE_SIZE` = 100 rows, `library.page_size` per page — paginated from day one;
+  **no score ever crosses the wire for the Exchanger**: the client sends
+  `ExchangerActionPayload` COPY/DUPLICATE/REQUEST_PAGE and the server writes the disk itself,
+  incrementing only the aggregate count). Anonymous entries render "an anonymous composer"
+  everywhere and the author UUID appears in no payload. Commands under `/neronotes library`:
+  `browse [page]` (1-based), `publish`, `unpublish <id>` (author-only), and op-gated
+  (`Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)`) `remove <id>` + `approve <id>`.
+  Stage 7 adds **compliance (POPIA / GDPR)**: `data/NeroNotesData` registers ONE eraser with
+  Core's `PlayerDataErasure` at init step 7 — library `anonymiseAuthorAndBackup` ("sever the
+  link, keep the work"), session/channel/activity `purgePlayerAndBackup` (each refreshes the
+  recovery backup in the same request) and `ResonanceService.unsubscribeAll` for live state.
+  New `data/ActivityStore` (+ plain-JVM `ActivityTable`, `"neronotes:activity"`, UUID + login
+  epoch-millis ONLY) feeds `data/RetentionSweep`: the join hook touches, the server-tick hook
+  sweeps on a pure schedule (1 min after each server start, then daily), purging via the SAME
+  `NeroNotesData.eraseFor` path — NeroNotes data only (never Core's full fan-out from OUR
+  retention key), never a connected player, anonymous counts logged. All three loaders wire the
+  join + tick hooks. `data/DataExport` implements data-subject access (GDPR Art. 15/20):
+  everything about ONE player as JSON at `<world>/neronotes/exports/<uuid>.json` — owned
+  channels (trusted players as a COUNT only), trust memberships (owner identity omitted:
+  third-party data), Soundforge session summary + return anchor, authored library entries incl.
+  anonymous ones with base64 scores, and self-explaining policy notes. Commands in
+  `command/NeroNotesCommands`: `/neronotes data export` (self-service), op-gated
+  `/neronotes data export <uuid>`, and `/neronotes data erase-me` + `erase-me confirm`
+  (irreversible; Core's full `PlayerDataErasure.erase` fan-out, like `/neroland data eraseme`).
+  Core's `ErasureConformance` runs green in the tests (probes
+  `neronotes:{library,soundforge_sessions,channels,activity}`; the library probe is author-keyed
+  so severing reads as erased; bystanders survive; the report carries no UUID; expect ONE
+  deliberate "Data eraser ... failed" warning per run — the harness's canary, not a bug). There
+  is NO separate disk-authorship store: pressed disks in circulation are item components — world
+  data outside erasure scope — and the library is the authoritative anonymisation point; decided
+  and documented in `PRIVACY.md` (finalised: sever-the-link answer, disks-in-circulation,
+  retention, Art. 6(1)(f) / s11(1)(f), `info@neroland.co.za`) and `wiki/Privacy-and-Your-Data.md`.
+  Info-level logs audited: no player-authored strings, no identities, anywhere.
+  Stage 8 adds **soft integrations and threshold events**, all in `integration/` (init step 10 —
+  `NeroNotesIntegrations.init()`, feature-detecting via `Services.platform().isModLoaded`, debug
+  logs only, NO reflection, zero new compile-time deps): Core `event.ThresholdEvents` crossings
+  via the pure rising-edge detector `ThresholdCrossings` (fires once per threshold on rising
+  edges, no repeat while above, nothing on an unchanged value; re-crossing after a real drop
+  re-fires) + `NotesThresholds` — `neronotes:compositions_published` (1/10/50/100/500/1000, scope
+  `"library"`, fired from `LibraryService.publishHeldDisk` off `LibraryStore.totalCount()` —
+  pending-approval entries count, publishing is the author's act) and
+  `neronotes:channel_listeners` (2/5/10/25, scope = the channel's DIMENSION id ONLY, fired from
+  `ResonanceService.subscribe`; **a crossing scope is a place/system key, never a player, owner or
+  channel identity** — Core's contract and ours). That bus IS the NeroQuests pairing: its
+  `custom_event` objective consumes the crossings with no compile edge in either direction;
+  `integration/QuestContent` documents every id a quest pack can reference (disk items, both
+  channels, the `neronotes:soundforge` gate; per-player "first disk" triggers are quests-side
+  content — threshold scopes may not identify players; voice unlocks don't exist in 0.1.0).
+  NeroEconomy seam: `integration/ExchangerPricing` (UUID-based so plain-JVM testable, like
+  `ChannelAccess`; default `FREE`) consulted LAST in `DiskExchangerMenu.tryCopy` — after every
+  other refusal, before the disk is written (`neronotes.exchanger.payment_refused`); holder
+  `NeroNotesIntegrations.exchangerPricing()`/`setExchangerPricing(...)`. 0.1.0 installs NO
+  bridge — copies stay free even with NeroEconomy present; duplication is outside the seam.
+  NeroEvents: `integration/ChannelTakeover` is a documented stub ONLY — nothing implements or
+  consults it. Dimension neutrality verified: `server.overworld()` appears only as the SavedData
+  home (all five stores) + SoundforgeTravel's vanilla-respawn fallback; channels, playback and
+  broadcast key off `level.dimension()` everywhere, and SpaceTags-empty safety has been tested
+  since Stage 4. Left for the Stage 10 runtime plan: Resonator sync in a non-overworld dimension
+  (two clients in the Soundforge) and the Core-only vs Core+NeroQuests load configurations.
+  Stage 9 adds **the companion (NeroLink) link module** in `link/` (init step 11 — LAST, the whole
+  registration inside try/catch (RuntimeException | LinkageError) in `NotesLinkModule.init()`;
+  new `link.module_enabled` config master switch): the ecosystem five-class shape —
+  `NotesLinkModule` (MODULE_ID = mod id, SCHEMA_VERSION = 1, every section/action/topic constant;
+  Core's `NeroLinkRegistry.register*` methods take TWO arguments, provider + `LinkModuleInfo` —
+  the single-argument javadoc is stale), `NotesLinkAccess` (THE single visibility/permission
+  point: the volatile server handle written every tick by each loader's server-tick hook via
+  `NotesLinkModule.rememberServer` beside the retention sweep — Core's SPI delivers only a UUID;
+  `channelRef` = an opaque one-way name-UUID over (dimension, owner, name) so trusted channels
+  are referenceable WITHOUT emitting their owner's UUID; `controllableChannel` resolves an
+  action's channel ONLY inside the requester's own owned+trusted sets, then re-checks
+  `ChannelAccess.canControl` with NO operator bypass — "not yours" and "does not exist" answer
+  identically), `NotesLinkSnapshots` (sections: `library` — visible entries, paginated by the
+  `page` param, metadata only, **anonymous/severed entries carry NO author key at all**; `disks`
+  — the ONLINE requester's carried custom disks, empty + `player_online: false` offline
+  (inventories exist only online — decided and documented); `channels`/`now_playing` — ONLY
+  owned/trusted channels, live playing state + subscriber COUNTS, trust list as a COUNT, never a
+  roster, no owner UUID anywhere), `NotesLinkActions` (`play`/`stop` on the requester's own
+  channels through the new `block/ResonatorIndex` — loaded Resonators per dimension, registered
+  in `ResonatorBlockEntity.setLevel`/`setRemoved` exactly like `ResonantBlockIndex` — driving the
+  new UUID transport paths `ResonatorBlockEntity.startPlaybackAs`/`stopPlaybackAs`; non-owner or
+  unknown = `NOT_OWNER`; **NO `skip` — 0.1.0 has no playlists/queues, so skip has nothing honest
+  to skip to** (cut documented in the wiki); nothing creates/renames/trusts/publishes/
+  unpublishes/approves/removes over the link; `allowOffline` default kept — playback control is
+  online-only) and `NotesLinkEvents` (`now_playing` to the channel OWNER on GENUINE transitions
+  only, fired from `ResonanceService.applyTransport`'s wasPlaying edge — re-anchors/seeks never
+  fire; `library` BROADCAST with counts only — no titles/authors/ids — from
+  `LibraryService.publishHeldDisk` and the unpublish/remove/approve commands; no per-player state
+  held, nothing for erasure to clear). `link/NotesLinkTest` proves NOT_OWNER for non-owners, the
+  no-author-key anonymity invariant (chosen AND erased), the empty-for-strangers channel set, no
+  owner UUID in any row, and empty unknown-section snapshots. Wiki:
+  `wiki/Companion-Link-Module.md`.
 - Mod id: **`neronotes`** (matches the registry namespace + every loader manifest). Package root:
   `za.co.neroland.neronotes`. Author: **Neroland**.
 - Version: **0.0.1-alpha.1**.

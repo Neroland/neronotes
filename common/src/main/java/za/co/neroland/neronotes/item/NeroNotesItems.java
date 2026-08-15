@@ -82,6 +82,22 @@ public final class NeroNotesItems {
                     "neronotes.tooltip.disk_press.budget",
                     "neronotes.tooltip.disk_press.anonymous"));
 
+    // ------------------------------------------------------------------
+    // Stage 6 — publishing + the shared library
+    // ------------------------------------------------------------------
+
+    public static final RegistrationProvider.RegistryEntry<Item> PUBLISH_LECTERN =
+            ITEMS.register("publish_lectern", key -> new NotesBlockItem(NeroNotesBlocks.PUBLISH_LECTERN.get(),
+                    new Item.Properties().setId(key).useBlockDescriptionPrefix(),
+                    "neronotes.tooltip.publish_lectern.publish",
+                    "neronotes.tooltip.publish_lectern.place"));
+
+    public static final RegistrationProvider.RegistryEntry<Item> DISK_EXCHANGER =
+            ITEMS.register("disk_exchanger", key -> new NotesBlockItem(NeroNotesBlocks.DISK_EXCHANGER.get(),
+                    new Item.Properties().setId(key).useBlockDescriptionPrefix(),
+                    "neronotes.tooltip.disk_exchanger.browse",
+                    "neronotes.tooltip.disk_exchanger.copy"));
+
     /** A blank resonant disk — the Disk Press's input; craftable in survival. */
     public static final RegistrationProvider.RegistryEntry<Item> BLANK_DISK =
             ITEMS.register("blank_disk", key -> new BlankDiskItem(
@@ -117,6 +133,8 @@ public final class NeroNotesItems {
         CoreCreativeTab.add(PATTERN_WALL);
         CoreCreativeTab.add(VOICE_PEDESTAL);
         CoreCreativeTab.add(DISK_PRESS);
+        CoreCreativeTab.add(PUBLISH_LECTERN);
+        CoreCreativeTab.add(DISK_EXCHANGER);
         CoreCreativeTab.add(BLANK_DISK);
         CoreCreativeTab.add(CUSTOM_DISK);
     }
