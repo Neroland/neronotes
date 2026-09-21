@@ -50,7 +50,7 @@ no MIDI, no playlists, no light shows, no cross-dimension relays. The full list 
 ## Requirements
 
 - **Neroland Core `1.11.0` or newer** (required; loads before NeroNotes).
-- **Minecraft 26.1.2 or 26.2** on **NeoForge, MinecraftForge/Forge, or Fabric** — the "6 cells".
+- **Minecraft 26.1.2 or 26.2** on **NeoForge, MinecraftForge/Forge, or Fabric** — the "9 cells".
 - **Java 25.**
 
 ## Building
@@ -63,9 +63,9 @@ The build is the repo root, a flattened cross-loader structure driven by Stonecu
 
 ```sh
 ./gradlew :fabric:26.2:build          # one cell
-./gradlew :neoforge:26.1.2:build :neoforge:26.2:build \
-          :forge:26.1.2:build :forge:26.2:build \
-          :fabric:26.1.2:build :fabric:26.2:build   # all six
+./gradlew :neoforge:26.1.2:build :neoforge:26.2:build :neoforge:26.3:build \
+          :forge:26.1.2:build :forge:26.2:build :forge:26.3:build \
+          :fabric:26.1.2:build :fabric:26.2:build :fabric:26.3:build   # all nine
 ./gradlew :fabric:26.2:ecjCheck       # static analysis
 ./gradlew :neoforge:26.2:test         # unit tests (wired into the NeoForge nodes)
 ```
