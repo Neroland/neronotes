@@ -65,11 +65,11 @@ yours on your own machine and the server never overrides them.
 
 ## Client-local keys
 
-Exactly four kinds, and no more — audio comfort and the telemetry opt-out:
+Exactly four kinds, and no more — audio comfort and the crash-reporting opt-out:
 
 | Key | Default (range) | Meaning |
 | --- | --- | --- |
-| `client.telemetry_opt_out` | `false` | Set `true` to opt out of anonymous error reporting entirely. See [Privacy and your data](Privacy-and-Your-Data.md). |
+| `telemetryEnabled` | `true` | Anonymous, NeroNotes-only crash reporting (Sentry, EU servers). **On by default**; set `false` to opt out entirely (takes effect on restart). See [Privacy and your data](Privacy-and-Your-Data.md). |
 | `client.volume.deep_bass` | `1.0` (0–1) | Volume multiplier for the Deep Bass voice family. |
 | `client.volume.sub_pad` | `1.0` (0–1) | Volume multiplier for the Sub Pad voice family. |
 | `client.volume.low_drone` | `1.0` (0–1) | Volume multiplier for the Low Drone voice family. |

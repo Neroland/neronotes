@@ -59,8 +59,8 @@ NeroNotes' own data. Players currently online are never purged.
 - Non-essential action logging is **off by default** (`data.action_logging_enabled = false`), and
   player-authored text (titles, disk names, channel names) and player identities are never written
   to info-level logs regardless.
-- Optional crash reporting is **opt-out** (`client.telemetry_opt_out = true` disables it
-  completely) and never contains player names, UUIDs, coordinates, chat, player-authored text, or
+- Anonymous crash reporting is **on by default** and **opt-out** (`telemetryEnabled = false` in
+  `config/neronotes.properties` disables it completely) and never contains player names, UUIDs, coordinates, chat, player-authored text, or
   a list of installed mods. See `PRIVACY.md` for the full description.
 
 ## Command reference

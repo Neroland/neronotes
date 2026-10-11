@@ -79,8 +79,9 @@ Neroland Core resolves from Maven Local or GitHub Packages — see
   disks, publishing, commands, configuration, privacy, the companion module.
 - [`USING-CORE.md`](USING-CORE.md) — every Neroland Core API this mod consumes, and how the Core
   dependency is declared.
-- [`PRIVACY.md`](PRIVACY.md) — what the optional error reporting does and does not collect, and
-  how gameplay data in your world save is handled.
+- [`PRIVACY.md`](PRIVACY.md) — what the anonymous error reporting (**on by default**, **opt-out** with
+  `telemetryEnabled=false` in `config/neronotes.properties`) does and does not collect, and how
+  gameplay data in your world save is handled.
 - [`CHANGELOG.md`](CHANGELOG.md) — release history, including the explicit not-in-this-release
   list.
 - [`AGENTS.md`](AGENTS.md) / [`CLAUDE.md`](CLAUDE.md) — contributor and AI-agent context.

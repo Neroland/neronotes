@@ -6,11 +6,12 @@ on, whose operator is responsible for their own server data.
 
 ## What is collected (error reporting)
 
-NeroNotes includes **optional, opt-out error reporting** via Sentry so crashes involving NeroNotes
-code can be found and fixed. When an error is reported, the report contains:
+NeroNotes includes anonymous error reporting via Sentry (EU servers) so crashes involving NeroNotes
+code can be found and fixed. It is **on by default** and **opt-out** (see
+[How to opt out](#how-to-opt-out)). When an error is reported, the report contains:
 
-- the exception type, message and stack trace (only errors that touch NeroNotes/Neroland code are
-  sent; everything else is dropped before sending);
+- the exception type, message and stack trace (only errors that touch NeroNotes' own code are
+  sent; errors from Neroland Core, other mods or Minecraft are dropped before sending);
 - the NeroNotes version and whether the game runs in a development environment.
 
 Reports are scrubbed before sending: your home directory path and operating-system username are
@@ -28,8 +29,9 @@ the build.
 
 ## How to opt out
 
-Set `client.telemetry_opt_out = true` in `config/neronotes.properties`. The mod then performs no
-error reporting whatsoever. Opting out has no gameplay effect.
+Set `telemetryEnabled = false` in `config/neronotes.properties` (created on first launch). The mod
+then performs no error reporting whatsoever. This is a client-local switch (never synced from a
+server), it takes effect on restart, and opting out has no gameplay effect.
 
 ## Compositions, authorship and the shared library (gameplay data stored in your world)
 

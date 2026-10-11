@@ -11,7 +11,7 @@ import za.co.neroland.neronotes.NeroNotesCommon;
  *
  * <p>This is the FULL 0.1.0 key schema, landed in Stage 0 so later stages
  * only ever read it. Every gameplay key is server-authoritative; the only
- * client-local keys are the telemetry opt-out, the per-voice-family volumes,
+ * client-local keys are {@code telemetryEnabled}, the per-voice-family volumes,
  * the glow intensity and the "mute other players' bases" toggle.</p>
  */
 public final class NeroNotesConfig {
@@ -19,9 +19,9 @@ public final class NeroNotesConfig {
     private static final String HEADER =
             "NeroNotes configuration.\n"
             + "Gameplay keys are server-authoritative: in multiplayer the server's values win and\n"
-            + "clients never decide what they may play, publish or own. The client.* keys are\n"
-            + "client-local (audio comfort + telemetry opt-out). See PRIVACY.md for what the\n"
-            + "optional error reporting does and does not collect.";
+            + "clients never decide what they may play, publish or own. The client.* keys and\n"
+            + "telemetryEnabled are client-local (audio comfort + crash-report opt-out). Crash\n"
+            + "reporting is on by default; see PRIVACY.md for what it does and does not collect.";
 
     public static final ConfigSchema SCHEMA = ConfigSchema.create(NeroNotesCommon.MOD_ID, HEADER);
 
@@ -125,14 +125,14 @@ public final class NeroNotesConfig {
 
     // ------------------------------------------------------------------
     // Client-local keys (serverAuthoritative = false) — EXACTLY these:
-    // telemetry opt-out, per-voice-family volume, glow intensity,
+    // telemetryEnabled, per-voice-family volume, glow intensity,
     // mute other players' bases.
     // ------------------------------------------------------------------
 
-    /** Telemetry opt-out — see PRIVACY.md. */
-    public static final ConfigValue<Boolean> TELEMETRY_OPT_OUT = SCHEMA.bool(
-            "client.telemetry_opt_out", false, false,
-            "Set true to opt out of anonymous error reporting entirely. See PRIVACY.md.");
+    /** Crash telemetry — on by default, client-local opt-out (never server-synced). See PRIVACY.md. */
+    public static final ConfigValue<Boolean> TELEMETRY_ENABLED = SCHEMA.bool(
+            "telemetryEnabled", true, false,
+            "On by default: send anonymous, NeroNotes-only crash reports (Sentry, EU servers): stack trace and mod/MC/loader/OS/Java versions; no IP, username, UUID, world data, chat, composition titles, disk names or author names; file paths are scrubbed of your account name. Set false to opt out. See PRIVACY.md.");
 
     /** Per-voice-family client volume: deep bass. */
     public static final ConfigValue<Double> VOLUME_DEEP_BASS = SCHEMA.doubleRange(

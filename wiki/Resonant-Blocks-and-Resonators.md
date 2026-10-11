@@ -96,7 +96,7 @@ These keys in `config/neronotes.properties` are yours locally — the server nev
 synced base audio goes silent for you, while your own channels keep playing. It is a local audio
 preference only — it grants and removes no permissions.
 
-The fourth and last client-local key, `client.telemetry_opt_out`, is covered in
+The fourth and last client-local key, `telemetryEnabled` (crash reporting, on by default), is covered in
 [Privacy and your data](Privacy-and-Your-Data.md); every key is listed on the
 [Configuration](Configuration.md) page.
 

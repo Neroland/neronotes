@@ -1,3 +1,11 @@
+[![NeroLink App — Beta](https://img.shields.io/badge/NeroLink_App-Now_in_Beta-60d4e8?style=for-the-badge)](https://nerolandmc.net/nerolink/#beta) [![Explore the Neroland ecosystem](https://img.shields.io/badge/Explore-The_Neroland_Ecosystem-1a5a6c?style=for-the-badge)](https://nerolandmc.net/ecosystem/)
+
+> 📱 **NeroLink App Beta — your Neroland world on your phone.** Check energy, alerts and machines live, claim quest rewards and search your storage without logging in. **[Join the beta at nerolandmc.net →](https://nerolandmc.net/nerolink/#beta)**
+>
+> 🌌 **Explore the Neroland ecosystem.** See how NeroNotes fits together with the rest of the Nero mods — every mod, wiki and changelog in one place. **[View the ecosystem at nerolandmc.net →](https://nerolandmc.net/ecosystem/)** · [NeroNotes on the website](https://nerolandmc.net/mods/neronotes/)
+
+---
+
 # NeroNotes
 
 **Futuristic music for Minecraft — compose your own disks in a dedicated studio dimension, then sync them across your whole base on glowing neon resonator blocks.**
@@ -34,3 +42,11 @@ Step through the **Harmonic Gate** into a dedicated composition dimension: a qui
 ## Links
 
 - 📖 **[Wiki](https://github.com/Neroland/neronotes/wiki)** — every block and system documented.
+
+---
+
+> **Telemetry notice:** NeroNotes sends anonymous error reports (stack trace + mod/game
+> versions only — never IPs, usernames, UUIDs, world data, composition titles or disk names) to the
+> developers via Sentry (EU servers) so crashes can be fixed. On by default — opt out any time by
+> setting `telemetryEnabled = false` in `config/neronotes.properties`. Full details:
+> [PRIVACY.md](https://github.com/Neroland/neronotes/blob/main/PRIVACY.md).

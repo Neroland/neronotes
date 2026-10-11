@@ -24,7 +24,7 @@ import za.co.neroland.neronotes.platform.Services;
  * <p>Privacy posture: {@code sendDefaultPii=false}, no server name, no session
  * tracking, home-path and OS-username scrubbing, a hard per-session event cap
  * ({@value #MAX_EVENTS_PER_SESSION}) and per-session dedup. Events without a
- * Neroland stack frame are dropped in {@code beforeSend}. No personal data
+ * NeroNotes stack frame are dropped in {@code beforeSend}. No personal data
  * ever — and specifically no composition titles, disk names or author display
  * names, which are player-authored free text.</p>
  *
@@ -47,7 +47,8 @@ public final class NeroNotesTelemetry {
     /** Hard cap on events sent in one game session. */
     static final int MAX_EVENTS_PER_SESSION = 10;
 
-    private static final String NEROLAND_PACKAGE_PREFIX = "za.co.neroland";
+    /** Only frames from NeroNotes' own package qualify an event (never Core's or another mod's). */
+    private static final String NEROLAND_PACKAGE_PREFIX = "za.co.neroland.neronotes";
 
     private static final AtomicInteger EVENTS_THIS_SESSION = new AtomicInteger();
     private static final Set<String> SESSION_FINGERPRINTS = Collections.synchronizedSet(new HashSet<>());
@@ -66,14 +67,14 @@ public final class NeroNotesTelemetry {
             NeroNotesCommon.LOGGER.debug("[NeroNotes] telemetry: no DSN configured; error reporting disabled");
             return;
         }
-        if (Boolean.TRUE.equals(NeroNotesConfig.TELEMETRY_OPT_OUT.get())) {
+        if (!Boolean.TRUE.equals(NeroNotesConfig.TELEMETRY_ENABLED.get())) {
             NeroNotesCommon.LOGGER.info("[NeroNotes] telemetry: opted out via config; error reporting disabled");
             return;
         }
         try {
             Sentry.init(NeroNotesTelemetry::configure);
             active = true;
-            NeroNotesCommon.LOGGER.info("[NeroNotes] telemetry: error reporting enabled (opt out via client.telemetry_opt_out; see PRIVACY.md)");
+            NeroNotesCommon.LOGGER.info("[NeroNotes] telemetry: error reporting enabled (opt out via telemetryEnabled=false in config/neronotes.properties; see PRIVACY.md)");
         } catch (RuntimeException | LinkageError e) {
             NeroNotesCommon.LOGGER.warn("[NeroNotes] telemetry: initialisation failed; continuing without error reporting", e);
         }
