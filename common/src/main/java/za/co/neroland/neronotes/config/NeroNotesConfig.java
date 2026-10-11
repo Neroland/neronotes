@@ -108,6 +108,16 @@ public final class NeroNotesConfig {
             "exchanger.enabled", true, true,
             "Whether the Disk Exchanger (library browsing + disk copying machine) is enabled.");
 
+    /**
+     * Price in credits of one Disk Exchanger library copy (0.4.0). Only
+     * charged when NeroEconomy is installed; 0 makes copies free. Capped at
+     * NeroEconomy's single-payment ceiling so the screen's data-slot readout
+     * never clamps.
+     */
+    public static final ConfigValue<Integer> LIBRARY_COPY_PRICE = SCHEMA.intRange(
+            "exchanger.library_copy_price", 25, 0, 1000, true,
+            "Credits one Disk Exchanger library copy costs when NeroEconomy is installed (0 = free). The composer receives the price less NeroEconomy's transfer fee; copies of anonymous, erased-author or your own entries pay the whole price to the Reserve. Ignored without NeroEconomy.");
+
     /** Retention window in days for the inactive-player purge (Stage 7). 0 disables the sweep. */
     public static final ConfigValue<Integer> RETENTION_DAYS = SCHEMA.intRange(
             "data.retention_days", 365, 0, 3650, true,

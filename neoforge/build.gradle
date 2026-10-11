@@ -71,6 +71,10 @@ dependencies {
     // root stonecutter.gradle repositories).
     implementation "za.co.neroland.nerolandcore:nerolandcore-neoforge-${mc}:${rootProject.nerolandcore_version}"
 
+    // NeroEconomy — OPTIONAL. API on the compile classpath only (the Disk Exchanger pricing bridge in
+    // compat/neroeconomy, touched only behind isModLoaded("neroeconomy")). Never bundled, never required.
+    compileOnly "za.co.neroland.neroeconomy:neroeconomy-neoforge-${mc}:${rootProject.neroeconomy_version}"
+
     // JUnit 5 for the shared common tests (see the test source-set wiring below).
     testImplementation platform('org.junit:junit-bom:5.12.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -24,7 +25,10 @@ import za.co.neroland.neronotes.voice.VoiceFamily;
  * server decides everything.
  *
  * <p>Anonymous entries show the translated "anonymous" line; no author UUID
- * exists anywhere client-side.</p>
+ * exists anywhere client-side. When copies are priced (NeroEconomy), the
+ * title bar shows the price and the Copy button's tooltip restates the split
+ * — what the copier pays and what the composer receives — from two
+ * data-slot numbers; the composer is never named.</p>
  */
 public class DiskExchangerScreen extends AbstractContainerScreen<DiskExchangerMenu> {
 
@@ -55,6 +59,9 @@ public class DiskExchangerScreen extends AbstractContainerScreen<DiskExchangerMe
     private NotesButton prevButton;
     private NotesButton nextButton;
     private NotesButton copyButton;
+    /** Price/fee the Copy tooltip was last built for (rebuilt only when they change). */
+    private int tooltipPrice = -1;
+    private int tooltipFee = -1;
 
     public DiskExchangerScreen(DiskExchangerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title, W, H);
@@ -159,6 +166,21 @@ public class DiskExchangerScreen extends AbstractContainerScreen<DiskExchangerMe
         prevButton.active = pageIndex > 0;
         nextButton.active = pageIndex + 1 < pageCount;
         copyButton.active = selectedId >= 0;
+        refreshCopyTooltip();
+    }
+
+    /** Restate the split before the player confirms: "you pay X; the composer receives X − fee". */
+    private void refreshCopyTooltip() {
+        int price = menu.copyPrice();
+        int fee = Math.max(0, Math.min(menu.copyFee(), price));
+        if (price == tooltipPrice && fee == tooltipFee) {
+            return;
+        }
+        tooltipPrice = price;
+        tooltipFee = fee;
+        copyButton.setTooltip(price <= 0
+                ? Tooltip.create(Component.translatable("neronotes.exchanger.price.free"))
+                : Tooltip.create(Component.translatable("neronotes.exchanger.price.split", price, price - fee, fee)));
     }
 
     @Override
@@ -267,6 +289,11 @@ public class DiskExchangerScreen extends AbstractContainerScreen<DiskExchangerMe
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         g.text(font, title, titleLabelX, titleLabelY, TITLE, false);
+        int price = menu.copyPrice();
+        if (price > 0) {
+            Component priceLabel = Component.translatable("neronotes.exchanger.price.label", price);
+            g.text(font, priceLabel, W - 8 - font.width(priceLabel), titleLabelY, ACCENT, false);
+        }
         g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, SUBTLE, false);
     }
 }

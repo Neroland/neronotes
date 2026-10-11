@@ -38,8 +38,8 @@ The loop: **compose → press → sync → play → publish → download.**
 - **Data protection built in** — self-service `/neronotes data export` and
   `/neronotes data erase-me`, a retention sweep for inactive players, and a documented
   sever-the-link-keep-the-work answer for erased authors. See [`PRIVACY.md`](PRIVACY.md).
-- **Ecosystem-aware, never dependent** — threshold-event milestones for NeroQuests, a pricing
-  seam for NeroEconomy, and a companion (NeroLink) module with strictly requester-scoped data
+- **Ecosystem-aware, never dependent** — threshold-event milestones for NeroQuests, paid
+  library copies with a composer royalty through NeroEconomy, and a companion (NeroLink) module with strictly requester-scoped data
   and `play`/`stop` actions. All optional, all feature-detected at runtime.
 
 **Honesty about placeholders:** this release ships **no `.ogg` audio** — every voice aliases a

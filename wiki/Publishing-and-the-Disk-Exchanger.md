@@ -54,7 +54,9 @@ Open it to browse the library:
 - Each row shows the title, the composer (or the anonymous line), and the download count.
 - **Copy**: select a row, put a **blank disk** in the blank slot, and press Copy. The server writes
   the composition onto your disk and adds one to the entry's download count. The score never
-  travels to your client during browsing — copying happens entirely on the server.
+  travels to your client during browsing — copying happens entirely on the server. With
+  NeroEconomy installed a library copy can cost credits; see
+  [Integrations](Integrations-and-Threshold-Events.md#neroeconomy).
 - **Duplicate**: put a pressed disk in the source slot and a blank disk in the blank slot, and
   press Dupe for an exact copy (title, palette and the credit choice included). The library and its
   counts are not involved.
@@ -83,6 +85,7 @@ Everything the lectern and the Exchanger do is also reachable under `/neronotes 
 | `library.op_approval_required` | `false` | Entries stay hidden until an operator approves them. |
 | `library.page_size` | `50` | Entries per library page. |
 | `exchanger.enabled` | `true` | Enables the Disk Exchanger machine. |
+| `exchanger.library_copy_price` | `25` | Credits one library copy costs when NeroEconomy is installed (0 = free). Ignored without NeroEconomy. |
 
 All of these are server-authoritative.
 

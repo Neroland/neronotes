@@ -80,6 +80,19 @@ pressed anonymously never contained a display name to begin with. We chose to do
 honestly rather than promise an "erase on next load" mechanism, which would itself require keeping
 a list of erased UUIDs — retaining exactly the identifier an erasure is meant to remove.
 
+## Paid library copies (only with NeroEconomy installed)
+
+When NeroEconomy is installed, copying a library entry at the Disk Exchanger can cost credits
+(`exchanger.library_copy_price`). NeroNotes **stores nothing new** for this: it hands NeroEconomy
+the copier's UUID and, only to route the composer's royalty, the entry's author UUID. Anonymous and
+erased-author entries have no author UUID, so their price goes to NeroEconomy's Reserve and no
+author is ever looked up. Neither side is shown the other: the copier sees only the price and the
+split, never the composer's name or UUID, and NeroNotes never logs a UUID or name with a payment.
+NeroEconomy records the payment in its own ledger (origin `neronotes/library_copy`), which is
+covered by NeroEconomy's privacy notice and is exported and erased with that player's economy data.
+Pressed disks are tagged `neroeconomy:untradeable`, so NeroEconomy never lists, vaults or sends
+them — the composer UUID and title inside a disk are never stored by the economy.
+
 ## Legal basis and your rights
 
 Error reporting relies on **legitimate interest** (GDPR Art. 6(1)(f) / POPIA s11(1)(f)): keeping

@@ -49,6 +49,7 @@ yours on your own machine and the server never overrides them.
 | `library.op_approval_required` | `false` | If true, a published disk only becomes visible after an operator runs `/neronotes library approve <id>`. |
 | `library.page_size` | `50` (10–100) | Page size for library listings (paginated from the first release). |
 | `exchanger.enabled` | `true` | Whether the Disk Exchanger machine is enabled. |
+| `exchanger.library_copy_price` | `25` | Credits one library copy costs when NeroEconomy is installed (0 = free). |
 
 ### Data protection
 

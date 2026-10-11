@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0-beta.1] - 2026-10-11
+
+Optional NeroEconomy pricing for Disk Exchanger library copies. NeroEconomy stays optional:
+without it nothing changes and copies stay free.
+
+### Added
+
+- **Paid library copies with NeroEconomy.** With NeroEconomy 0.3.0 or later installed, copying a
+  library entry at the Disk Exchanger costs `exchanger.library_copy_price` credits (new key,
+  default 25, 0 = free). For an entry whose composer is someone else, the price goes to the
+  composer less NeroEconomy's transfer fee, which goes to its Reserve; for anonymous,
+  erased-author or your own entries the whole price goes to the Reserve. A refused payment writes
+  nothing and the Exchanger says why. Duplicating a disk you hold stays free.
+- **The split on the Exchanger screen.** The title bar shows the copy price, and the Copy button's
+  tooltip states what you pay and what the composer receives before you confirm. The composer is
+  never named or identified.
+- **Pressed disks are untradeable in NeroEconomy.** `neronotes:custom_disk` joins the
+  `neroeconomy:untradeable` item tag (data only, harmless without NeroEconomy), so disks are never
+  listed, vaulted or sent to the companion app with their composer and title data.
+
+### Changed
+
+- The Disk Exchanger pricing seam gains add-only defaults: a server-aware `chargeCopy` overload
+  and price/fee quotes for the screen. Existing implementations keep working unchanged.
+- Mod metadata lists NeroEconomy as an optional dependency (`[0.3.0-beta.1,)`); the build
+  compiles against its API only and never bundles it.
+
 ## [0.3.0-beta.1] - 2026-09-24
 
 EMI compatibility. No gameplay, id, tag or config change.

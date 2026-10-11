@@ -109,6 +109,10 @@ dependencies {
     // root stonecutter.gradle repositories).
     implementation "za.co.neroland.nerolandcore:nerolandcore-forge-${mc}:${rootProject.nerolandcore_version}"
 
+    // NeroEconomy — OPTIONAL. API on the compile classpath only (the Disk Exchanger pricing bridge in
+    // compat/neroeconomy, touched only behind isModLoaded("neroeconomy")). Never bundled, never required.
+    compileOnly "za.co.neroland.neroeconomy:neroeconomy-forge-${mc}:${rootProject.neroeconomy_version}"
+
     // JEI common API only; Forge 26.x loader artifacts are not yet published on the pinned JEI lines.
     if (jeiVersion) {
         compileOnly "mezz.jei:jei-${mc}-common-api:${jeiVersion}"

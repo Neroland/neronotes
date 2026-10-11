@@ -20,6 +20,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neronotes.config.NeroNotesConfig;
+import za.co.neroland.neronotes.integration.ExchangerPricing;
 import za.co.neroland.neronotes.integration.NeroNotesIntegrations;
 import za.co.neroland.neronotes.item.CustomDiskItem;
 import za.co.neroland.neronotes.item.DiskContents;
@@ -59,7 +60,11 @@ public class DiskExchangerMenu extends AbstractContainerMenu {
     public static final int DATA_PAGE = 0;
     public static final int DATA_PAGE_COUNT = 1;
     public static final int DATA_VISIBLE_COUNT = 2;
-    public static final int DATA_COUNT = 3;
+    /** Price of one library copy in credits (0 = free) — for the screen's split line. */
+    public static final int DATA_COPY_PRICE = 3;
+    /** The part of that price that does not reach the composer (the economy's fee). */
+    public static final int DATA_COPY_FEE = 4;
+    public static final int DATA_COUNT = 5;
 
     /** Data slots are 16-bit on the wire; gauge values clamp to this. */
     private static final int DATA_SLOT_MAX = 32767;
@@ -183,10 +188,10 @@ public class DiskExchangerMenu extends AbstractContainerMenu {
         }
         // Stage 8: the NeroEconomy pricing seam — consulted LAST, once every
         // other refusal is ruled out, so a paid copy can never be charged and
-        // then refused. The default is free; 0.1.0 installs no bridge, so
-        // this always allows. The composer UUID is the royalty target (empty
+        // then refused. The default is free; with NeroEconomy installed the
+        // bridge charges the copier and routes the royalty. The composer UUID is the royalty target (empty
         // for anonymous/erased entries) and never surfaces to the client.
-        if (!NeroNotesIntegrations.exchangerPricing().chargeCopy(player.getUUID(), entryId, entry.author())) {
+        if (!NeroNotesIntegrations.exchangerPricing().chargeCopy(server, player.getUUID(), entryId, entry.author())) {
             player.sendSystemMessage(Component.translatable("neronotes.exchanger.payment_refused"));
             return;
         }
@@ -246,6 +251,12 @@ public class DiskExchangerMenu extends AbstractContainerMenu {
         data.set(DATA_PAGE, Math.min(page, DATA_SLOT_MAX));
         data.set(DATA_PAGE_COUNT, Math.min(library.pageCount(pageSize), DATA_SLOT_MAX));
         data.set(DATA_VISIBLE_COUNT, Math.min(library.visibleCount(), DATA_SLOT_MAX));
+        // The price quote — numbers only; nothing about any composer reaches the client.
+        ExchangerPricing pricing = NeroNotesIntegrations.exchangerPricing();
+        long price = Math.max(0L, pricing.copyPrice());
+        long fee = price == 0 ? 0L : Math.max(0L, Math.min(price, pricing.royaltyFeeFor(price)));
+        data.set(DATA_COPY_PRICE, (int) Math.min(price, DATA_SLOT_MAX));
+        data.set(DATA_COPY_FEE, (int) Math.min(fee, DATA_SLOT_MAX));
     }
 
     private static String truncate(String value, int max) {
@@ -313,5 +324,15 @@ public class DiskExchangerMenu extends AbstractContainerMenu {
 
     public int visibleCount() {
         return data.get(DATA_VISIBLE_COUNT);
+    }
+
+    /** Price of one library copy in credits; 0 = free. */
+    public int copyPrice() {
+        return data.get(DATA_COPY_PRICE);
+    }
+
+    /** The economy's fee within {@link #copyPrice()} when a composer royalty is routed. */
+    public int copyFee() {
+        return data.get(DATA_COPY_FEE);
     }
 }

@@ -22,12 +22,13 @@ import za.co.neroland.neronotes.platform.Services;
  *       {@code custom_event} objective listens to Core's bus on its own. The
  *       detection is logged so a server owner reading a debug log can see
  *       the pairing is live.</li>
- *   <li><strong>neroeconomy</strong>: the {@link ExchangerPricing} seam
- *       exists and the Exchanger copy path consults it, but 0.1.0 installs
- *       no bridge — copies stay {@link ExchangerPricing#FREE} even with
- *       NeroEconomy present. A later release ships the {@code compileOnly}
- *       bridge that calls {@link #setExchangerPricing} behind this
- *       detection.</li>
+ *   <li><strong>neroeconomy</strong>: since 0.4.0 the {@code compileOnly}
+ *       bridge ({@code compat/neroeconomy/NeroEconomyExchangerBridge}) is
+ *       installed through {@link #setExchangerPricing} behind this
+ *       detection: library copies cost {@code exchanger.library_copy_price}
+ *       credits, routed to the composer as a royalty (less NeroEconomy's
+ *       fee) or to the Reserve for anonymous, erased or own entries. With
+ *       NeroEconomy absent copies stay {@link ExchangerPricing#FREE}.</li>
  *   <li><strong>neroevents</strong>: an empty skeleton today —
  *       {@link ChannelTakeover} documents the future seam; nothing is built
  *       against it.</li>
@@ -43,7 +44,18 @@ public final class NeroNotesIntegrations {
     /** Called once from {@code NeroNotesCommon.init()} step 10. */
     public static void init() {
         logDetection("neroquests", "ThresholdEvents crossings become quest triggers");
-        logDetection("neroeconomy", "ExchangerPricing seam available (0.1.0 installs no bridge; copies stay free)");
+        logDetection("neroeconomy", "Disk Exchanger library copies priced through the NeroEconomy bridge");
+        if (Services.platform().isModLoaded("neroeconomy")) {
+            // The ONLY path into compat/neroeconomy — the bridge class (the one place that imports
+            // NeroEconomy) is never touched unless the mod is loaded. A failure costs pricing, never
+            // the mod: copies stay free.
+            try {
+                za.co.neroland.neronotes.compat.neroeconomy.NeroEconomyExchangerBridge.install();
+            } catch (RuntimeException | LinkageError failure) {
+                NeroNotesCommon.LOGGER.warn("[NeroNotes] NeroEconomy pricing bridge unavailable; library copies stay free ({})",
+                        failure.getClass().getSimpleName());
+            }
+        }
         logDetection("neroevents", "ChannelTakeover seam documented only; nothing wired");
         NeroNotesCommon.LOGGER.debug(
                 "[NeroNotes] integrations ready — ThresholdEvents channels: {}, {}",
@@ -56,7 +68,7 @@ public final class NeroNotesIntegrations {
     }
 
     /**
-     * Install a pricing provider (a future NeroEconomy bridge). {@code null}
+     * Install a pricing provider (the NeroEconomy bridge). {@code null}
      * restores the free default.
      */
     public static void setExchangerPricing(ExchangerPricing pricing) {

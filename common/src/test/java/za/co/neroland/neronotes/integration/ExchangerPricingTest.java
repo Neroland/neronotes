@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,6 +30,22 @@ class ExchangerPricingTest {
     void defaultAllowsEveryCopyForFree() {
         assertTrue(ExchangerPricing.FREE.chargeCopy(PLAYER, 1, Optional.of(AUTHOR)));
         assertTrue(ExchangerPricing.FREE.chargeCopy(PLAYER, 2, Optional.empty())); // anonymous/erased author
+    }
+
+    @Test
+    void defaultQuoteIsFreeAndServerOverloadDelegates() {
+        assertEquals(0L, ExchangerPricing.FREE.copyPrice());
+        assertEquals(0L, ExchangerPricing.FREE.royaltyFeeFor(100L));
+        ExchangerPricing legacy = new ExchangerPricing() {
+            @Override
+            public boolean chargeCopy(UUID player, int entryId, Optional<UUID> author) {
+                return entryId != 7;
+            }
+        };
+        // A provider written against the original UUID-only signature keeps deciding when the
+        // Exchanger calls the server-aware overload.
+        assertTrue(legacy.chargeCopy(null, PLAYER, 1, Optional.of(AUTHOR)));
+        assertFalse(legacy.chargeCopy(null, PLAYER, 7, Optional.empty()));
     }
 
     @Test

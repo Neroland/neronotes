@@ -46,11 +46,23 @@ threshold bus. Voice unlocks do not exist in 0.1.0 — every voice ships unlocke
 
 ## NeroEconomy
 
-The Disk Exchanger consults a **pricing seam** before every library copy. In 0.1.0 the built-in
-answer is *free* — always allowed, nothing charged — even with NeroEconomy installed; the seam
-exists so a later release can price Exchanger copies and route composer royalties (anonymous and
-erased-author compositions have no royalty target by design). Duplicating a disk you already own
-never involves the library and is outside the seam.
+NeroEconomy is optional. Without it, library copies at the Disk Exchanger are free. With it
+installed (0.3.0 or later), each library copy costs `exchanger.library_copy_price` credits (25 by
+default, 0 for free):
+
+- **An entry with a composer who is not you**: the price moves from you to the composer in one
+  step, less NeroEconomy's transfer fee (5 % by default), which goes to the Reserve. Copying never
+  creates credits.
+- **An anonymous or erased-author entry, or your own**: the whole price goes to the Reserve. An
+  author is never looked up.
+
+The price shows in the Exchanger's title bar, and the Copy button's tooltip states the split before
+you confirm. The composer is never named or identified to you. If the payment is refused (not
+enough credits, a budget limit), the Exchanger writes nothing and tells you why. Duplicating a disk
+you already own never involves the library and is always free.
+
+Pressed disks are tagged `neroeconomy:untradeable`, so they cannot be listed, vaulted or sent to
+the companion app through NeroEconomy.
 
 ## NeroEvents
 

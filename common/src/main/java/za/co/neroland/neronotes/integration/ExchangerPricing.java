@@ -3,16 +3,18 @@ package za.co.neroland.neronotes.integration;
 import java.util.Optional;
 import java.util.UUID;
 
+import net.minecraft.server.MinecraftServer;
+
 /**
  * The NeroEconomy pricing seam for Disk Exchanger <em>library copies</em> —
  * consulted by the Exchanger copy path (after every other validation, before
  * the disk is written), <strong>with no pricing logic in NeroNotes</strong>.
- * 0.1.0 ships only {@link #FREE}: every copy is allowed at no cost. A future
- * NeroEconomy bridge (feature-detected in {@link NeroNotesIntegrations},
- * {@code compileOnly} + {@code isModLoaded}, never reflection) installs a
- * real implementation via
+ * The default is {@link #FREE}: every copy is allowed at no cost. Since
+ * 0.4.0 the NeroEconomy bridge ({@code compat/neroeconomy}, feature-detected
+ * in {@link NeroNotesIntegrations}, {@code compileOnly} + {@code isModLoaded},
+ * never reflection) installs a real implementation via
  * {@link NeroNotesIntegrations#setExchangerPricing(ExchangerPricing)} that
- * charges the copier and can route a composer royalty.
+ * charges the copier and routes a composer royalty.
  *
  * <p>Signatures are UUID-based (no {@code ServerPlayer}) so the seam and its
  * default stay plain-JVM testable, matching {@code signal/ChannelAccess}. An
@@ -48,5 +50,35 @@ public interface ExchangerPricing {
      */
     default boolean chargeCopy(UUID player, int entryId, Optional<UUID> author) {
         return true;
+    }
+
+    /**
+     * Server-aware variant the Exchanger copy path calls (added in 0.4.0).
+     * An implementation that must reach the running server (an economy
+     * call) overrides this; the default delegates to
+     * {@link #chargeCopy(UUID, int, Optional)}, so providers written against
+     * the original signature keep working unchanged.
+     *
+     * @param server the running server the copy happens on
+     */
+    default boolean chargeCopy(MinecraftServer server, UUID player, int entryId, Optional<UUID> author) {
+        return chargeCopy(player, entryId, author);
+    }
+
+    /**
+     * The price of one library copy, shown on the Exchanger screen before the
+     * player confirms (added in 0.4.0). {@code 0} (the default) means free.
+     */
+    default long copyPrice() {
+        return 0L;
+    }
+
+    /**
+     * The part of {@code price} that does not reach the composer when a
+     * royalty is routed (a fee to the economy), for the screen's split line
+     * (added in 0.4.0). The default is {@code 0}.
+     */
+    default long royaltyFeeFor(long price) {
+        return 0L;
     }
 }

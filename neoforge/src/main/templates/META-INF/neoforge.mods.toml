@@ -34,3 +34,11 @@ type = "required"
 versionRange = "${nerolandcore_version_range}"
 ordering = "AFTER"
 side = "BOTH"
+
+# NeroEconomy is OPTIONAL: with it, Disk Exchanger library copies are priced through its sibling API.
+[[dependencies.${mod_id}]]
+modId = "neroeconomy"
+type = "optional"
+versionRange = "[0.3.0-beta.1,)"
+ordering = "AFTER"
+side = "BOTH"

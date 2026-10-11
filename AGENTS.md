@@ -223,8 +223,13 @@
   NeroEconomy seam: `integration/ExchangerPricing` (UUID-based so plain-JVM testable, like
   `ChannelAccess`; default `FREE`) consulted LAST in `DiskExchangerMenu.tryCopy` — after every
   other refusal, before the disk is written (`neronotes.exchanger.payment_refused`); holder
-  `NeroNotesIntegrations.exchangerPricing()`/`setExchangerPricing(...)`. 0.1.0 installs NO
-  bridge — copies stay free even with NeroEconomy present; duplication is outside the seam.
+  `NeroNotesIntegrations.exchangerPricing()`/`setExchangerPricing(...)`. Since 0.4.0 the ONLY
+  NeroEconomy importer is `compat/neroeconomy/NeroEconomyExchangerBridge` (compileOnly, installed
+  from `NeroNotesIntegrations.init()` behind `isModLoaded("neroeconomy")`; API_VERSION read
+  reflectively, Core `CurrencyApi` fallback below v1): caller `neronotes`, reason `library_copy`,
+  `transfer` to a composer who is not the copier else `charge`, price `exchanger.library_copy_price`.
+  The menu calls the server-aware `chargeCopy(server, …)` overload; price/fee reach the screen as
+  data slots (`DATA_COPY_PRICE`/`DATA_COPY_FEE`) — never a composer id. Duplication is outside the seam.
   NeroEvents: `integration/ChannelTakeover` is a documented stub ONLY — nothing implements or
   consults it. Dimension neutrality verified: `server.overworld()` appears only as the SavedData
   home (all five stores) + SoundforgeTravel's vanilla-respawn fallback; channels, playback and

@@ -114,6 +114,9 @@
   "neronotes.exchanger.entry_gone": "That composition is no longer in the library.",
   "neronotes.exchanger.entry_unreadable": "That library entry could not be read.",
   "neronotes.exchanger.payment_refused": "The Exchanger refuses the copy — payment was not accepted.",
+  "neronotes.exchanger.price.label": "Copy: %s cr",
+  "neronotes.exchanger.price.free": "Copies from the library are free.",
+  "neronotes.exchanger.price.split": "You pay %1$s credits. The composer receives %2$s (%3$s to the Reserve). Copies of anonymous entries or your own go wholly to the Reserve.",
   "neronotes.exchanger.copied": "The Exchanger writes the composition onto your disk.",
   "neronotes.exchanger.duplicated": "The Exchanger writes an exact duplicate onto your disk.",
 
