@@ -1,0 +1,62 @@
+{
+  "title": "chapter.neronotes.resonance.title",
+  "icon": "neronotes:harmonic_gate",
+  "allow_server_scope": true,
+  "quests": [
+    {
+      "quest": "neronotes:resonance/blank_slate",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "quest": "neronotes:resonance/tuning_fork",
+      "x": 2,
+      "y": 0
+    },
+    {
+      "quest": "neronotes:resonance/the_soundforge",
+      "x": 4,
+      "y": 0
+    },
+    {
+      "quest": "neronotes:resonance/pressed",
+      "x": 6,
+      "y": 0
+    },
+    {
+      "quest": "neronotes:resonance/published",
+      "x": 8,
+      "y": 0
+    },
+    {
+      "quest": "neronotes:resonance/exchanger",
+      "x": 2,
+      "y": 2
+    },
+    {
+      "quest": "neronotes:resonance/on_the_air",
+      "x": 4,
+      "y": 2
+    },
+    {
+      "quest": "neronotes:resonance/first_pressing",
+      "x": 0,
+      "y": 4
+    },
+    {
+      "quest": "neronotes:resonance/a_library_grows",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "quest": "neronotes:resonance/a_hundred_songs",
+      "x": 4,
+      "y": 4
+    },
+    {
+      "quest": "neronotes:resonance/drew_a_crowd",
+      "x": 6,
+      "y": 4
+    }
+  ]
+}

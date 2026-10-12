@@ -29,20 +29,53 @@ Semantics, precisely:
 
 ## NeroQuests
 
-With NeroQuests installed, its `custom_event` quest objective consumes exactly the channels above
-— "the server published its first composition" becomes quest content with no configuration on the
-NeroNotes side. Useful ids for quest packs:
+NeroQuests is optional. NeroNotes ships a quest chapter as plain data inside its own jar — it
+appears in the quest book when NeroQuests is installed and does nothing otherwise; NeroNotes has
+no dependency on NeroQuests in any form.
+
+### The "Resonance" chapter
+
+Chapter `neronotes:resonance`, 11 quests:
+
+| Quest | Scope | Done when |
+| --- | --- | --- |
+| Blank Slate | you | craft a Resonant Disk (blank) |
+| Tuning Fork | you | craft a Harmonic Gate (rewards four blank disks) |
+| The Soundforge | you | enter the Soundforge |
+| Pressed | you | hold a pressed disk of your own |
+| Published | you | publish one of your compositions to the shared library (anonymously counts) |
+| Swap Meet | you | craft a Disk Exchanger |
+| On the Air | you | someone other than you tunes in to one of your channels |
+| First Pressing | server | the shared library holds its first composition |
+| A Library Grows | server | ten compositions |
+| A Hundred Songs | server | one hundred compositions |
+| Drew a Crowd | server | one resonance channel has five listeners at once |
+
+The four *server* quests are a shared "world log": they complete once for the whole server and
+credit nobody in particular, because they read the threshold channels above.
+
+### Personal milestone gates
+
+Two personal milestones are recorded as player-scope **record gates** in Neroland Core's gate
+store, which the quest pack reads with a `gate_open` objective:
+
+| Gate | Opens when |
+| --- | --- |
+| `neronotes:first_publish` ("Published Composer") | one of your disks is published — on operator approval instead when `library.op_approval_required` is on |
+| `neronotes:first_broadcast` ("On the Air") | a listener other than you joins one of your channels, whether or not you are online |
+
+They have no requirements and gate nothing: NeroNotes declares no *progression* gates — the
+Soundforge needs only a charged Harmonic Gate. A gate records only *that* you published or were
+heard, never which composition or who listened, so an anonymous publication stays anonymous.
+
+### Ids for your own packs
 
 - Items: `neronotes:blank_disk` (the natural reward — press- and Exchanger-ready),
   `neronotes:custom_disk` (only meaningful with disk contents; prefer granting blank disks).
-- Threshold channels: the two in the table above.
+- Threshold channels: the two in the table above (server-wide world-log quests).
+- Gates: the two above (per-player quests).
 
-NeroNotes declares no progression gates — the Soundforge needs only a charged Harmonic Gate, so
-there is no gate id for a quest pack to reference.
-
-Because threshold events are server-wide by design, *per-player* objectives ("press your own first
-disk") belong to quest-pack mechanics such as inventory or advancement objectives, not to the
-threshold bus. Voice unlocks do not exist in 0.1.0 — every voice ships unlocked.
+Voice unlocks do not exist — every voice ships unlocked.
 
 ## NeroEconomy
 

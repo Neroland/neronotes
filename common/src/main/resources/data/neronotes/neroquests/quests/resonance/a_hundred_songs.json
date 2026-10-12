@@ -1,0 +1,29 @@
+{
+  "title": "quest.neronotes.resonance.a_hundred_songs.title",
+  "description": "quest.neronotes.resonance.a_hundred_songs.desc",
+  "icon": "minecraft:chiseled_bookshelf",
+  "prerequisites": [
+    "neronotes:resonance/a_library_grows"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:custom_event",
+      "channel": "neronotes:compositions_published",
+      "event_scope": "library",
+      "direction": "rising",
+      "min_value": 100,
+      "audience": "world"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 250
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 150
+    }
+  ],
+  "scope": "server"
+}

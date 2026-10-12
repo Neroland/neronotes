@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0-beta.1] - 2026-10-11
+
+A NeroQuests quest chapter and the two personal milestones it reads. Requires Neroland Core
+1.15.0. NeroQuests stays optional: the pack is plain data inside the jar and nothing in NeroNotes
+depends on it.
+
+### Added
+
+- **A NeroQuests quest pack.** Ships chapter `neronotes:resonance` "Resonance", 11 quests, that
+  appears in the quest book when NeroQuests is installed; inert otherwise, no dependency. Seven
+  player quests follow the compose loop — craft a blank disk, build a Harmonic Gate and a Disk
+  Exchanger, enter the Soundforge, hold a pressed disk, publish a composition, draw your first
+  listener — and four server-wide "world log" quests mark the shared library's first, tenth and
+  hundredth composition and the first channel with five listeners.
+- **Two personal milestone gates.** `neronotes:first_publish` ("Published Composer") opens for a
+  composer when one of their disks is published — on operator approval instead when
+  `library.op_approval_required` is on — and `neronotes:first_broadcast` ("On the Air") opens for
+  a channel owner the first time someone other than them tunes in, whether or not the owner is
+  online. Both are player-scope record gates in Neroland Core's gate store: they have no
+  requirements, gate nothing (nothing in NeroNotes is progression-gated), and record only *that*
+  the player published or was heard — never which composition. An anonymous publication stays
+  anonymous.
+
+### Changed
+
+- Threshold crossings on `neronotes:compositions_published` and `neronotes:channel_listeners` now
+  name NeroNotes as their source (Core 1.15.0 sourced crossings). Scopes are unchanged: `library`
+  and the dimension id, never a player.
+- Requires Neroland Core 1.15.0 (was 1.13.0).
+
 ## [0.4.0-beta.1] - 2026-10-11
 
 Optional NeroEconomy pricing for Disk Exchanger library copies. NeroEconomy stays optional:
@@ -69,4 +99,3 @@ Minecraft **26.3** support. No gameplay, id, tag or config change.
 - 26.3 API differences are handled with Stonecutter blocks: `PoseStack#rotate` (was `mulPose`), the new `Prediction` argument on `drop` / `placeItemBackInInventory`, `setPermanentlyInvulnerable`, and similar renames.
 - Build: the shared `common/` Java source is now preprocessed by Stonecutter for every non-active node (`stonecutterProcessCommon`), so common code can carry `//? if >=26.3 {` blocks, and `common/src/main/resources-<mc>` overlay folders are merged over the shared resources for matching nodes (`mergeCommonResources`). The active node still compiles the raw `common/` folder.
 - Build plugins aligned with Neroland Core: ModDevGradle `2.0.147` (the older 2.0.141 cannot set up NeoForge 26.3), ForgeGradle `7.0.40`, Stonecutter `0.9.8`.
-

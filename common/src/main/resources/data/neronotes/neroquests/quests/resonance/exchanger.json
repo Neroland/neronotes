@@ -1,0 +1,26 @@
+{
+  "title": "quest.neronotes.resonance.exchanger.title",
+  "description": "quest.neronotes.resonance.exchanger.desc",
+  "icon": "neronotes:disk_exchanger",
+  "prerequisites": [
+    "neronotes:resonance/blank_slate"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:craft_item",
+      "item": "neronotes:disk_exchanger",
+      "count": 1
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 80
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 40
+    }
+  ],
+  "scope": "player"
+}

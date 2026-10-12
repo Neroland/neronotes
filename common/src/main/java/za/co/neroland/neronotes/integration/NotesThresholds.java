@@ -66,7 +66,7 @@ public final class NotesThresholds {
      */
     public static void publishedCountChanged(long previous, long current) {
         for (long threshold : ThresholdCrossings.crossedRising(previous, current, PUBLISH_THRESHOLDS)) {
-            ThresholdEvents.fire(new ThresholdEvents.ThresholdCrossing(
+            ThresholdEvents.fire(NeroNotesCommon.MOD_ID, new ThresholdEvents.ThresholdCrossing(
                     COMPOSITIONS_PUBLISHED, SCOPE_LIBRARY, current, threshold, true));
         }
     }
@@ -78,7 +78,7 @@ public final class NotesThresholds {
      */
     public static void listenerCountChanged(String dimensionId, long previous, long current) {
         for (long threshold : ThresholdCrossings.crossedRising(previous, current, LISTENER_THRESHOLDS)) {
-            ThresholdEvents.fire(new ThresholdEvents.ThresholdCrossing(
+            ThresholdEvents.fire(NeroNotesCommon.MOD_ID, new ThresholdEvents.ThresholdCrossing(
                     CHANNEL_LISTENERS, dimensionId, current, threshold, true));
         }
     }

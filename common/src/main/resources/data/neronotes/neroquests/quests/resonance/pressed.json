@@ -1,0 +1,26 @@
+{
+  "title": "quest.neronotes.resonance.pressed.title",
+  "description": "quest.neronotes.resonance.pressed.desc",
+  "icon": "neronotes:custom_disk",
+  "prerequisites": [
+    "neronotes:resonance/the_soundforge"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:collect_item",
+      "item": "neronotes:custom_disk",
+      "count": 1
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 150
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 60
+    }
+  ],
+  "scope": "player"
+}

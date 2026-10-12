@@ -17,6 +17,7 @@ import net.minecraft.world.phys.Vec3;
 import za.co.neroland.neronotes.NeroNotesCommon;
 import za.co.neroland.neronotes.block.ResonantBlockIndex;
 import za.co.neroland.neronotes.config.NeroNotesConfig;
+import za.co.neroland.neronotes.integration.NotesMilestones;
 import za.co.neroland.neronotes.integration.NotesThresholds;
 import za.co.neroland.neronotes.link.NotesLinkEvents;
 import za.co.neroland.neronotes.network.ResonanceNotePayload;
@@ -209,6 +210,11 @@ public final class ResonanceService {
             // owner UUID and channel name never leave this method. Server
             // thread: subscribe is only ever called from server-side hooks.
             NotesThresholds.listenerCountChanged(key.dimension(), before, subs.size());
+            // Personal milestone for the OWNER: someone else is listening. The
+            // owner UUID goes into Core's gate store only (offline-capable).
+            if (!player.getUUID().equals(key.owner())) {
+                NotesMilestones.broadcast(player.level().getServer(), key.owner());
+            }
         }
     }
 

@@ -1,0 +1,27 @@
+{
+  "title": "quest.neronotes.resonance.first_pressing.title",
+  "description": "quest.neronotes.resonance.first_pressing.desc",
+  "icon": "minecraft:jukebox",
+  "prerequisites": [],
+  "objectives": [
+    {
+      "type": "neroquests:custom_event",
+      "channel": "neronotes:compositions_published",
+      "event_scope": "library",
+      "direction": "rising",
+      "min_value": 1,
+      "audience": "world"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 50
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 30
+    }
+  ],
+  "scope": "server"
+}

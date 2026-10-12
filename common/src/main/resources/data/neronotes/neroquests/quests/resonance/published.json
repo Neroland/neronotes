@@ -1,0 +1,25 @@
+{
+  "title": "quest.neronotes.resonance.published.title",
+  "description": "quest.neronotes.resonance.published.desc",
+  "icon": "minecraft:lectern",
+  "prerequisites": [
+    "neronotes:resonance/pressed"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:gate_open",
+      "gate": "neronotes:first_publish"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 200
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 80
+    }
+  ],
+  "scope": "player"
+}

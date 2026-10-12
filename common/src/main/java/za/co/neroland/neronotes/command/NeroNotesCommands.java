@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 import za.co.neroland.nerolandcore.data.PlayerDataErasure;
 import za.co.neroland.neronotes.config.NeroNotesConfig;
 import za.co.neroland.neronotes.data.DataExport;
+import za.co.neroland.neronotes.integration.NotesMilestones;
 import za.co.neroland.neronotes.library.LibraryService;
 import za.co.neroland.neronotes.library.LibraryStore;
 import za.co.neroland.neronotes.library.LibraryTable;
@@ -288,6 +289,10 @@ public final class NeroNotesCommands {
             source.sendSuccess(() -> Component.translatable("neronotes.command.library.approved", id), true);
             // Stage 9: approval changes the VISIBLE count — broadcast counts only.
             NotesLinkEvents.libraryChanged(source.getServer());
+            // Approval is when a pending entry becomes a publication: open the
+            // composer's record gate now (skipped when the author was erased).
+            library.entry(id).flatMap(LibraryTable.Entry::author)
+                    .ifPresent(author -> NotesMilestones.published(source.getServer(), author));
             return 1;
         }
         source.sendFailure(Component.translatable(library.entry(id).isPresent()

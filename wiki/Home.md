@@ -40,9 +40,9 @@ Neroland ecosystem. Built on **Neroland Core**.
   for downloading and duplicating disks, the `/neronotes library` commands, and the aggregate-only
   download counting.
 - [Integrations and threshold events](Integrations-and-Threshold-Events.md) — the server-wide
-  milestone events pack makers can build quests on, the ids a quest pack can reference, the
-  Exchanger pricing seam (free in 0.1.0), and how everything degrades silently when a companion
-  mod is absent.
+  milestone events pack makers can build quests on, the bundled NeroQuests "Resonance" chapter and
+  the two personal milestone gates it reads, the ids a quest pack can reference, NeroEconomy
+  pricing for library copies, and how everything degrades silently when a companion mod is absent.
 - [Companion link module (NeroLink)](Companion-Link-Module.md) — what a paired companion app can
   see (the library, your own disks and channels, what is playing) and do (play/stop on your own
   channels only), the anonymity guarantees, and the `link.module_enabled` switch.

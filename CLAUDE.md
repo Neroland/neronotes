@@ -270,7 +270,14 @@
   `wiki/Companion-Link-Module.md`.
 - Mod id: **`neronotes`** (matches the registry namespace + every loader manifest). Package root:
   `za.co.neroland.neronotes`. Author: **Neroland**.
-- Version: **0.1.0-beta.1** (in `gradle.properties`; untagged — the owner tags after Stage 11).
+- Version: **0.5.0-beta.1** (in `gradle.properties`). 0.5.0 ships the NeroQuests quest pack
+  (`data/neronotes/neroquests/`, chapter `resonance`, 11 quests, inert data — NO dependency on
+  NeroQuests in any form) and two player-scope **record** gates in `data/neronotes/neroland_gates/`
+  (`first_publish`, `first_broadcast`), opened via `integration/NotesMilestones` →
+  `ProgressionGates.open(server, uuid, gate)` (Core 1.15.0, offline-capable) from
+  `LibraryService.publishHeldDisk` / the `approve` command and `ResonanceService.subscribe`. Record
+  gates have no `requires` and are NEVER checked for access. `NotesThresholds` fires sourced
+  crossings (`ThresholdEvents.fire("neronotes", …)`).
 - Targets **MC 26.1.2, 26.2 AND 26.3** on **NeoForge, MinecraftForge/Forge, and Fabric** → the **"9 cells"**.
   **Java 25.** Mappings = official Mojang names (26.x ships de-obfuscated; no Parchment).
 

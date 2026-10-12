@@ -1,0 +1,27 @@
+{
+  "title": "quest.neronotes.resonance.tuning_fork.title",
+  "description": "quest.neronotes.resonance.tuning_fork.desc",
+  "icon": "neronotes:harmonic_gate",
+  "prerequisites": [
+    "neronotes:resonance/blank_slate"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:craft_item",
+      "item": "neronotes:harmonic_gate",
+      "count": 1
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 80
+    },
+    {
+      "type": "neroquests:item",
+      "item": "neronotes:blank_disk",
+      "count": 4
+    }
+  ],
+  "scope": "player"
+}

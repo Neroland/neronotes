@@ -1,0 +1,29 @@
+{
+  "title": "quest.neronotes.resonance.a_library_grows.title",
+  "description": "quest.neronotes.resonance.a_library_grows.desc",
+  "icon": "minecraft:bookshelf",
+  "prerequisites": [
+    "neronotes:resonance/first_pressing"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:custom_event",
+      "channel": "neronotes:compositions_published",
+      "event_scope": "library",
+      "direction": "rising",
+      "min_value": 10,
+      "audience": "world"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 100
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 60
+    }
+  ],
+  "scope": "server"
+}

@@ -44,9 +44,20 @@ package za.co.neroland.neronotes.integration;
  * unlocked and the voice registry has no lock concept; a pack must not
  * pretend otherwise.</p>
  *
- * <p>NeroNotes declares no progression gates (standalone-first): the
- * Soundforge needs only a charged Harmonic Gate, so there is no gate id for
- * a quest pack to reference.</p>
+ * <p><strong>Personal milestones</strong> — since 0.5.0 NeroNotes records two
+ * player-scope <em>record</em> gates in Core's gate store (see
+ * {@link NotesMilestones}); a pack reads them with a {@code gate_open}
+ * objective. They have no {@code requires} and gate nothing — NeroNotes
+ * declares no <em>progression</em> gates (standalone-first): the Soundforge
+ * needs only a charged Harmonic Gate.</p>
+ * <ul>
+ *   <li>{@value #GATE_FIRST_PUBLISH} — the player has published a
+ *       composition to the shared library (opened on approval when operator
+ *       approval is required; anonymous publications count and stay
+ *       anonymous).</li>
+ *   <li>{@value #GATE_FIRST_BROADCAST} — a listener other than the owner
+ *       tuned in to one of the player's resonance channels.</li>
+ * </ul>
  */
 public final class QuestContent {
 
@@ -55,6 +66,12 @@ public final class QuestContent {
 
     /** {@link NotesThresholds#CHANNEL_LISTENERS} as a datapack-friendly string. */
     public static final String THRESHOLD_CHANNEL_LISTENERS = "neronotes:channel_listeners";
+
+    /** {@link NotesMilestones#FIRST_PUBLISH} as a datapack-friendly string. */
+    public static final String GATE_FIRST_PUBLISH = "neronotes:first_publish";
+
+    /** {@link NotesMilestones#FIRST_BROADCAST} as a datapack-friendly string. */
+    public static final String GATE_FIRST_BROADCAST = "neronotes:first_broadcast";
 
     /** The blank resonant disk item id. */
     public static final String ITEM_BLANK_DISK = "neronotes:blank_disk";

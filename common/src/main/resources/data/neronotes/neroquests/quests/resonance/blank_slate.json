@@ -1,0 +1,24 @@
+{
+  "title": "quest.neronotes.resonance.blank_slate.title",
+  "description": "quest.neronotes.resonance.blank_slate.desc",
+  "icon": "neronotes:blank_disk",
+  "prerequisites": [],
+  "objectives": [
+    {
+      "type": "neroquests:craft_item",
+      "item": "neronotes:blank_disk",
+      "count": 1
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 30
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 15
+    }
+  ],
+  "scope": "player"
+}

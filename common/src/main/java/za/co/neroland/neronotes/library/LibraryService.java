@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
 import za.co.neroland.neronotes.config.NeroNotesConfig;
+import za.co.neroland.neronotes.integration.NotesMilestones;
 import za.co.neroland.neronotes.integration.NotesThresholds;
 import za.co.neroland.neronotes.item.CustomDiskItem;
 import za.co.neroland.neronotes.item.DiskContents;
@@ -109,6 +110,13 @@ public final class LibraryService {
             NotesThresholds.publishedCountChanged(countBefore, store.totalCount());
             // Stage 9: broadcast link event — counts only, no titles, no authors.
             NotesLinkEvents.libraryChanged(server);
+            // Personal milestone: the composer's player-scope record gate. With
+            // op approval on, the entry is not visible yet — the approve command
+            // opens it instead. Anonymous or not, the gate says only "has
+            // published something".
+            if (!approvalRequired) {
+                NotesMilestones.published(server, contents.author());
+            }
         }
         return result.ok() ? result.id() : -1;
     }

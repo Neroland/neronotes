@@ -1,0 +1,25 @@
+{
+  "title": "quest.neronotes.resonance.the_soundforge.title",
+  "description": "quest.neronotes.resonance.the_soundforge.desc",
+  "icon": "minecraft:amethyst_block",
+  "prerequisites": [
+    "neronotes:resonance/tuning_fork"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:reach_dimension",
+      "dimension": "neronotes:soundforge"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 120
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 50
+    }
+  ],
+  "scope": "player"
+}

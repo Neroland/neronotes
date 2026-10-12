@@ -38,9 +38,12 @@ The loop: **compose → press → sync → play → publish → download.**
 - **Data protection built in** — self-service `/neronotes data export` and
   `/neronotes data erase-me`, a retention sweep for inactive players, and a documented
   sever-the-link-keep-the-work answer for erased authors. See [`PRIVACY.md`](PRIVACY.md).
-- **Ecosystem-aware, never dependent** — threshold-event milestones for NeroQuests, paid
-  library copies with a composer royalty through NeroEconomy, and a companion (NeroLink) module with strictly requester-scoped data
-  and `play`/`stop` actions. All optional, all feature-detected at runtime.
+- **Ecosystem-aware, never dependent** — a NeroQuests quest chapter (`neronotes:resonance`
+  "Resonance", 11 quests) shipped as inert data that appears in the quest book only when
+  NeroQuests is installed, driven by threshold-event milestones and two personal milestone gates;
+  paid library copies with a composer royalty through NeroEconomy; and a companion (NeroLink)
+  module with strictly requester-scoped data and `play`/`stop` actions. All optional, all
+  feature-detected at runtime.
 
 **Honesty about placeholders:** this release ships **no `.ogg` audio** — every voice aliases a
 vanilla sound event — and block/item textures are generated placeholders. No real-audio import,

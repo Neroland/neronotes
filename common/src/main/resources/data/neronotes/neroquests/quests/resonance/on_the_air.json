@@ -1,0 +1,26 @@
+{
+  "title": "quest.neronotes.resonance.on_the_air.title",
+  "description": "quest.neronotes.resonance.on_the_air.desc",
+  "icon": "neronotes:resonator",
+  "prerequisites": [
+    "neronotes:resonance/tuning_fork"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:gate_open",
+      "gate": "neronotes:first_broadcast"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 120
+    },
+    {
+      "type": "neroquests:item",
+      "item": "neronotes:blank_disk",
+      "count": 2
+    }
+  ],
+  "scope": "player"
+}

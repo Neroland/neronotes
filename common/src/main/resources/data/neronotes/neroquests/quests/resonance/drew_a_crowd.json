@@ -1,0 +1,26 @@
+{
+  "title": "quest.neronotes.resonance.drew_a_crowd.title",
+  "description": "quest.neronotes.resonance.drew_a_crowd.desc",
+  "icon": "minecraft:note_block",
+  "prerequisites": [],
+  "objectives": [
+    {
+      "type": "neroquests:custom_event",
+      "channel": "neronotes:channel_listeners",
+      "direction": "rising",
+      "min_value": 5,
+      "audience": "world"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 100
+    },
+    {
+      "type": "neroquests:currency",
+      "amount": 60
+    }
+  ],
+  "scope": "server"
+}

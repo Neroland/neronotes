@@ -74,8 +74,18 @@ All packages below are `za.co.neroland.nerolandcore.*`.
 
 - **`ThresholdEvents`** — `integration/NotesThresholds` fires `ThresholdCrossing`s on the
   channels `neronotes:compositions_published` (scope `library`) and
-  `neronotes:channel_listeners` (scope = dimension id). Scopes are places/systems, never player
+  `neronotes:channel_listeners` (scope = dimension id) through the sourced
+  `fire("neronotes", crossing)` overload (Core 1.15.0). Scopes are places/systems, never player
   identities — Core's contract. NeroQuests' `custom_event` objective consumes these.
+
+### `progression` — record gates
+
+- **`ProgressionGates.open(MinecraftServer, UUID, Identifier)`** (Core 1.15.0, offline-capable) —
+  `integration/NotesMilestones` opens the two player-scope **record** gates shipped under
+  `data/neronotes/neroland_gates/`: `neronotes:first_publish` (from `LibraryService.publishHeldDisk`,
+  or the `approve` command when operator approval is on) and `neronotes:first_broadcast` (from
+  `ResonanceService.subscribe`, for the channel owner, when a non-owner listens). Neither has
+  `requires`; neither is ever checked — `isOpen`/`tryOpen` are not called anywhere.
 
 ### `machine` / `energy` / `platform` — the powered machine seam
 
@@ -132,9 +142,10 @@ All packages below are `za.co.neroland.nerolandcore.*`.
   and downstream registrations would be silently dropped.
 - **Core's menu helpers** — `menu/MenuOpener` is NeroNotes' own seam (Paper-hybrid-safe
   `openMenu` wrapper); every menu opens through it.
-- **`progression.ProgressionGates` / `CoreGates`** — NeroNotes declares and checks no
-  progression gates. The `neronotes:soundforge` gate (requiring Core's Industrial Power) shipped
-  through Stage 10 and was removed on 2026-08-15 for standalone-first play, following Nerotech:
-  entering the Soundforge needs only a charged Harmonic Gate.
+- **`progression.ProgressionGates` as a check / `CoreGates`** — NeroNotes checks no progression
+  gates (the two record gates above are written, never read). The `neronotes:soundforge` gate
+  (requiring Core's Industrial Power) shipped through Stage 10 and was removed on 2026-08-15 for
+  standalone-first play, following Nerotech: entering the Soundforge needs only a charged
+  Harmonic Gate.
 - **Core sound or dimension helpers** — Core ships none; NeroNotes registers its own
   `SoundEvent`s and defines the Soundforge as a datapack dimension.
