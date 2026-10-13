@@ -100,9 +100,9 @@ repositories {
 
 dependencies {
     implementation minecraft.dependency("net.minecraftforge:forge:${forgeVersion}")
-    annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.5'
+    annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.6'
 
-    implementation 'io.sentry:sentry:8.45.0'
+    implementation 'io.sentry:sentry:8.60.0'
     jarJar(group: 'io.sentry', name: 'sentry', version: '8.45.0')
 
     // Neroland Core — required foundation (resolved from mavenLocal or GitHub Packages; see the
