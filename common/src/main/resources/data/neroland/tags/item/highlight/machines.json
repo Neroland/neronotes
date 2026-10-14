@@ -1,11 +1,65 @@
 {
   "replace": false,
   "values": [
-    { "id": "neronotes:resonator", "required": false },
-    { "id": "neronotes:harmonic_gate", "required": false },
-    { "id": "neronotes:transport_lectern", "required": false },
-    { "id": "neronotes:disk_press", "required": false },
-    { "id": "neronotes:publish_lectern", "required": false },
-    { "id": "neronotes:disk_exchanger", "required": false }
+    {
+      "id": "neronotes:resonator",
+      "required": false
+    },
+    {
+      "id": "neronotes:harmonic_gate",
+      "required": false
+    },
+    {
+      "id": "neronotes:transport_lectern",
+      "required": false
+    },
+    {
+      "id": "neronotes:disk_press",
+      "required": false
+    },
+    {
+      "id": "neronotes:publish_lectern",
+      "required": false
+    },
+    {
+      "id": "neronotes:disk_exchanger",
+      "required": false
+    },
+    {
+      "id": "neronotes:pattern_wall",
+      "required": false
+    },
+    {
+      "id": "neronotes:voice_pedestal",
+      "required": false
+    },
+    {
+      "id": "neronotes:resonant_block_deep_bass",
+      "required": false
+    },
+    {
+      "id": "neronotes:resonant_block_glassy_pluck",
+      "required": false
+    },
+    {
+      "id": "neronotes:resonant_block_high_lead",
+      "required": false
+    },
+    {
+      "id": "neronotes:resonant_block_low_drone",
+      "required": false
+    },
+    {
+      "id": "neronotes:resonant_block_percussion",
+      "required": false
+    },
+    {
+      "id": "neronotes:resonant_block_sub_pad",
+      "required": false
+    },
+    {
+      "id": "neronotes:resonant_block_synth_texture",
+      "required": false
+    }
   ]
 }
