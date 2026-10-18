@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "neronotes:resonant_block_deep_bass",
+    "neronotes:resonant_block_sub_pad",
+    "neronotes:resonant_block_low_drone",
+    "neronotes:resonant_block_high_lead",
+    "neronotes:resonant_block_glassy_pluck",
+    "neronotes:resonant_block_percussion",
+    "neronotes:resonant_block_synth_texture",
+    "neronotes:resonator",
+    "neronotes:harmonic_gate",
+    "neronotes:transport_lectern",
+    "neronotes:pattern_wall",
+    "neronotes:voice_pedestal",
+    "neronotes:disk_press",
+    "neronotes:publish_lectern",
+    "neronotes:disk_exchanger"
+  ]
+}
