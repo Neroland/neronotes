@@ -3,7 +3,9 @@ package za.co.neroland.neronotes.signal;
 import java.util.UUID;
 
 import net.minecraft.server.level.ServerPlayer;
+//? if >=1.21.11 {
 import net.minecraft.server.permissions.Permissions;
+//?}
 
 /**
  * The single authorisation decision point for resonance channels.
@@ -63,6 +65,10 @@ public final class ChannelAccess {
 
     /** Operator check — the 26.x permission set, gamemaster level (classic op level 2). */
     public static boolean isOperator(ServerPlayer player) {
+        //? if >=1.21.11 {
         return player != null && player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
+        //?} else {
+        /*return player != null && player.hasPermissions(2);
+        *///?}
     }
 }

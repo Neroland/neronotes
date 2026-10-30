@@ -9,6 +9,12 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
+//? if >=1.21.6 {
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+//?} else {
+/*import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+*///?}
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -32,47 +38,78 @@ public final class NeroNotesForge {
     public NeroNotesForge(FMLJavaModLoadingContext context) {
         NeroNotesCommon.LOGGER.info("[NeroNotes] Forge bootstrap");
         NeroNotesCommon.init();
+        //? if >=1.21.6 {
+        BusGroup modBusGroup = context.getModBusGroup();
+        //?} else {
+        /*IEventBus modBusGroup = context.getModEventBus();
+        *///?}
         // Drain Core's registration provider queues (sound events, later blocks/items)
         // on this mod's bus group. Called AFTER init() so every registry class has queued.
-        RegistrationProvider.attach(context.getModBusGroup());
+        RegistrationProvider.attach(modBusGroup);
         // Build the neronotes:main channel AFTER init() so the payload declarations exist.
         ForgeNetworkPlatform.attachChannel(buildChannel());
         // Stage 4: Harmonic Gate energy on Core's shared capability.
         ForgeCapabilities.register();
         // Stage 4: /neronotes soundforge return (game-bus command registration).
-        RegisterCommandsEvent.BUS.addListener(event ->
-                NeroNotesCommands.register(event.getDispatcher()));
         // Stage 7: last-seen touch on join + the daily retention sweep.
-        PlayerEvent.PlayerLoggedInEvent.BUS.addListener(event -> {
-            if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-                RetentionSweep.onPlayerJoin(serverPlayer);
-            }
-        });
         // Stage 9: the same tick hook hands the link module its server handle
         // (Core's link SPI delivers only a UUID; the module needs the server).
-        TickEvent.ServerTickEvent.Post.BUS.addListener(event -> {
-            NotesLinkModule.rememberServer(event.server());
-            RetentionSweep.onServerTick(event.server());
-        });
         // Logout housekeeping: drop the player's channel subscriptions so the
         // server-tracked subscriber map never accumulates departed players.
-        PlayerEvent.PlayerLoggedOutEvent.BUS.addListener(event -> {
-            if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-                ResonanceService.unsubscribeAll(serverPlayer.getUUID());
-            }
-        });
         // Server lifecycle: clear ALL static server-side runtime state (the
         // resonance guard/subscribers, both block-entity indexes, the link
         // module's server handle, the retention tick counter) once the server
         // is fully stopped — singleplayer re-enters a new integrated server in
         // the same JVM.
-        ServerStoppedEvent.BUS.addListener(event ->
-                NeroNotesCommon.onServerStopped(event.getServer()));
+        //? if >=1.21.6 {
+        RegisterCommandsEvent.BUS.addListener(NeroNotesForge::onRegisterCommands);
+        PlayerEvent.PlayerLoggedInEvent.BUS.addListener(NeroNotesForge::onPlayerLoggedIn);
+        TickEvent.ServerTickEvent.Post.BUS.addListener(NeroNotesForge::onServerTick);
+        PlayerEvent.PlayerLoggedOutEvent.BUS.addListener(NeroNotesForge::onPlayerLoggedOut);
+        ServerStoppedEvent.BUS.addListener(NeroNotesForge::onServerStopped);
+        //?} else {
+        /*// Forge before 1.21.6 has one game event bus (EventBus 6) instead of per-event buses.
+        MinecraftForge.EVENT_BUS.addListener(NeroNotesForge::onRegisterCommands);
+        MinecraftForge.EVENT_BUS.addListener(NeroNotesForge::onPlayerLoggedIn);
+        MinecraftForge.EVENT_BUS.addListener(NeroNotesForge::onServerTick);
+        MinecraftForge.EVENT_BUS.addListener(NeroNotesForge::onPlayerLoggedOut);
+        MinecraftForge.EVENT_BUS.addListener(NeroNotesForge::onServerStopped);
+        *///?}
         // Stage 3/5: client-only playback engine + screens, behind the dist
         // guard so client classes never load on a dedicated server.
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            NeroNotesForgeClient.install(context.getModBusGroup());
+            NeroNotesForgeClient.install(modBusGroup);
         }
+    }
+
+    private static void onRegisterCommands(RegisterCommandsEvent event) {
+        NeroNotesCommands.register(event.getDispatcher());
+    }
+
+    private static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            RetentionSweep.onPlayerJoin(serverPlayer);
+        }
+    }
+
+    private static void onServerTick(TickEvent.ServerTickEvent.Post event) {
+        //? if >=1.21.9 {
+        net.minecraft.server.MinecraftServer server = event.server();
+        //?} else {
+        /*net.minecraft.server.MinecraftServer server = event.getServer();
+        *///?}
+        NotesLinkModule.rememberServer(server);
+        RetentionSweep.onServerTick(server);
+    }
+
+    private static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            ResonanceService.unsubscribeAll(serverPlayer.getUUID());
+        }
+    }
+
+    private static void onServerStopped(ServerStoppedEvent event) {
+        NeroNotesCommon.onServerStopped(event.getServer());
     }
 
     private static Channel<CustomPacketPayload> buildChannel() {

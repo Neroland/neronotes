@@ -6,7 +6,9 @@ import java.util.Optional;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+//? if >=1.21.9 {
 import net.minecraft.client.input.MouseButtonEvent;
+//?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -64,7 +66,13 @@ public class DiskExchangerScreen extends AbstractContainerScreen<DiskExchangerMe
     private int tooltipFee = -1;
 
     public DiskExchangerScreen(DiskExchangerMenu menu, Inventory playerInventory, Component title) {
+        //? if >=26.1 {
         super(menu, playerInventory, title, W, H);
+        //?} else {
+        /*super(menu, playerInventory, title);
+        this.imageWidth = W;
+        this.imageHeight = H;
+        *///?}
         this.titleLabelX = 8;
         this.titleLabelY = 5;
         this.inventoryLabelX = 8;
@@ -143,10 +151,17 @@ public class DiskExchangerScreen extends AbstractContainerScreen<DiskExchangerMe
     // Interaction
     // ------------------------------------------------------------------
 
+    //? if >=1.21.9 {
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        int x = (int) (event.x() - (leftPos + LIST_X));
-        int y = (int) (event.y() - (topPos + LIST_Y));
+        double mouseX = event.x();
+        double mouseY = event.y();
+    //?} else {
+    /*@Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    *///?}
+        int x = (int) (mouseX - (leftPos + LIST_X));
+        int y = (int) (mouseY - (topPos + LIST_Y));
         if (x >= 0 && x < LIST_W && y >= 0 && y < VISIBLE_ROWS * ROW_H) {
             int row = rowOffset + y / ROW_H;
             List<LibraryPagePayload.PageEntry> rows = entries();
@@ -155,7 +170,11 @@ public class DiskExchangerScreen extends AbstractContainerScreen<DiskExchangerMe
             }
             return true;
         }
+        //? if >=1.21.9 {
         return super.mouseClicked(event, doubleClick);
+        //?} else {
+        /*return super.mouseClicked(mouseX, mouseY, button);
+        *///?}
     }
 
     @Override
@@ -193,12 +212,27 @@ public class DiskExchangerScreen extends AbstractContainerScreen<DiskExchangerMe
     // Rendering
     // ------------------------------------------------------------------
 
+    //? if >=26.1 {
     @Override
     public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         drawPanel(g);
         super.extractContents(g, mouseX, mouseY, partialTick);
+    //?} else {
+    /*@Override
+    protected void renderBg(GuiGraphicsExtractor g, float partialTick, int mouseX, int mouseY) {
+        drawPanel(g);
+    }
+
+    @Override
+    public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
+    *///?}
         drawListing(g);
         drawPageReadout(g);
+        //? if <26.1 {
+        /*// Before 26.1 AbstractContainerScreen.render does not draw the hovered-slot tooltip itself.
+        this.renderTooltip(g, mouseX, mouseY);
+        *///?}
     }
 
     private void drawPanel(GuiGraphicsExtractor g) {
@@ -286,8 +320,13 @@ public class DiskExchangerScreen extends AbstractContainerScreen<DiskExchangerMe
         return clipped.equals(text) ? text : clipped + "…";
     }
 
+    //? if >=26.1 {
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+    //?} else {
+    /*@Override
+    protected void renderLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+    *///?}
         g.text(font, title, titleLabelX, titleLabelY, TITLE, false);
         int price = menu.copyPrice();
         if (price > 0) {

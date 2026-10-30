@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 
 import za.co.neroland.neronotes.NeroNotesCommon;
+import za.co.neroland.neronotes.data.NbtCompat;
 
 /**
  * The per-player Soundforge session rows: one row per player who has ever
@@ -183,12 +184,12 @@ public final class SoundforgeSessionTable {
      */
     public static SoundforgeSessionTable load(CompoundTag root) {
         SoundforgeSessionTable table = new SoundforgeSessionTable();
-        Optional<ListTag> list = root.getList(KEY_SESSIONS);
+        Optional<ListTag> list = NbtCompat.list(root, KEY_SESSIONS);
         if (list.isEmpty()) {
             return table;
         }
         for (int i = 0; i < list.get().size(); i++) {
-            Optional<CompoundTag> row = list.get().getCompound(i);
+            Optional<CompoundTag> row = NbtCompat.compound(list.get(), i);
             if (row.isEmpty()) {
                 NeroNotesCommon.LOGGER.warn("[NeroNotes] skipping malformed soundforge session row {} (not a compound)", i);
                 continue;
@@ -204,21 +205,21 @@ public final class SoundforgeSessionTable {
     }
 
     private void loadRow(CompoundTag tag) {
-        UUID player = UUID.fromString(tag.getString(KEY_PLAYER).orElseThrow());
+        UUID player = UUID.fromString(NbtCompat.string(tag, KEY_PLAYER).orElseThrow());
         ReturnAnchor anchor = null;
-        Optional<String> dimension = tag.getString(KEY_DIMENSION);
+        Optional<String> dimension = NbtCompat.string(tag, KEY_DIMENSION);
         if (dimension.isPresent()) {
             anchor = new ReturnAnchor(dimension.get(),
-                    tag.getDoubleOr(KEY_X, 0),
-                    tag.getDoubleOr(KEY_Y, 0),
-                    tag.getDoubleOr(KEY_Z, 0),
-                    tag.getFloatOr(KEY_YROT, 0f),
-                    tag.getFloatOr(KEY_XROT, 0f));
+                    NbtCompat.getDoubleOr(tag, KEY_X, 0),
+                    NbtCompat.getDoubleOr(tag, KEY_Y, 0),
+                    NbtCompat.getDoubleOr(tag, KEY_Z, 0),
+                    NbtCompat.getFloatOr(tag, KEY_YROT, 0f),
+                    NbtCompat.getFloatOr(tag, KEY_XROT, 0f));
         }
         Row row = new Row(anchor,
-                tag.getBooleanOr(KEY_INSIDE, false),
-                tag.getLongOr(KEY_ENTERED, 0),
-                tag.getCompound(KEY_DATA).orElse(null));
+                NbtCompat.getBooleanOr(tag, KEY_INSIDE, false),
+                NbtCompat.getLongOr(tag, KEY_ENTERED, 0),
+                NbtCompat.compound(tag, KEY_DATA).orElse(null));
         rows.put(player, row);
     }
 }

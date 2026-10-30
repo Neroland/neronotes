@@ -163,9 +163,14 @@ public class TransportLecternBlockEntity extends BlockEntity {
      * Breaking the lectern ends the preview so the channel's play slot frees
      * up. 26.x calls this on REAL removal only — never on chunk unload.
      */
+    //? if >=1.21.5 {
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
+    //?} else {
+    /*// Before 1.21.5 there is no such hook on block entities; the block's onRemove calls this instead.
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+    *///?}
         stopPreview();
     }
 

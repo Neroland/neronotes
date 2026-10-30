@@ -435,9 +435,14 @@ public class ResonatorBlockEntity extends BlockEntity {
      * only — never on chunk unload — so a STOP transport here is safe. No
      * blockstate write: the block is going away.
      */
+    //? if >=1.21.5 {
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
+    //?} else {
+    /*// Before 1.21.5 there is no such hook on block entities; the block's onRemove calls this instead.
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+    *///?}
         stopTransportOnly();
     }
 
@@ -513,9 +518,16 @@ public class ResonatorBlockEntity extends BlockEntity {
     // Persistence
     // ------------------------------------------------------------------
 
+    //? if >=1.21.6 {
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+    //?} else {
+    /*@Override
+    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        ValueOutput output = ValueOutput.of(tag, registries);
+    *///?}
         if (owner != null) {
             output.store(KEY_OWNER, UUIDUtil.CODEC, owner);
         }
@@ -527,9 +539,16 @@ public class ResonatorBlockEntity extends BlockEntity {
         }
     }
 
+    //? if >=1.21.6 {
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+    //?} else {
+    /*@Override
+    protected void loadAdditional(net.minecraft.nbt.CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(nbt, registries);
+        ValueInput input = ValueInput.of(nbt, registries);
+    *///?}
         owner = input.read(KEY_OWNER, UUIDUtil.CODEC).orElse(null);
         String storedChannel = input.getStringOr(KEY_CHANNEL, DEFAULT_CHANNEL_NAME);
         channelName = ChannelNames.isValid(storedChannel) ? storedChannel : DEFAULT_CHANNEL_NAME;

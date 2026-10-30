@@ -12,6 +12,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 
 import za.co.neroland.neronotes.NeroNotesCommon;
+import za.co.neroland.neronotes.data.NbtCompat;
 
 /**
  * The channel rows themselves: a mutable map of {@link ChannelKey} →
@@ -220,12 +221,12 @@ public final class ChannelTable {
      */
     public static ChannelTable load(CompoundTag root) {
         ChannelTable table = new ChannelTable();
-        Optional<ListTag> list = root.getList(KEY_CHANNELS);
+        Optional<ListTag> list = NbtCompat.list(root, KEY_CHANNELS);
         if (list.isEmpty()) {
             return table;
         }
         for (int i = 0; i < list.get().size(); i++) {
-            Optional<CompoundTag> row = list.get().getCompound(i);
+            Optional<CompoundTag> row = NbtCompat.compound(list.get(), i);
             if (row.isEmpty()) {
                 NeroNotesCommon.LOGGER.warn("[NeroNotes] skipping malformed channel row {} (not a compound)", i);
                 continue;
@@ -241,15 +242,15 @@ public final class ChannelTable {
     }
 
     private void loadRow(CompoundTag row) {
-        String dimension = row.getString(KEY_DIMENSION).orElseThrow();
-        UUID owner = UUID.fromString(row.getString(KEY_OWNER).orElseThrow());
-        String name = row.getString(KEY_NAME).orElseThrow();
+        String dimension = NbtCompat.string(row, KEY_DIMENSION).orElseThrow();
+        UUID owner = UUID.fromString(NbtCompat.string(row, KEY_OWNER).orElseThrow());
+        String name = NbtCompat.string(row, KEY_NAME).orElseThrow();
         ChannelKey key = new ChannelKey(dimension, owner, name);
         ResonanceChannel channel = ResonanceChannel.create(key);
-        Optional<ListTag> trusted = row.getList(KEY_TRUSTED);
+        Optional<ListTag> trusted = NbtCompat.list(row, KEY_TRUSTED);
         if (trusted.isPresent()) {
             for (int i = 0; i < trusted.get().size(); i++) {
-                Optional<String> id = trusted.get().getString(i);
+                Optional<String> id = NbtCompat.string(trusted.get(), i);
                 if (id.isPresent()) {
                     UUID player = UUID.fromString(id.get());
                     if (!player.equals(owner)) {

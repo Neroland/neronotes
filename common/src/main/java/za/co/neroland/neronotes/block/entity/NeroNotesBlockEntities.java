@@ -68,7 +68,12 @@ public final class NeroNotesBlockEntities {
      */
     private static <T extends BlockEntity> BlockEntityType<T> create(
             BlockEntityType.BlockEntitySupplier<T> factory, Block[] blocks) {
+        //? if >=1.21.2 {
         return new BlockEntityType<>(factory, Set.of(blocks));
+        //?} else {
+        /*// 1.21.1's constructor also takes a data-fixer type; vanilla passes null for unfixed types.
+        return new BlockEntityType<>(factory, Set.of(blocks), null);
+        *///?}
     }
 
     /**

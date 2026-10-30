@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import net.minecraft.nbt.CompoundTag;
 
+import za.co.neroland.neronotes.data.NbtCompat;
 import za.co.neroland.neronotes.score.Score.Layer;
 import za.co.neroland.neronotes.score.Score.Note;
 
@@ -111,7 +112,7 @@ class ScoreCodecTest {
         assertThrows(ScoreFormatException.class, () -> ScoreCodec.fromNbt(new CompoundTag()),
                 "an empty tag must fail loud");
         CompoundTag truncatedLayer = ScoreCodec.toNbt(sampleScore());
-        truncatedLayer.getList("layers").orElseThrow().getCompound(0).orElseThrow().remove("notes");
+        NbtCompat.compound(NbtCompat.list(truncatedLayer, "layers").orElseThrow(), 0).orElseThrow().remove("notes");
         assertThrows(ScoreFormatException.class, () -> ScoreCodec.fromNbt(truncatedLayer),
                 "a layer without notes must fail loud");
         assertThrows(ScoreFormatException.class,

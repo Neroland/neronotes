@@ -122,7 +122,11 @@ public class DiskPressMenu extends AbstractContainerMenu {
         int budget = NeroNotesConfig.DISK_SCORE_BUDGET_BYTES.get();
         DiskPressLogic.Result result = DiskPressLogic.press(
                 score, rawTitle, anonymous,
+                //? if >=1.21.9 {
                 player.getUUID(), player.getGameProfile().name(),
+                //?} else {
+                /*player.getUUID(), player.getGameProfile().getName(),
+                *///?}
                 budget,
                 NeroNotesConfig.DISK_NAME_MAX_LENGTH.get(),
                 DiskNames.parseBlockedWords(NeroNotesConfig.MODERATION_BLOCKED_WORDS.get()),

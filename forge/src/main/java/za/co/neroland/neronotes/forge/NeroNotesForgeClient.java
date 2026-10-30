@@ -2,7 +2,12 @@ package za.co.neroland.neronotes.forge;
 
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+//? if >=1.21.6 {
 import net.minecraftforge.eventbus.api.bus.BusGroup;
+//?} else {
+/*import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+*///?}
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 import za.co.neroland.neronotes.client.ClientExchangerState;
@@ -31,21 +36,34 @@ public final class NeroNotesForgeClient {
      * the registries exist (client setup — menu types are not registered yet
      * at mod construction).
      */
+    //? if >=1.21.6 {
     public static void install(BusGroup modBusGroup) {
+    //?} else {
+    /*public static void install(IEventBus modBusGroup) {
+    *///?}
         ClientPlaybackEngine.install();
         ClientSequencerState.install();
         ClientExchangerState.install();
-        FMLClientSetupEvent.getBus(modBusGroup).addListener(event -> {
-            MenuScreens.register(NeroNotesMenus.SEQUENCER.get(), SequencerScreen::new);
-            MenuScreens.register(NeroNotesMenus.DISK_PRESS.get(), DiskPressScreen::new);
-            MenuScreens.register(NeroNotesMenus.DISK_EXCHANGER.get(), DiskExchangerScreen::new);
-        });
-        // Leaving a world: drop every client-side cache (playheads, sequencer
-        // session, exchanger page) so nothing from one world leaks into the next.
-        ClientPlayerNetworkEvent.LoggingOut.BUS.addListener(event -> {
-            ClientPlaybackEngine.clearClientState();
-            ClientSequencerState.clear();
-            ClientExchangerState.clear();
-        });
+        //? if >=1.21.6 {
+        FMLClientSetupEvent.getBus(modBusGroup).addListener(NeroNotesForgeClient::onClientSetup);
+        ClientPlayerNetworkEvent.LoggingOut.BUS.addListener(NeroNotesForgeClient::onLoggingOut);
+        //?} else {
+        /*modBusGroup.addListener(NeroNotesForgeClient::onClientSetup);
+        MinecraftForge.EVENT_BUS.addListener(NeroNotesForgeClient::onLoggingOut);
+        *///?}
+    }
+
+    private static void onClientSetup(FMLClientSetupEvent event) {
+        MenuScreens.register(NeroNotesMenus.SEQUENCER.get(), SequencerScreen::new);
+        MenuScreens.register(NeroNotesMenus.DISK_PRESS.get(), DiskPressScreen::new);
+        MenuScreens.register(NeroNotesMenus.DISK_EXCHANGER.get(), DiskExchangerScreen::new);
+    }
+
+    // Leaving a world: drop every client-side cache (playheads, sequencer
+    // session, exchanger page) so nothing from one world leaks into the next.
+    private static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        ClientPlaybackEngine.clearClientState();
+        ClientSequencerState.clear();
+        ClientExchangerState.clear();
     }
 }

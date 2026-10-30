@@ -13,6 +13,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
+import za.co.neroland.nerolandcore.data.SavedDataCompat;
 import za.co.neroland.nerolandcore.data.SavedDataRecovery;
 import za.co.neroland.neronotes.NeroNotesCommon;
 
@@ -43,15 +44,12 @@ public final class LibraryStore extends SavedData {
 
     private static final Supplier<LibraryStore> FACTORY = LibraryStore::new;
 
-    // The four-argument constructor is the one present on every loader/MC cell
-    // (the three-argument convenience overload is a NeoForge-only patch). A null
-    // DataFixTypes means "no datafixing" — correct for mod data with its own
-    // versioning discipline.
-    public static final SavedDataType<LibraryStore> TYPE = new SavedDataType<LibraryStore>(
+    // Declared through Core's SavedDataCompat so the store is the same on every Minecraft line (26.x:
+    // the four-argument SavedDataType with no datafixing, as before; 1.21.x: that line's equivalent).
+    public static final SavedDataType<LibraryStore> TYPE = SavedDataCompat.type(
             Identifier.fromNamespaceAndPath(NeroNotesCommon.MOD_ID, "library"),
             FACTORY,
-            CODEC,
-            null);
+            CODEC);
 
     private final LibraryTable table;
 

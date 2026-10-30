@@ -9,7 +9,7 @@
   manifest version ranges are DERIVED from it — never hardcode `[1.0,2.0)`).
 - **Status:** **Stage 10 complete — 0.1.0-beta.1 is release-ready; only the owner-run Stage 11
   runtime verification remains.** `mod_version=0.1.0-beta.1` (bumped, rebuilt green, **untagged**
-  — the owner reviews, commits, decides the Sentry DSN and tags `v0.1.0-beta.1`). Docs now
+  — the owner reviews, commits, tags `v0.1.0-beta.1`). Docs now
   describe the shipped source: `CHANGELOG.md` (Keep-a-Changelog, with the explicit
   "Not in this release" scope-cut list), rewritten `README.md`, `USING-CORE.md` (every Core API
   actually consumed + the derived-range dependency wiring), `PLAN-0.1.0.md` (the Stage 11 script:

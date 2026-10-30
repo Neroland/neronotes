@@ -93,12 +93,24 @@ class SoundforgeResourcesTest {
         JsonObject recipe = readJson("/data/neronotes/recipe/harmonic_gate.json");
         assertEquals("minecraft:crafting_shaped", recipe.get("type").getAsString());
         JsonObject key = recipe.getAsJsonObject("key");
-        assertEquals("#c:plates/nero_alloy", key.get("P").getAsString());
-        assertEquals("#nerolandcore:materials/plasma_glass", key.get("G").getAsString());
-        String centre = key.get("A").getAsString();
+        assertEquals("#c:plates/nero_alloy", ingredient(key.get("P")));
+        assertEquals("#nerolandcore:materials/plasma_glass", ingredient(key.get("G")));
+        String centre = ingredient(key.get("A"));
         assertTrue(centre.startsWith("minecraft:") || centre.startsWith("#"),
                 "only tags or vanilla ids — never a hardcoded item id from another mod");
         assertEquals("neronotes:harmonic_gate",
                 recipe.getAsJsonObject("result").get("id").getAsString());
+    }
+
+    /**
+     * An ingredient in its short string form. Builds for Minecraft before 1.21.2 ship the recipe with
+     * {"item": ..} / {"tag": ..} objects instead (rewritten at build time), so read either form.
+     */
+    private static String ingredient(com.google.gson.JsonElement element) {
+        if (element.isJsonObject()) {
+            JsonObject object = element.getAsJsonObject();
+            return object.has("tag") ? "#" + object.get("tag").getAsString() : object.get("item").getAsString();
+        }
+        return element.getAsString();
     }
 }

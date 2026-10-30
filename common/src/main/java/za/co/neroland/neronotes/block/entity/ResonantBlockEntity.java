@@ -145,15 +145,29 @@ public class ResonantBlockEntity extends BlockEntity {
     // Persistence
     // ------------------------------------------------------------------
 
+    //? if >=1.21.6 {
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+    //?} else {
+    /*@Override
+    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        ValueOutput output = ValueOutput.of(tag, registries);
+    *///?}
         output.putInt(KEY_PITCH, pitch());
     }
 
+    //? if >=1.21.6 {
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+    //?} else {
+    /*@Override
+    protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        ValueInput input = ValueInput.of(tag, registries);
+    *///?}
         pitch = input.getIntOr(KEY_PITCH, -1);
         if (pitch > Score.MAX_PITCH) {
             pitch = -1; // corrupt / out-of-range: re-derive the band default

@@ -38,11 +38,11 @@ import za.co.neroland.neronotes.platform.Services;
 public final class NeroNotesTelemetry {
 
     /**
-     * Sentry DSN. While this placeholder is in place {@link #init()} performs
-     * no Sentry initialisation at all and no telemetry can be sent; replace it
-     * with the real project DSN to enable reporting.
+     * Sentry DSN for the NeroNotes project (EU ingest). A DSN is a public,
+     * send-only client key, so shipping it in the jar is expected. Reporting
+     * still only starts when the player has not opted out.
      */
-    private static final String DSN = "__NERONOTES_SENTRY_DSN_PLACEHOLDER__";
+    private static final String DSN = "https://caad87f68d8255f7f2a65cbb8d29f782@o4511183823241216.ingest.de.sentry.io/4512346896728144";
 
     /** Hard cap on events sent in one game session. */
     static final int MAX_EVENTS_PER_SESSION = 10;
@@ -88,7 +88,7 @@ public final class NeroNotesTelemetry {
         options.setAttachServerName(false);
         options.setEnableAutoSessionTracking(false);
         options.setTracesSampleRate(0.05);
-        options.setBeforeSend((event, hint) -> filterAndScrub(event));
+        options.setBeforeSend((event, hint) -> ForeignMixinFailure.matches(event) ? null : filterAndScrub(event));
     }
 
     /**

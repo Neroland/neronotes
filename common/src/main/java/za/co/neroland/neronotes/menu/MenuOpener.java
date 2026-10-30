@@ -56,7 +56,11 @@ public final class MenuOpener {
             }
             serverPlayer.sendSystemMessage(Component.translatable("neronotes.menu.open_failed"), true);
         } else {
+            //? if >=26.1 {
             player.sendSystemMessage(Component.translatable("neronotes.menu.open_failed"));
+            //?} else {
+            /*player.displayClientMessage(Component.translatable("neronotes.menu.open_failed"), false);
+            *///?}
         }
         // Telemetry gets the CLASS NAME only — never the rendered display title,
         // which may be player-authored text.

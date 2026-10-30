@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import net.minecraft.nbt.CompoundTag;
 
+import za.co.neroland.neronotes.data.NbtCompat;
 import za.co.neroland.neronotes.library.LibraryTable.Entry;
 import za.co.neroland.neronotes.library.LibraryTable.PublishError;
 import za.co.neroland.neronotes.library.LibraryTable.PublishResult;
@@ -260,7 +261,7 @@ class LibraryTableTest {
         // Corrupt: append a rubbish row.
         CompoundTag bad = new CompoundTag();
         bad.putString("id", "not-an-int");
-        saved.getList("entries").orElseThrow().add(bad);
+        NbtCompat.list(saved, "entries").orElseThrow().add(bad);
         LibraryTable loaded = LibraryTable.load(saved);
         assertEquals(1, loaded.totalCount());
         assertEquals("Good", loaded.visibleEntries().get(0).title());

@@ -17,6 +17,7 @@ import net.minecraft.nbt.NbtIo;
 
 import za.co.neroland.neronotes.score.Score.Layer;
 import za.co.neroland.neronotes.score.Score.Note;
+import za.co.neroland.neronotes.data.NbtCompat;
 
 /**
  * The one codec for {@link Score}: NBT for disks and SavedData, uncompressed
@@ -111,13 +112,13 @@ public final class ScoreCodec {
         int ticksPerBeat = requireInt(tag, KEY_TICKS_PER_BEAT);
         int loopStart = requireInt(tag, KEY_LOOP_START);
         int loopEnd = requireInt(tag, KEY_LOOP_END);
-        Optional<ListTag> layersTag = tag.getList(KEY_LAYERS);
+        Optional<ListTag> layersTag = NbtCompat.list(tag, KEY_LAYERS);
         if (layersTag.isEmpty()) {
             throw new ScoreFormatException("score is missing the '" + KEY_LAYERS + "' list");
         }
         List<Layer> layers = new ArrayList<>(layersTag.get().size());
         for (int i = 0; i < layersTag.get().size(); i++) {
-            Optional<CompoundTag> layerTag = layersTag.get().getCompound(i);
+            Optional<CompoundTag> layerTag = NbtCompat.compound(layersTag.get(), i);
             if (layerTag.isEmpty()) {
                 throw new ScoreFormatException("score layer " + i + " is not a compound tag");
             }
@@ -131,7 +132,7 @@ public final class ScoreCodec {
     }
 
     private static int requireInt(CompoundTag tag, String key) throws ScoreFormatException {
-        Optional<Integer> value = tag.getInt(key);
+        Optional<Integer> value = NbtCompat.intValue(tag, key);
         if (value.isEmpty()) {
             throw new ScoreFormatException("score is missing the int field '" + key + "'");
         }
@@ -139,11 +140,11 @@ public final class ScoreCodec {
     }
 
     private static Layer readLayer(CompoundTag layerTag, int index) throws ScoreFormatException {
-        Optional<String> voiceId = layerTag.getString(KEY_VOICE);
+        Optional<String> voiceId = NbtCompat.string(layerTag, KEY_VOICE);
         if (voiceId.isEmpty() || voiceId.get().isBlank()) {
             throw new ScoreFormatException("score layer " + index + " is missing its '" + KEY_VOICE + "' id");
         }
-        Optional<int[]> packed = layerTag.getIntArray(KEY_NOTES);
+        Optional<int[]> packed = NbtCompat.intArray(layerTag, KEY_NOTES);
         if (packed.isEmpty()) {
             throw new ScoreFormatException("score layer " + index + " is missing its '" + KEY_NOTES + "' array");
         }

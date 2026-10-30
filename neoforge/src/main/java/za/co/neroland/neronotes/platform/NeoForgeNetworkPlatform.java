@@ -2,7 +2,9 @@ package za.co.neroland.neronotes.platform;
 
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+//? if >=1.21.6 {
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+//?}
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
@@ -24,6 +26,10 @@ public final class NeoForgeNetworkPlatform implements NetworkPlatform {
 
     @Override
     public void sendToServer(CustomPacketPayload payload) {
+        //? if >=1.21.6 {
         ClientPacketDistributor.sendToServer(payload);
+        //?} else {
+        /*PacketDistributor.sendToServer(payload);
+        *///?}
     }
 }

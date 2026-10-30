@@ -3,7 +3,9 @@ package za.co.neroland.neronotes.client;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+//? if >=1.21.9 {
 import net.minecraft.client.input.KeyEvent;
+//?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -39,7 +41,13 @@ public class DiskPressScreen extends AbstractContainerScreen<DiskPressMenu> {
     private boolean anonymous; // default: credited — anonymity is the opt-out
 
     public DiskPressScreen(DiskPressMenu menu, Inventory playerInventory, Component title) {
+        //? if >=26.1 {
         super(menu, playerInventory, title, W, H);
+        //?} else {
+        /*super(menu, playerInventory, title);
+        this.imageWidth = W;
+        this.imageHeight = H;
+        *///?}
         this.titleLabelX = 8;
         this.titleLabelY = 5;
         this.inventoryLabelX = 8;
@@ -77,23 +85,53 @@ public class DiskPressScreen extends AbstractContainerScreen<DiskPressMenu> {
     }
 
     /** Let the focused title box swallow typing (incl. the inventory key). */
+    //? if >=1.21.9 {
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (event.key() == 256) { // Escape
+        int keyCode = event.key();
+    //?} else {
+    /*@Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    *///?}
+        if (keyCode == 256) { // Escape
             onClose();
             return true;
         }
-        if (titleBox != null && (titleBox.keyPressed(event) || titleBox.canConsumeInput())) {
+        //? if >=1.21.9 {
+        boolean consumed = titleBox != null && (titleBox.keyPressed(event) || titleBox.canConsumeInput());
+        //?} else {
+        /*boolean consumed = titleBox != null && (titleBox.keyPressed(keyCode, scanCode, modifiers) || titleBox.canConsumeInput());
+        *///?}
+        if (consumed) {
             return true;
         }
+        //? if >=1.21.9 {
         return super.keyPressed(event);
+        //?} else {
+        /*return super.keyPressed(keyCode, scanCode, modifiers);
+        *///?}
     }
 
+    //? if >=26.1 {
     @Override
     public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         drawPanel(g);
         super.extractContents(g, mouseX, mouseY, partialTick);
+    //?} else {
+    /*@Override
+    protected void renderBg(GuiGraphicsExtractor g, float partialTick, int mouseX, int mouseY) {
+        drawPanel(g);
+    }
+
+    @Override
+    public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
+    *///?}
         drawGauge(g);
+        //? if <26.1 {
+        /*// Before 26.1 AbstractContainerScreen.render does not draw the hovered-slot tooltip itself.
+        this.renderTooltip(g, mouseX, mouseY);
+        *///?}
     }
 
     private void drawPanel(GuiGraphicsExtractor g) {
@@ -136,8 +174,13 @@ public class DiskPressScreen extends AbstractContainerScreen<DiskPressMenu> {
         }
     }
 
+    //? if >=26.1 {
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+    //?} else {
+    /*@Override
+    protected void renderLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+    *///?}
         g.text(font, title, titleLabelX, titleLabelY, TITLE, false);
         g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, SUBTLE, false);
     }

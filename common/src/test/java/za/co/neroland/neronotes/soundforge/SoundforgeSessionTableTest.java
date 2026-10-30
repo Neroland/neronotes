@@ -12,6 +12,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 
+import za.co.neroland.neronotes.data.NbtCompat;
+
 /**
  * Plain-JVM tests for the Soundforge session rows: the return-position
  * round-trip through NBT (the "never strand a player" guarantee), the
@@ -41,7 +43,7 @@ class SoundforgeSessionTableTest {
         assertTrue(reloaded.isInside(COMPOSER));
         assertEquals(1234L, reloaded.enteredGameTime(COMPOSER).orElseThrow());
         assertEquals("session score placeholder",
-                reloaded.sessionData(COMPOSER).orElseThrow().getString("stage5").orElseThrow());
+                NbtCompat.string(reloaded.sessionData(COMPOSER).orElseThrow(), "stage5").orElseThrow());
     }
 
     @Test
@@ -69,7 +71,7 @@ class SoundforgeSessionTableTest {
         ReturnAnchor elsewhere = new ReturnAnchor("nerospace:greenxertz", -100.0, 70.0, 42.0, 0.0f, 0.0f);
         table.beginSession(COMPOSER, elsewhere, 20L);
         assertEquals(elsewhere, table.returnAnchor(COMPOSER).orElseThrow());
-        assertEquals(3, table.sessionData(COMPOSER).orElseThrow().getInt("layers").orElseThrow(),
+        assertEquals(3, NbtCompat.intValue(table.sessionData(COMPOSER).orElseThrow(), "layers").orElseThrow(),
                 "re-entering must not discard the composing session");
     }
 
@@ -93,8 +95,11 @@ class SoundforgeSessionTableTest {
         table.beginSession(COMPOSER, anchor(), 5L);
         CompoundTag root = table.save();
 
-        ListTag sessions = root.getList("sessions").orElseThrow();
+        ListTag sessions = NbtCompat.list(root, "sessions").orElseThrow();
+        // Before 1.21.5 a ListTag holds one element type only, so a non-compound row cannot exist there.
+        //? if >=1.21.5 {
         sessions.add(StringTag.valueOf("not a compound"));
+        //?}
         CompoundTag junk = new CompoundTag();
         junk.putString("player", "definitely-not-a-uuid");
         sessions.add(junk);

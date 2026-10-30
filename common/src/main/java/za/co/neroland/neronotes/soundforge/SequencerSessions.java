@@ -14,6 +14,7 @@ import za.co.neroland.neronotes.score.ScoreFormatException;
 import za.co.neroland.neronotes.voice.VoiceDefinition;
 import za.co.neroland.neronotes.voice.VoiceFamily;
 import za.co.neroland.neronotes.voice.VoiceRegistry;
+import za.co.neroland.neronotes.data.NbtCompat;
 
 /**
  * Server-side access to a player's <strong>sequencer session</strong>: the
@@ -49,7 +50,7 @@ public final class SequencerSessions {
     public static Score sessionScore(MinecraftServer server, UUID player) {
         Optional<CompoundTag> data = SoundforgeSessionStore.get(server).sessionData(player);
         if (data.isPresent()) {
-            Optional<CompoundTag> scoreTag = data.get().getCompound(KEY_SCORE);
+            Optional<CompoundTag> scoreTag = NbtCompat.compound(data.get(), KEY_SCORE);
             if (scoreTag.isPresent()) {
                 try {
                     return ScoreCodec.fromNbt(scoreTag.get());
@@ -66,7 +67,7 @@ public final class SequencerSessions {
     /** The player's active layer index, clamped to the session's layer count. */
     public static int activeLayer(MinecraftServer server, UUID player) {
         int stored = SoundforgeSessionStore.get(server).sessionData(player)
-                .flatMap(tag -> tag.getInt(KEY_ACTIVE_LAYER))
+                .flatMap(tag -> NbtCompat.intValue(tag, KEY_ACTIVE_LAYER))
                 .orElse(0);
         int layerCount = sessionScore(server, player).layers().size();
         return Math.max(0, Math.min(stored, layerCount - 1));

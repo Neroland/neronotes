@@ -6,6 +6,10 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+//? if <1.21.6 {
+/*import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.MinecraftForge;
+*///?}
 
 import org.jetbrains.annotations.Nullable;
 
@@ -29,10 +33,18 @@ public final class ForgeCapabilities {
     }
 
     public static void register() {
+        //? if >=1.21.6 {
         AttachCapabilitiesEvent.BlockEntities.BUS.addListener(ForgeCapabilities::onAttachBlockEntity);
+        //?} else {
+        /*MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, ForgeCapabilities::onAttachBlockEntity);
+        *///?}
     }
 
+    //? if >=1.21.6 {
     private static void onAttachBlockEntity(AttachCapabilitiesEvent.BlockEntities event) {
+    //?} else {
+    /*private static void onAttachBlockEntity(AttachCapabilitiesEvent<BlockEntity> event) {
+    *///?}
         if (!(event.getObject() instanceof HarmonicGateBlockEntity gate)) {
             return;
         }

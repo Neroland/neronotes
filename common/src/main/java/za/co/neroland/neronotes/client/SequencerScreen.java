@@ -6,7 +6,9 @@ import java.util.Optional;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+//? if >=1.21.9 {
 import net.minecraft.client.input.MouseButtonEvent;
+//?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -66,7 +68,13 @@ public class SequencerScreen extends AbstractContainerScreen<SequencerMenu> {
     private NotesButton addLayerButton;
 
     public SequencerScreen(SequencerMenu menu, Inventory playerInventory, Component title) {
+        //? if >=26.1 {
         super(menu, playerInventory, title, W, H);
+        //?} else {
+        /*super(menu, playerInventory, title);
+        this.imageWidth = W;
+        this.imageHeight = H;
+        *///?}
         this.titleLabelX = 8;
         this.titleLabelY = 6;
         this.inventoryLabelY = 10_000; // no player inventory on this screen
@@ -191,17 +199,28 @@ public class SequencerScreen extends AbstractContainerScreen<SequencerMenu> {
     // Interaction
     // ------------------------------------------------------------------
 
+    //? if >=1.21.9 {
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        int col = (int) Math.floor((event.x() - (leftPos + GRID_X)) / CELL);
-        int row = (int) Math.floor((event.y() - (topPos + GRID_Y)) / CELL);
+        double mouseX = event.x();
+        double mouseY = event.y();
+    //?} else {
+    /*@Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    *///?}
+        int col = (int) Math.floor((mouseX - (leftPos + GRID_X)) / CELL);
+        int row = (int) Math.floor((mouseY - (topPos + GRID_Y)) / CELL);
         if (col >= 0 && col < COLS && row >= 0 && row < ROWS) {
             int tick = tickOffset + col;
             int pitch = pitchBase + (ROWS - 1 - row);
             send(SequencerEdit.toggleNote(clientActiveLayer(), tick, pitch));
             return true;
         }
+        //? if >=1.21.9 {
         return super.mouseClicked(event, doubleClick);
+        //?} else {
+        /*return super.mouseClicked(mouseX, mouseY, button);
+        *///?}
     }
 
     @Override
@@ -237,12 +256,27 @@ public class SequencerScreen extends AbstractContainerScreen<SequencerMenu> {
     // Rendering
     // ------------------------------------------------------------------
 
+    //? if >=26.1 {
     @Override
     public void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         drawPanel(g);
         super.extractContents(g, mouseX, mouseY, partialTick);
+    //?} else {
+    /*@Override
+    protected void renderBg(GuiGraphicsExtractor g, float partialTick, int mouseX, int mouseY) {
+        drawPanel(g);
+    }
+
+    @Override
+    public void render(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
+    *///?}
         drawReadouts(g);
         drawGrid(g);
+        //? if <26.1 {
+        /*// Before 26.1 AbstractContainerScreen.render does not draw the hovered-slot tooltip itself.
+        this.renderTooltip(g, mouseX, mouseY);
+        *///?}
     }
 
     private void drawPanel(GuiGraphicsExtractor g) {
@@ -346,8 +380,13 @@ public class SequencerScreen extends AbstractContainerScreen<SequencerMenu> {
         }
     }
 
+    //? if >=26.1 {
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+    //?} else {
+    /*@Override
+    protected void renderLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+    *///?}
         g.text(font, title, titleLabelX, titleLabelY, TITLE, false);
     }
 }

@@ -3,6 +3,7 @@ package za.co.neroland.neronotes.command;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -68,6 +69,15 @@ public final class NeroNotesCommands {
     private NeroNotesCommands() {
     }
 
+    /** Gamemaster-level (op 2) requirement; 1.21.6+ expresses it as a permission check object. */
+    private static Predicate<CommandSourceStack> gamemasters() {
+        //? if >=1.21.6 {
+        return Commands.hasPermission(Commands.LEVEL_GAMEMASTERS);
+        //?} else {
+        /*return source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS);
+        *///?}
+    }
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
                 Commands.literal("neronotes")
@@ -87,17 +97,17 @@ public final class NeroNotesCommands {
                                                 .executes(ctx -> unpublish(ctx.getSource(),
                                                         IntegerArgumentType.getInteger(ctx, "id")))))
                                 .then(Commands.literal("remove")
-                                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                                        .requires(gamemasters())
                                         .then(Commands.argument("id", IntegerArgumentType.integer(1))
                                                 .executes(ctx -> remove(ctx.getSource(),
                                                         IntegerArgumentType.getInteger(ctx, "id")))))
                                 .then(Commands.literal("approve")
-                                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                                        .requires(gamemasters())
                                         .then(Commands.argument("id", IntegerArgumentType.integer(1))
                                                 .executes(ctx -> approve(ctx.getSource(),
                                                         IntegerArgumentType.getInteger(ctx, "id"))))))
                         .then(Commands.literal("gallery")
-                                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                                .requires(gamemasters())
                                 .executes(ctx -> NotesGallery.build(ctx.getSource()))
                                 .then(Commands.literal("clear")
                                         .executes(ctx -> NotesGallery.clear(ctx.getSource()))))
@@ -105,7 +115,7 @@ public final class NeroNotesCommands {
                                 .then(Commands.literal("export")
                                         .executes(ctx -> exportSelf(ctx.getSource()))
                                         .then(Commands.argument("uuid", StringArgumentType.string())
-                                                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                                                .requires(gamemasters())
                                                 .executes(ctx -> exportOther(ctx.getSource(),
                                                         StringArgumentType.getString(ctx, "uuid")))))
                                 .then(Commands.literal("erase-me")

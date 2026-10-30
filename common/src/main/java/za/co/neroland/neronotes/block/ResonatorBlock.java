@@ -91,28 +91,54 @@ public class ResonatorBlock extends Block implements EntityBlock {
      * Resonator. The disk is read, not consumed. Anything else in hand falls
      * through to the empty-hand toggle below.
      */
+    //? if >=1.21.2 {
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                           Player player, InteractionHand hand, BlockHitResult hitResult) {
+    //?} else {
+    /*@Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level,
+            BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    *///?}
         DiskContents contents = CustomDiskItem.contentsOf(stack);
         if (contents == null) {
+            //? if >=1.21.2 {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
+            //?} else {
+            /*return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            *///?}
         }
         if (level.isClientSide()) {
+            //? if >=1.21.2 {
             return InteractionResult.SUCCESS;
+            //?} else {
+            /*return net.minecraft.world.ItemInteractionResult.SUCCESS;
+            *///?}
         }
         if (!(level.getBlockEntity(pos) instanceof ResonatorBlockEntity resonator)
                 || !(player instanceof ServerPlayer serverPlayer)) {
+            //? if >=1.21.2 {
             return InteractionResult.PASS;
+            //?} else {
+            /*return net.minecraft.world.ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+            *///?}
         }
         if (!resonator.mayLoad(serverPlayer)) {
             serverPlayer.sendSystemMessage(Component.translatable("neronotes.resonator.denied"));
+            //? if >=1.21.2 {
             return InteractionResult.SUCCESS;
+            //?} else {
+            /*return net.minecraft.world.ItemInteractionResult.SUCCESS;
+            *///?}
         }
         resonator.setScore(contents.score());
         serverPlayer.sendSystemMessage(
                 Component.translatable("neronotes.resonator.disk_loaded", contents.title()));
+        //? if >=1.21.2 {
         return InteractionResult.SUCCESS;
+        //?} else {
+        /*return net.minecraft.world.ItemInteractionResult.SUCCESS;
+        *///?}
     }
 
     @Override
@@ -165,4 +191,16 @@ public class ResonatorBlock extends Block implements EntityBlock {
         return (tickLevel, pos, tickState, blockEntity) -> ResonatorBlockEntity.serverTick(
                 (ServerLevel) tickLevel, pos, tickState, (ResonatorBlockEntity) blockEntity);
     }
+
+    //? if <1.21.5 {
+    /*// Before 1.21.5 block entities have no preRemoveSideEffects hook; real removal (never chunk unload)
+    // arrives here, so forward it.
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof ResonatorBlockEntity blockEntity) {
+            blockEntity.preRemoveSideEffects(pos, state);
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+    *///?}
 }

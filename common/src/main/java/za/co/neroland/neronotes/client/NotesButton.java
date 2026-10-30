@@ -25,8 +25,16 @@ public class NotesButton extends Button {
         this.selected = selected;
     }
 
+    //? if >=26.1 {
     @Override
     protected void extractContents(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
+    //?} else if >=1.21.11 {
+    /*@Override
+    protected void renderContents(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
+    *///?} else {
+    /*@Override
+    protected void renderWidget(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
+    *///?}
         int x = getX();
         int y = getY();
         int w = getWidth();

@@ -90,9 +90,9 @@ public final class SoundforgeTravel {
         gate.consumeTeleportCharge();
         SoundforgeDimension.ensurePlatform(soundforge);
         BlockPos arrival = SoundforgeDimension.ARRIVAL_POS;
-        player.teleportTo(soundforge,
+        teleport(player, soundforge,
                 arrival.getX() + 0.5, arrival.getY(), arrival.getZ() + 0.5,
-                Set.of(), SoundforgeDimension.ARRIVAL_Y_ROT, SoundforgeDimension.ARRIVAL_X_ROT, true);
+                SoundforgeDimension.ARRIVAL_Y_ROT, SoundforgeDimension.ARRIVAL_X_ROT);
         return TravelResult.ENTERED;
     }
 
@@ -118,26 +118,43 @@ public final class SoundforgeTravel {
             ServerLevel target = dimensionId == null ? null
                     : server.getLevel(ResourceKey.create(Registries.DIMENSION, dimensionId));
             if (target != null) {
-                player.teleportTo(target, anchor.x(), anchor.y(), anchor.z(),
-                        Set.of(), anchor.yRot(), anchor.xRot(), true);
+                teleport(player, target, anchor.x(), anchor.y(), anchor.z(), anchor.yRot(), anchor.xRot());
                 store.markOutside(player.getUUID());
                 return TravelResult.RETURNED;
             }
         }
 
         // Never strand a player: no (resolvable) anchor -> the world's respawn point.
+        //? if >=1.21.9 {
         LevelData.RespawnData respawn = server.overworld().getRespawnData();
         ServerLevel spawnLevel = server.getLevel(respawn.globalPos().dimension());
         if (spawnLevel == null) {
             spawnLevel = server.overworld();
         }
         BlockPos spawn = respawn.globalPos().pos();
+        float spawnYaw = respawn.yaw();
+        float spawnPitch = respawn.pitch();
+        //?} else {
+        /*ServerLevel spawnLevel = server.overworld();
+        BlockPos spawn = spawnLevel.getSharedSpawnPos();
+        float spawnYaw = spawnLevel.getSharedSpawnAngle();
+        float spawnPitch = 0f;
+        *///?}
         NeroNotesCommon.LOGGER.warn("[NeroNotes] soundforge return anchor missing or unresolvable; using world spawn");
-        player.teleportTo(spawnLevel,
-                spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5,
-                Set.of(), respawn.yaw(), respawn.pitch(), true);
+        teleport(player, spawnLevel,
+                spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, spawnYaw, spawnPitch);
         store.markOutside(player.getUUID());
         return TravelResult.RETURNED_FALLBACK;
+    }
+
+    /** Cross-dimension teleport with no relative components; 1.21.1's form has no dismount flag. */
+    private static void teleport(ServerPlayer player, ServerLevel level, double x, double y, double z,
+            float yRot, float xRot) {
+        //? if >=1.21.2 {
+        player.teleportTo(level, x, y, z, Set.of(), yRot, xRot, true);
+        //?} else {
+        /*player.teleportTo(level, x, y, z, Set.of(), yRot, xRot);
+        *///?}
     }
 
     /** Convenience guard used by the block and command paths. */

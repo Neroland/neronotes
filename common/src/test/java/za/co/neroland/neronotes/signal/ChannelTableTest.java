@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import net.minecraft.nbt.CompoundTag;
 
+import za.co.neroland.neronotes.data.NbtCompat;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -115,7 +117,7 @@ class ChannelTableTest {
         CompoundTag saved = table.save();
         // Corrupt one row: a garbage owner UUID must not take the whole store down.
         CompoundTag broken = saved.copy();
-        broken.getList("channels").orElseThrow().getCompound(0).orElseThrow().putString("owner", "not-a-uuid");
+        NbtCompat.compound(NbtCompat.list(broken, "channels").orElseThrow(), 0).orElseThrow().putString("owner", "not-a-uuid");
         ChannelTable loaded = ChannelTable.load(broken);
         assertEquals(0, loaded.size(), "malformed row skipped");
     }

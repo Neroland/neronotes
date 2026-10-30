@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import za.co.neroland.neronotes.NeroNotesCommon;
 import za.co.neroland.neronotes.item.DiskNames;
+import za.co.neroland.neronotes.data.NbtCompat;
 
 /**
  * The published-disk library rows — the plain-JVM heart of
@@ -400,14 +401,14 @@ public final class LibraryTable {
      */
     public static LibraryTable load(CompoundTag root) {
         LibraryTable table = new LibraryTable();
-        table.nextId = Math.max(1, root.getIntOr(KEY_NEXT_ID, 1));
-        Optional<ListTag> list = root.getList(KEY_ENTRIES);
+        table.nextId = Math.max(1, NbtCompat.getIntOr(root, KEY_NEXT_ID, 1));
+        Optional<ListTag> list = NbtCompat.list(root, KEY_ENTRIES);
         if (list.isEmpty()) {
             return table;
         }
         int maxId = 0;
         for (int i = 0; i < list.get().size(); i++) {
-            Optional<CompoundTag> row = list.get().getCompound(i);
+            Optional<CompoundTag> row = NbtCompat.compound(list.get(), i);
             if (row.isEmpty()) {
                 NeroNotesCommon.LOGGER.warn("[NeroNotes] skipping malformed library row {} (not a compound)", i);
                 continue;
@@ -426,15 +427,15 @@ public final class LibraryTable {
     }
 
     private static Entry loadRow(CompoundTag tag) {
-        int id = tag.getInt(KEY_ID).orElseThrow();
-        String title = tag.getString(KEY_TITLE).orElseThrow();
-        UUID author = tag.getString(KEY_AUTHOR).map(UUID::fromString).orElse(null);
-        String authorName = tag.getStringOr(KEY_AUTHOR_NAME, "");
-        boolean anonymous = tag.getBooleanOr(KEY_ANONYMOUS, false);
-        String familyId = tag.getStringOr(KEY_FAMILY, "");
-        byte[] scoreBytes = tag.getByteArray(KEY_SCORE).orElseThrow();
-        int downloads = tag.getIntOr(KEY_DOWNLOADS, 0);
-        boolean pending = tag.getBooleanOr(KEY_PENDING, false);
+        int id = NbtCompat.intValue(tag, KEY_ID).orElseThrow();
+        String title = NbtCompat.string(tag, KEY_TITLE).orElseThrow();
+        UUID author = NbtCompat.string(tag, KEY_AUTHOR).map(UUID::fromString).orElse(null);
+        String authorName = NbtCompat.getStringOr(tag, KEY_AUTHOR_NAME, "");
+        boolean anonymous = NbtCompat.getBooleanOr(tag, KEY_ANONYMOUS, false);
+        String familyId = NbtCompat.getStringOr(tag, KEY_FAMILY, "");
+        byte[] scoreBytes = NbtCompat.byteArray(tag, KEY_SCORE).orElseThrow();
+        int downloads = NbtCompat.getIntOr(tag, KEY_DOWNLOADS, 0);
+        boolean pending = NbtCompat.getBooleanOr(tag, KEY_PENDING, false);
         return new Entry(id, title, author, authorName, anonymous, familyId, scoreBytes, downloads, pending);
     }
 }

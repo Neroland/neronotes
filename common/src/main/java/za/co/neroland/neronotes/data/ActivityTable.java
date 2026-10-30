@@ -107,19 +107,19 @@ public final class ActivityTable {
      */
     public static ActivityTable load(CompoundTag root) {
         ActivityTable table = new ActivityTable();
-        Optional<ListTag> list = root.getList(KEY_PLAYERS);
+        Optional<ListTag> list = NbtCompat.list(root, KEY_PLAYERS);
         if (list.isEmpty()) {
             return table;
         }
         for (int i = 0; i < list.get().size(); i++) {
-            Optional<CompoundTag> row = list.get().getCompound(i);
+            Optional<CompoundTag> row = NbtCompat.compound(list.get(), i);
             if (row.isEmpty()) {
                 NeroNotesCommon.LOGGER.warn("[NeroNotes] skipping malformed activity row {} (not a compound)", i);
                 continue;
             }
             try {
-                UUID player = UUID.fromString(row.get().getString(KEY_PLAYER).orElseThrow());
-                long seen = row.get().getLong(KEY_LAST_SEEN).orElseThrow();
+                UUID player = UUID.fromString(NbtCompat.string(row.get(), KEY_PLAYER).orElseThrow());
+                long seen = NbtCompat.longValue(row.get(), KEY_LAST_SEEN).orElseThrow();
                 table.lastSeen.put(player, seen);
             } catch (RuntimeException malformed) {
                 NeroNotesCommon.LOGGER.warn("[NeroNotes] skipping malformed activity row {}: {}", i,

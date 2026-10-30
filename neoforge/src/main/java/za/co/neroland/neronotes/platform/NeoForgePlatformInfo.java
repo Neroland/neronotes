@@ -34,7 +34,11 @@ public final class NeoForgePlatformInfo implements PlatformInfo {
 
     @Override
     public boolean isDevelopment() {
+        //? if >=1.21.9 {
         return !FMLEnvironment.isProduction();
+        //?} else {
+        /*return !FMLEnvironment.production;
+        *///?}
     }
 
     @Override

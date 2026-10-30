@@ -12,9 +12,9 @@ Conventions used below:
 - Log lines are quoted exactly. NeroNotes logs under the logger name `NeroNotes`; every message
   starts with the literal prefix `[NeroNotes]` and a space. Lines marked *(debug)* only appear with debug
   logging enabled for that logger (e.g. Fabric `log4j` config or `-Dforge.logging.console.level=debug`).
-- On a stock build the Sentry DSN is the placeholder, so telemetry is entirely inert. The only
-  telemetry line is *(debug)* `[NeroNotes] telemetry: no DSN configured; error reporting disabled`
-  — you will **not** see an "error reporting enabled" line, and that is correct.
+- The build ships the real Sentry DSN. With telemetry on (the default) the line is
+  `[NeroNotes] telemetry: error reporting enabled (opt out via telemetryEnabled=false in config/neronotes.properties; see PRIVACY.md)`;
+  with `telemetryEnabled=false` it is `[NeroNotes] telemetry: opted out via config; error reporting disabled`.
 
 ## Prerequisites
 

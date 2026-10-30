@@ -100,7 +100,11 @@ public final class NotesGallery {
             source.sendFailure(Component.literal("Run this as a player."));
             return 0;
         }
+        //? if >=1.21.6 {
         ServerLevel level = player.level();
+        //?} else {
+        /*ServerLevel level = player.serverLevel();
+        *///?}
         BlockPos origin = player.blockPosition();
         int x0 = origin.getX() + OFFSET_EAST;
         int z0 = origin.getZ() - HALF_DEPTH;
@@ -207,7 +211,11 @@ public final class NotesGallery {
             source.sendFailure(Component.literal("Run this as a player."));
             return 0;
         }
+        //? if >=1.21.6 {
         ServerLevel level = player.level();
+        //?} else {
+        /*ServerLevel level = player.serverLevel();
+        *///?}
         BlockPos origin = player.blockPosition();
         int x0 = origin.getX() + OFFSET_EAST;
         int z0 = origin.getZ() - HALF_DEPTH;

@@ -90,7 +90,7 @@ class ActivityTableTest {
         CompoundTag bad = new CompoundTag();
         bad.putString("player", "not-a-uuid");
         bad.putLong("last_seen", 1L);
-        saved.getList("players").orElseThrow().add(bad);
+        NbtCompat.list(saved, "players").orElseThrow().add(bad);
 
         ActivityTable reloaded = ActivityTable.load(saved);
         assertEquals(1, reloaded.size(), "the malformed row is dropped, the good one kept");

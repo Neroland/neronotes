@@ -82,4 +82,16 @@ public class TransportLecternBlock extends Block implements EntityBlock {
                 (net.minecraft.server.level.ServerLevel) tickLevel, pos, tickState,
                 (TransportLecternBlockEntity) blockEntity);
     }
+
+    //? if <1.21.5 {
+    /*// Before 1.21.5 block entities have no preRemoveSideEffects hook; real removal (never chunk unload)
+    // arrives here, so forward it.
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof TransportLecternBlockEntity blockEntity) {
+            blockEntity.preRemoveSideEffects(pos, state);
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+    *///?}
 }
