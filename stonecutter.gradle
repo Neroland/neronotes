@@ -347,6 +347,181 @@ subprojects {
             }
         }
     }
+    // Datapack format: the dimension types and worldgen in common/src/main/resources are written for 26.x. For older
+    // nodes, rewrite them at build time into that line's format (same files, overlaid last so they win) instead of
+    // keeping per-version copies. 1.21.11 only drops the attributes and fields 26.1 added. Before 1.21.11 a dimension
+    // type goes back to the old field set (ultrawarm, natural, bed_works, effects, fixed_time, ...) derived from its
+    // attributes, and each biome takes its planet's sky, fog and water-fog colours and sounds into `effects` as ints.
+    // Old lines have no equivalent for the ambient light tint, star brightness, sunrise and cloud colours, or a moon
+    // that is not opposite the sun, so those are dropped there.
+    if (isNode) {
+        afterEvaluate { node ->
+            def sc = node.extensions.findByName('stonecutter')
+            if (sc == null || !sc.eval(sc.current.version, '<26.1')) {
+                return
+            }
+            def base = new File(rootProject.ext.commonResources).canonicalFile
+            def below = { String v -> sc.eval(sc.current.version, '<' + v) }
+            def outDir = node.file('build/generated/legacy-worldgen')
+            def legacyWorldgen = node.tasks.register('legacyWorldgen') {
+                group = 'stonecutter'
+                description = "Rewrites the 26.x dimension types and worldgen into this Minecraft line's format."
+                inputs.dir(base)
+                inputs.property('mc', sc.current.version.toString())
+                outputs.dir(outDir)
+                doLast {
+                    node.delete(outDir)
+                    def slurper = new groovy.json.JsonSlurper()
+                    def files = [:] // "data/<ns>/<kind>/<path>.json" -> parsed json, for the kinds rewritten below
+                    base.eachFileRecurse(groovy.io.FileType.FILES) { f ->
+                        def rel = base.toPath().relativize(f.toPath()).toString().replace('\\', '/')
+                        if (rel ==~ /data\/[^\/]+\/(dimension_type|dimension|worldgen\/(biome|noise_settings|configured_feature))\/.+\.json/) {
+                            files[rel] = slurper.parse(f)
+                        }
+                    }
+                    def kind = { String rel -> rel.split('/')[2] == 'worldgen' ? rel.split('/')[3] : rel.split('/')[2] }
+                    def idOf = { String rel -> // data/ns/<kind dirs>/name.json -> ns:name
+                        def p = rel.split('/')
+                        p[1] + ':' + p[(p[2] == 'worldgen' ? 4 : 3)..-1].join('/').replaceAll(/\.json$/, '')
+                    }
+                    // Attributes that only exist from 26.1 (1.21.11 rejects the unknown id); older lines have no equivalent.
+                    def only26 = ['minecraft:visual/ambient_light_color', 'minecraft:visual/block_light_tint',
+                                  'minecraft:visual/night_vision_color']
+                    // Fields 26.1 added to dimension_type; 1.21.11 has neither (the dragon fight is tied to the End there).
+                    def only26Fields = ['default_clock', 'has_ender_dragon_fight']
+                    // 26.x `skybox` -> pre-1.21.11 `effects`.
+                    def skyEffects = [overworld: 'minecraft:overworld', end: 'minecraft:the_end', none: 'minecraft:the_nether']
+                    def legacy = below('1.21.11') // no environment attributes at all: the pre-1.21.11 field set
+                    def rgb = { v -> v instanceof String ? (Long.parseLong(v.substring(1), 16) & 0xFFFFFF) as int : v }
+                    def alpha = { v -> v instanceof String && v.length() == 9 ? Integer.parseInt(v.substring(1, 3), 16) : 255 }
+                    // A fixed sun angle (0 = noon, degrees) as the fixed day time old lines take, inverting their
+                    // celestial angle curve f(d) = (2d + 0.5 - cos(pi d) / 2) / 3 with d = frac(time / 24000 - 0.25).
+                    def fixedTime = { Number deg ->
+                        double f = ((deg.doubleValue() % 360) + 360) % 360 / 360.0
+                        double lo = 0, hi = 1
+                        for (int i = 0; i < 50; i++) {
+                            double mid = (lo + hi) / 2
+                            if ((mid * 2 + 0.5 - Math.cos(mid * Math.PI) / 2) / 3 < f) { lo = mid } else { hi = mid }
+                        }
+                        Math.round(((lo + 0.25) % 1.0) * 24000) % 24000
+                    }
+                    def types = files.findAll { kind(it.key) == 'dimension_type' }.collectEntries { [(idOf(it.key)): it.value] }
+                    // Which dimension type's attributes a biome sits under: a level stem listing it, else the type whose
+                    // name prefixes the biome's (e.g. terraformed_mars_* -> mars). Unmatched biomes get vanilla defaults.
+                    def typeOfBiome = [:]
+                    def ids
+                    ids = { o -> o instanceof Map ? o.values().collectMany { ids(it) } : o instanceof List ? o.collectMany { ids(it) }
+                            : o instanceof String && o.contains(':') ? [o] : [] }
+                    files.findAll { kind(it.key) == 'dimension' }.each { rel, j ->
+                        ids([j.generator?.biome_source, j.generator?.settings instanceof Map ? j.generator.settings.biome : null]).each { typeOfBiome.putIfAbsent(it, j.type) }
+                    }
+                    def typeFor = { String biome ->
+                        typeOfBiome[biome] ?: types.keySet().find { t ->
+                            def ns = t.split(':')[0], n = t.split(':')[1], b = biome.split(':')
+                            b[0] == ns && (b[1] == n || b[1].startsWith(n + '_') || b[1].startsWith('terraformed_' + n + '_'))
+                        }
+                    }
+                    def out = [:]
+                    files.each { rel, j ->
+                        switch (kind(rel)) {
+                            case 'dimension_type':
+                                def a = (j.attributes ?: [:]).findAll { !(it.key in only26) }
+                                if (!legacy) {
+                                    def t = j.findAll { !(it.key in only26Fields) }
+                                    if (j.attributes != null) { t.attributes = a }
+                                    out[rel] = t
+                                    break
+                                }
+                                def bed = a['minecraft:gameplay/bed_rule'] ?: [can_sleep: 'when_dark', can_set_spawn: 'always']
+                                def t = [:]
+                                ['ambient_light', 'coordinate_scale', 'has_ceiling', 'has_skylight', 'height', 'infiniburn',
+                                 'logical_height', 'min_y', 'monster_spawn_block_light_limit', 'monster_spawn_light_level'].each {
+                                    if (j.containsKey(it)) { t[it] = j[it] }
+                                }
+                                t.bed_works = bed.explodes != true
+                                t.effects = skyEffects[j.skybox ?: 'overworld']
+                                if (j.has_fixed_time == true) { t.fixed_time = fixedTime(a['minecraft:visual/sun_angle'] ?: 0) }
+                                t.has_raids = a['minecraft:gameplay/can_start_raid'] != false
+                                // `natural` gated sleeping/spawn-setting, portal piglins and working clocks/compasses.
+                                t.natural = a['minecraft:gameplay/nether_portal_spawns_piglin'] == true || bed.can_sleep != 'never'
+                                t.piglin_safe = a['minecraft:gameplay/piglins_zombify'] == false
+                                t.respawn_anchor_works = a['minecraft:gameplay/respawn_anchor_works'] == true
+                                t.ultrawarm = a['minecraft:gameplay/water_evaporates'] == true
+                                def cloud = a['minecraft:visual/cloud_color'] ?: '#00000000'
+                                if (!below('1.21.6') && alpha(cloud) > 0 && rgb(cloud) != 0) {
+                                    t.cloud_height = Math.round((a['minecraft:visual/cloud_height'] ?: 192.33) as double) as int
+                                }
+                                out[rel] = t.sort()
+                                break
+                            case 'biome':
+                                def a = (j.attributes ?: [:]).findAll { !(it.key in only26) }
+                                if (!legacy) {
+                                    def b = new LinkedHashMap(j)
+                                    if (j.attributes != null) { b.attributes = a }
+                                    out[rel] = b
+                                    break
+                                }
+                                // A biome no planet claims (generic terraformed ones) keeps vanilla overworld's sky and fog.
+                                def dim = types[typeFor(idOf(rel))]?.attributes ?: ['minecraft:visual/sky_color': 7907327,
+                                                                                    'minecraft:visual/fog_color': 12638463]
+                                def attr = { String k -> a.containsKey(k) ? a[k] : dim[k] } // biome layer overrides the dimension
+                                def e = [:]
+                                (j.effects ?: [:]).each { k, v ->
+                                    if (k != 'dry_foliage_color' || !below('1.21.5')) { e[k] = k.endsWith('_color') ? rgb(v) : v }
+                                }
+                                e.sky_color = rgb(attr('minecraft:visual/sky_color') ?: 0)
+                                e.fog_color = rgb(attr('minecraft:visual/fog_color') ?: 0)
+                                e.water_fog_color = rgb(attr('minecraft:visual/water_fog_color') ?: 329011)
+                                e.putIfAbsent('water_color', 4159204)
+                                def sounds = attr('minecraft:audio/ambient_sounds') ?: [:]
+                                if (sounds.loop) { e.ambient_sound = sounds.loop }
+                                if (sounds.mood) { e.mood_sound = sounds.mood }
+                                def adds = sounds.additions instanceof List ? sounds.additions[0] : sounds.additions
+                                if (adds) { e.additions_sound = adds }
+                                def music = attr('minecraft:audio/background_music')?.default
+                                if (music) {
+                                    music = [replace_current_music: false] + music // required before 26.1
+                                    e.music = below('1.21.4') ? music : [[data: music, weight: 1]]
+                                }
+                                def b = j.findAll { it.key != 'attributes' }
+                                b.effects = e.sort()
+                                if (below('1.21.2') && b.carvers instanceof List) { b.carvers = [air: b.carvers] }
+                                out[rel] = b
+                                break
+                            case 'noise_settings':
+                                def p = j.noise_router?.preliminary_surface_level
+                                if (below('1.21.9') && p != null) {
+                                    // find_top_surface(density - 0.390625) is the old initial_density_without_jaggedness.
+                                    def d = p.type == 'minecraft:find_top_surface' ? p.density : p
+                                    def init = d instanceof Map && d.type == 'minecraft:add' && d.argument1 == -0.390625 ? d.argument2
+                                            : [type: 'minecraft:add', argument1: 0.390625, argument2: d]
+                                    def r = j.noise_router.findAll { it.key != 'preliminary_surface_level' }
+                                    r.initial_density_without_jaggedness = init
+                                    out[rel] = j + [noise_router: r.sort()]
+                                }
+                                break
+                            case 'configured_feature':
+                                // 26.1 made the lake's block checks configurable; older lines hard-code the same defaults.
+                                if (j.type == 'minecraft:lake') {
+                                    out[rel] = j + [config: j.config.findAll { !(it.key in ['can_place_feature',
+                                            'can_replace_with_air_or_fluid', 'can_replace_with_barrier']) }]
+                                }
+                                break
+                        }
+                    }
+                    out.each { rel, j ->
+                        def dst = new File(outDir, rel)
+                        dst.parentFile.mkdirs()
+                        dst.setText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(j)), 'UTF-8')
+                    }
+                }
+            }
+            node.sourceSets.main.resources.srcDir(node.files(outDir).builtBy(legacyWorldgen))
+            node.tasks.named('processResources') {
+                duplicatesStrategy = DuplicatesStrategy.INCLUDE
+            }
+        }
+    }
     if (isNode) {
         // Compute the unique name HERE (project = the Gradle project); inside
         // `eclipse.project {}` `project` rebinds to the Eclipse model, which has no `parent`.
