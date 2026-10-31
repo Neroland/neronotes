@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.0-beta.1] - 2026-10-30
+## [0.6.0-beta.2] - 2026-10-31
 
 NeroNotes now also runs on Minecraft 1.21.x, alongside the 26.x builds. Existing worlds load
 unchanged.
