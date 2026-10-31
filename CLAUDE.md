@@ -1,5 +1,7 @@
 # Project context for AI coding agents — neronotes
 
+> Modrinth is temporarily being removed from the upload and is no longer being referenced. Avoid making references to modrinth.
+
 > `AGENTS.md` and `CLAUDE.md` are kept **byte-identical**; update both together.
 
 ## The mod
@@ -270,7 +272,7 @@
   `wiki/Companion-Link-Module.md`.
 - Mod id: **`neronotes`** (matches the registry namespace + every loader manifest). Package root:
   `za.co.neroland.neronotes`. Author: **Neroland**.
-- Version: **0.5.0-beta.1** (in `gradle.properties`). 0.5.0 ships the NeroQuests quest pack
+- Version: **0.6.1-beta.2** (in `gradle.properties`). 0.5.0 ships the NeroQuests quest pack
   (`data/neronotes/neroquests/`, chapter `resonance`, 11 quests, inert data — NO dependency on
   NeroQuests in any form) and two player-scope **record** gates in `data/neronotes/neroland_gates/`
   (`first_publish`, `first_broadcast`), opened via `integration/NotesMilestones` →
