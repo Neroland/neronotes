@@ -372,3 +372,7 @@
 - Add loader-specific code to `common/` — use the platform seams.
 - Register payloads into Core's `CoreNetwork`, resolve services lazily, or call `openMenu` outside
   `MenuOpener`.
+
+## Translation workflow
+
+English is the source language for new and changed text. Community translations are intended to be contributed through Weblate; other-language translations are not required when implementing a feature. Preserve existing translations. This supersedes older instructions that require translating every change.
