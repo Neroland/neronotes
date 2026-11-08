@@ -272,7 +272,7 @@
   `wiki/Companion-Link-Module.md`.
 - Mod id: **`neronotes`** (matches the registry namespace + every loader manifest). Package root:
   `za.co.neroland.neronotes`. Author: **Neroland**.
-- Version: **0.6.1-beta.2** (in `gradle.properties`). 0.5.0 ships the NeroQuests quest pack
+- Version: **0.6.1-beta.3** (in `gradle.properties`). 0.5.0 ships the NeroQuests quest pack
   (`data/neronotes/neroquests/`, chapter `resonance`, 11 quests, inert data — NO dependency on
   NeroQuests in any form) and two player-scope **record** gates in `data/neronotes/neroland_gates/`
   (`first_publish`, `first_broadcast`), opened via `integration/NotesMilestones` →

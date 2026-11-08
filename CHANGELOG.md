@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1-beta.3] - 2026-11-08
+
+### Fixed
+
+- **Escape did not close the Disk Press screen on Minecraft 26.3.** Minecraft 26.3 reports keys differently, so
+  the Disk Press ignored Escape. Escape closes it again.
+
 ## [0.6.1-beta.2] - 2026-10-31
 
 ### Changed
