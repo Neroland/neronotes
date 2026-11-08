@@ -93,7 +93,7 @@ public class DiskPressScreen extends AbstractContainerScreen<DiskPressMenu> {
     /*@Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
     *///?}
-        if (keyCode == 256) { // Escape
+        if (keyCode == com.mojang.blaze3d.platform.InputConstants.KEY_ESCAPE) {
             onClose();
             return true;
         }
