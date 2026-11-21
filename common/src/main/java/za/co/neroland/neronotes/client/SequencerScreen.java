@@ -273,6 +273,7 @@ public class SequencerScreen extends AbstractContainerScreen<SequencerMenu> {
     *///?}
         drawReadouts(g);
         drawGrid(g);
+        gaugeTooltip(g, mouseX, mouseY);
         //? if <26.1 {
         /*// Before 26.1 AbstractContainerScreen.render does not draw the hovered-slot tooltip itself.
         this.renderTooltip(g, mouseX, mouseY);
@@ -303,9 +304,9 @@ public class SequencerScreen extends AbstractContainerScreen<SequencerMenu> {
                 l + 48, t + 162, SUBTLE, false);
         g.text(font, Component.literal("p" + pitchBase), l + 184, t + 162, SUBTLE, false);
         // Size-vs-budget gauge (data-slot backed).
-        int gaugeX = l + 8;
-        int gaugeY = t + 178;
-        int gaugeW = 160;
+        int gaugeX = l + GAUGE_X;
+        int gaugeY = t + GAUGE_Y;
+        int gaugeW = GAUGE_W;
         g.fill(gaugeX - 1, gaugeY - 1, gaugeX + gaugeW + 1, gaugeY + 7, INK);
         g.fill(gaugeX, gaugeY, gaugeX + gaugeW, gaugeY + 6, TROUGH);
         float frac = Math.min(1.0f, menu.sizeUnits() / (float) menu.budgetUnits());
@@ -319,6 +320,31 @@ public class SequencerScreen extends AbstractContainerScreen<SequencerMenu> {
                 gaugeX + gaugeW + 6, gaugeY - 1, SUBTLE, false);
         // Hint line.
         g.text(font, Component.translatable("neronotes.sequencer.hint"), l + 8, t + 192, 0xFF5C6470, false);
+    }
+
+    // The size-vs-budget gauge (panel-relative; 6 px tall inside a 1 px frame).
+    private static final int GAUGE_X = 8;
+    private static final int GAUGE_Y = 178;
+    private static final int GAUGE_W = 160;
+
+    /** Size change of the session score over the last second, for the gauge's rate. */
+    private final GaugeMath.RateWindow sizeWindow = new GaugeMath.RateWindow();
+
+    /** Hovering the size gauge: what it is, used / limit in bytes, how fast it is growing, the room left. */
+    private void gaugeTooltip(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+        long sizeBytes = (long) menu.sizeUnits() * SequencerMenu.SIZE_UNIT_BYTES;
+        long tick = minecraft == null || minecraft.level == null ? 0L : minecraft.level.getGameTime();
+        sizeWindow.sample(tick, sizeBytes);
+        int gx = leftPos + GAUGE_X;
+        int gy = topPos + GAUGE_Y;
+        if (mouseX < gx - 1 || mouseX > gx + GAUGE_W || mouseY < gy - 1 || mouseY > gy + 6
+                || (hoveredSlot != null && hoveredSlot.hasItem())) {
+            return;
+        }
+        List<Component> lines = new ArrayList<>();
+        GaugeTooltips.budget(lines, Component.translatable("neronotes.gui.gauge.score_size"), sizeBytes,
+                (long) menu.budgetUnits() * SequencerMenu.SIZE_UNIT_BYTES, sizeWindow.perSecond());
+        GaugeTooltips.show(g, font, lines, width, mouseX, mouseY);
     }
 
     private void drawGrid(GuiGraphicsExtractor g) {

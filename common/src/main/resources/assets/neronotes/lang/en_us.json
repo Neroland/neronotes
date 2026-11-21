@@ -76,6 +76,14 @@
   "neronotes.sequencer.voice_selected": "Active layer voice: %s",
   "neronotes.sequencer.no_session": "Open the transport lectern first to start a session.",
 
+  "neronotes.gui.gauge.score_size": "Score size",
+  "neronotes.gui.gauge.budget.amount": "%s / %s bytes (%s%%)",
+  "neronotes.gui.gauge.budget.growing": "Growing, +%s bytes/s",
+  "neronotes.gui.gauge.budget.shrinking": "Shrinking, -%s bytes/s",
+  "neronotes.gui.gauge.budget.steady": "Not changing",
+  "neronotes.gui.gauge.budget.room": "%s bytes of room left",
+  "neronotes.gui.gauge.budget.over": "%s bytes over the limit: trim the score",
+
   "neronotes.press.title": "Disk Press",
   "neronotes.press.title_hint": "Composition title...",
   "neronotes.press.credited": "Credited to you",

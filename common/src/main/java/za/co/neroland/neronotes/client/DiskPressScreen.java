@@ -1,5 +1,8 @@
 package za.co.neroland.neronotes.client;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -11,6 +14,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 import za.co.neroland.neronotes.item.DiskNames;
 import za.co.neroland.neronotes.menu.DiskPressMenu;
+import za.co.neroland.neronotes.menu.SequencerMenu;
 import za.co.neroland.neronotes.network.DiskPressPayload;
 import za.co.neroland.neronotes.platform.Services;
 
@@ -128,6 +132,7 @@ public class DiskPressScreen extends AbstractContainerScreen<DiskPressMenu> {
         super.render(g, mouseX, mouseY, partialTick);
     *///?}
         drawGauge(g);
+        gaugeTooltip(g, mouseX, mouseY);
         //? if <26.1 {
         /*// Before 26.1 AbstractContainerScreen.render does not draw the hovered-slot tooltip itself.
         this.renderTooltip(g, mouseX, mouseY);
@@ -161,9 +166,13 @@ public class DiskPressScreen extends AbstractContainerScreen<DiskPressMenu> {
         g.fill(x, y, x + 16, y + 16, TROUGH);
     }
 
+    // The size-vs-budget gauge (panel-relative; 6 px tall inside a 1 px frame).
+    private static final int GAUGE_X = 8;
+    private static final int GAUGE_Y = 82;
+
     private void drawGauge(GuiGraphicsExtractor g) {
-        int x = leftPos + 8;
-        int y = topPos + 82;
+        int x = leftPos + GAUGE_X;
+        int y = topPos + GAUGE_Y;
         int w = W - 16;
         g.fill(x - 1, y - 1, x + w + 1, y + 7, INK);
         g.fill(x, y, x + w, y + 6, TROUGH);
@@ -172,6 +181,25 @@ public class DiskPressScreen extends AbstractContainerScreen<DiskPressMenu> {
         if (fw > 0) {
             g.fill(x, y, x + fw, y + 6, frac >= 1.0f ? WARN : ACCENT);
         }
+    }
+
+    /**
+     * Hovering the size gauge: what it is, the score's size / the press limit in bytes, and the room left (or how
+     * far over the press would refuse it). The score cannot change on this screen, so there is no rate line.
+     */
+    private void gaugeTooltip(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+        int x = leftPos + GAUGE_X;
+        int y = topPos + GAUGE_Y;
+        int w = W - 16;
+        if (mouseX < x - 1 || mouseX > x + w || mouseY < y - 1 || mouseY > y + 6
+                || (hoveredSlot != null && hoveredSlot.hasItem())) {
+            return;
+        }
+        List<Component> lines = new ArrayList<>();
+        GaugeTooltips.budget(lines, Component.translatable("neronotes.gui.gauge.score_size"),
+                (long) menu.sizeUnits() * SequencerMenu.SIZE_UNIT_BYTES,
+                (long) menu.budgetUnits() * SequencerMenu.SIZE_UNIT_BYTES, Double.NaN);
+        GaugeTooltips.show(g, font, lines, width, mouseX, mouseY);
     }
 
     //? if >=26.1 {

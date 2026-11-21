@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Hovering a gauge now shows what it is, how much, and the rate.
+
+## [0.6.1] - 2026-11-21
+
+### Changed
+
+- Transitioning to stable versions: the alpha/beta label is dropped from the version number, so this release is **0.6.1** (previously 0.6.1-beta.3). Nothing else changes with the version label.
+
 ### Dependencies
 
 - Updated Neroland Core from 1.17.0 to 1.17.6.
