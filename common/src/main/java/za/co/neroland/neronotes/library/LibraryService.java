@@ -116,6 +116,8 @@ public final class LibraryService {
             // published something".
             if (!approvalRequired) {
                 NotesMilestones.published(server, contents.author());
+                NotesMilestones.publishedCount(server, contents.author(),
+                        store.visibleCountBy(contents.author()));
             }
         }
         return result.ok() ? result.id() : -1;

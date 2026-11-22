@@ -214,6 +214,10 @@ public final class ResonanceService {
             // owner UUID goes into Core's gate store only (offline-capable).
             if (!player.getUUID().equals(key.owner())) {
                 NotesMilestones.broadcast(player.level().getServer(), key.owner());
+                // Listener rungs for the owner: listeners other than the owner,
+                // from this in-memory set only (nothing is stored).
+                int others = subs.contains(key.owner()) ? subs.size() - 1 : subs.size();
+                NotesMilestones.listeners(player.level().getServer(), key.owner(), others - 1, others);
             }
         }
     }

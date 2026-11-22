@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-11-26
+
+### Added
+
+- Player-scope record gates for trophy and quest packs: `neronotes:listeners/10` and `/25` (one of
+  the owner's channels reaches that many listeners other than them, counted from the live
+  subscriber set), `neronotes:published/10` and `/25` (that many visible compositions, counted from
+  the library) and `neronotes:entered_soundforge` (on entering the Soundforge, or leaving it for
+  earlier visits). Only the player UUID reaches Core's gate store; nothing new is stored.
+
 ### Changed
 
 - Hovering a gauge now shows what it is, how much, and the rate.

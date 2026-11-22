@@ -48,9 +48,10 @@ is never sent to the mod authors:
 - your Soundforge return anchor and session score;
 - a last-seen timestamp (UUID + login time only) that exists solely to drive the retention sweep
   below;
-- two per-player milestone flags ("has published a composition", "has been listened to") kept in
+- per-player milestone flags ("has published a composition", "has published 10 / 25", "has been
+  listened to", "a channel reached 10 / 25 listeners", "has entered the Soundforge") kept in
   Neroland Core's progression-gate store, which Core's own privacy notice and erasure cover; they
-  record no composition, channel or listener.
+  record no composition, channel or listener, and no new counter is stored for them.
 
 **Access and portability.** Run `/neronotes data export` to export everything above that concerns
 you — chat shows a summary, and the full record (including your published scores, base64-encoded)

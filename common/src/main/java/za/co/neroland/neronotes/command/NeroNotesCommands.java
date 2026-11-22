@@ -302,7 +302,11 @@ public final class NeroNotesCommands {
             // Approval is when a pending entry becomes a publication: open the
             // composer's record gate now (skipped when the author was erased).
             library.entry(id).flatMap(LibraryTable.Entry::author)
-                    .ifPresent(author -> NotesMilestones.published(source.getServer(), author));
+                    .ifPresent(author -> {
+                        NotesMilestones.published(source.getServer(), author);
+                        NotesMilestones.publishedCount(source.getServer(), author,
+                                library.visibleCountBy(author));
+                    });
             return 1;
         }
         source.sendFailure(Component.translatable(library.entry(id).isPresent()

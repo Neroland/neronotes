@@ -267,6 +267,17 @@ public final class LibraryTable {
         return count;
     }
 
+    /** How many visible (not pending) entries {@code author} holds. */
+    public int visibleCountBy(UUID author) {
+        int count = 0;
+        for (Entry entry : entries.values()) {
+            if (entry.author != null && entry.author.equals(author) && !entry.pending) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     /** The entry with {@code id}, visible or pending. */
     public Optional<Entry> entry(int id) {
         return Optional.ofNullable(entries.get(id));

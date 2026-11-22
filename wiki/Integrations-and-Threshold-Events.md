@@ -56,13 +56,16 @@ credit nobody in particular, because they read the threshold channels above.
 
 ### Personal milestone gates
 
-Two personal milestones are recorded as player-scope **record gates** in Neroland Core's gate
+Personal milestones are recorded as player-scope **record gates** in Neroland Core's gate
 store, which the quest pack reads with a `gate_open` objective:
 
 | Gate | Opens when |
 | --- | --- |
 | `neronotes:first_publish` ("Published Composer") | one of your disks is published — on operator approval instead when `library.op_approval_required` is on |
 | `neronotes:first_broadcast` ("On the Air") | a listener other than you joins one of your channels, whether or not you are online |
+| `neronotes:listeners/10`, `neronotes:listeners/25` | one of your channels reaches 10 / 25 listeners other than you |
+| `neronotes:published/10`, `neronotes:published/25` | you have 10 / 25 visible compositions in the library (counted again each time you publish) |
+| `neronotes:entered_soundforge` | you cross into the Soundforge (or leave it, for visits made before this gate existed) |
 
 They have no requirements and gate nothing: NeroNotes declares no *progression* gates — the
 Soundforge needs only a charged Harmonic Gate. A gate records only *that* you published or were

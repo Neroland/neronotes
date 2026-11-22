@@ -164,6 +164,11 @@ public final class LibraryStore extends SavedData {
         return table.countBy(author);
     }
 
+    /** Visible (not pending) entries held by {@code author}. */
+    public int visibleCountBy(UUID author) {
+        return table.visibleCountBy(author);
+    }
+
     /** Erasure-conformance probe: does {@code author} still hold any library entry? */
     public boolean hasRow(UUID author) {
         return table.hasRow(author);

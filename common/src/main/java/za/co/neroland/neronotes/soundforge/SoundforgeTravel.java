@@ -93,6 +93,7 @@ public final class SoundforgeTravel {
         teleport(player, soundforge,
                 arrival.getX() + 0.5, arrival.getY(), arrival.getZ() + 0.5,
                 SoundforgeDimension.ARRIVAL_Y_ROT, SoundforgeDimension.ARRIVAL_X_ROT);
+        za.co.neroland.neronotes.integration.NotesMilestones.enteredSoundforge(server, player.getUUID());
         return TravelResult.ENTERED;
     }
 
@@ -110,6 +111,8 @@ public final class SoundforgeTravel {
         if (!SoundforgeDimension.isSoundforge(player.level())) {
             return TravelResult.NOT_INSIDE;
         }
+        // A player leaving was inside: credit visits made before the gate existed.
+        za.co.neroland.neronotes.integration.NotesMilestones.enteredSoundforge(server, player.getUUID());
         SoundforgeSessionStore store = SoundforgeSessionStore.get(server);
         ReturnAnchor anchor = store.returnAnchor(player.getUUID()).orElse(null);
 

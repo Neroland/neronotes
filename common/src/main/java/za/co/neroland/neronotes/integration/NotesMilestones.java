@@ -39,7 +39,52 @@ public final class NotesMilestones {
     public static final Identifier FIRST_BROADCAST =
             Identifier.fromNamespaceAndPath(NeroNotesCommon.MOD_ID, "first_broadcast");
 
+    /** Opened for a player the first time they cross into the Soundforge. */
+    public static final Identifier ENTERED_SOUNDFORGE =
+            Identifier.fromNamespaceAndPath(NeroNotesCommon.MOD_ID, "entered_soundforge");
+
     private NotesMilestones() {
+    }
+
+    /** The rung gate {@code neronotes:listeners/<rung>}. */
+    public static Identifier listenersGate(int rung) {
+        return Identifier.fromNamespaceAndPath(NeroNotesCommon.MOD_ID, "listeners/" + rung);
+    }
+
+    /** The rung gate {@code neronotes:published/<rung>}. */
+    public static Identifier publishedGate(int rung) {
+        return Identifier.fromNamespaceAndPath(NeroNotesCommon.MOD_ID, "published/" + rung);
+    }
+
+    /**
+     * One of {@code owner}'s channels went from {@code before} to {@code after}
+     * listeners other than the owner: open every listener rung it crossed. The
+     * count comes from the live, in-memory subscriber set; nothing is stored.
+     */
+    public static void listeners(MinecraftServer server, UUID owner, int before, int after) {
+        for (int rung : NotesMilestoneRules.LISTENER_RUNGS) {
+            if (NotesMilestoneRules.crossed(before, after, rung)) {
+                ProgressionGates.open(server, owner, listenersGate(rung));
+            }
+        }
+    }
+
+    /**
+     * {@code author} now has {@code visibleCount} visible compositions in the
+     * library: open every published rung reached (so earlier publications count
+     * the next time they publish). The count comes from the library table.
+     */
+    public static void publishedCount(MinecraftServer server, UUID author, int visibleCount) {
+        for (int rung : NotesMilestoneRules.PUBLISHED_RUNGS) {
+            if (NotesMilestoneRules.reached(visibleCount, rung)) {
+                ProgressionGates.open(server, author, publishedGate(rung));
+            }
+        }
+    }
+
+    /** Record that {@code player} is in the Soundforge. Idempotent. */
+    public static void enteredSoundforge(MinecraftServer server, UUID player) {
+        ProgressionGates.open(server, player, ENTERED_SOUNDFORGE);
     }
 
     /**

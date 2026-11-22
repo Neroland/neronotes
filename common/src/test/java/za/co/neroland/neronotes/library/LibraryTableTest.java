@@ -46,6 +46,20 @@ class LibraryTableTest {
     // ------------------------------------------------------------------
 
     @Test
+    void visibleCountByIgnoresPendingAndOtherAuthors() {
+        LibraryTable table = new LibraryTable();
+        publish(table, "One", ALICE, false, false);
+        publish(table, "Two", ALICE, true, false);
+        PublishResult pending = publish(table, "Three", ALICE, false, true);
+        publish(table, "Bob's", BOB, false, false);
+        assertEquals(2, table.visibleCountBy(ALICE));
+        assertEquals(3, table.countBy(ALICE));
+        assertTrue(table.approve(pending.id()));
+        assertEquals(3, table.visibleCountBy(ALICE));
+        assertEquals(1, table.visibleCountBy(BOB));
+    }
+
+    @Test
     void perPlayerQuotaIsEnforcedPerAuthor() {
         LibraryTable table = new LibraryTable();
         for (int i = 0; i < 3; i++) {
