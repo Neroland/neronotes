@@ -54,6 +54,9 @@ public final class NeroNotesData {
     /** Init step 7 of {@code NeroNotesCommon.init()} — register the eraser with Core. */
     public static void init() {
         PlayerDataErasure.register(NeroNotesData::eraseFor);
+        // The read-side twin for Core's /neroland data exportme: the same document as /neronotes data export.
+        za.co.neroland.nerolandcore.data.PlayerDataExport.register(za.co.neroland.neronotes.NeroNotesCommon.MOD_ID,
+                DataExport::forCore);
         NeroNotesCommon.LOGGER.debug("[NeroNotes] player-data eraser registered with Core");
     }
 

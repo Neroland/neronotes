@@ -6,10 +6,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.sentry.Sentry;
+import io.sentry.IScopes;
+import io.sentry.Scope;
+import io.sentry.Scopes;
+import io.sentry.SentryClient;
 import io.sentry.SentryEvent;
 import io.sentry.SentryLevel;
 import io.sentry.SentryOptions;
+import io.sentry.UncaughtExceptionHandlerIntegration;
 import io.sentry.protocol.SentryException;
 import io.sentry.protocol.SentryStackFrame;
 import io.sentry.protocol.SentryStackTrace;
@@ -53,6 +57,10 @@ public final class NeroNotesTelemetry {
     private static final AtomicInteger EVENTS_THIS_SESSION = new AtomicInteger();
     private static final Set<String> SESSION_FINGERPRINTS = Collections.synchronizedSet(new HashSet<>());
     private static volatile boolean active;
+    /** NeroNotes' own scopes; {@code null} until {@link #init()} succeeds. Never the global hub. */
+    private static volatile IScopes scopes;
+    /** Process-lifetime uncaught-exception hook bound to {@link #scopes}; kept so it is never collected. */
+    private static UncaughtExceptionHandlerIntegration uncaughtHandler;
 
     private NeroNotesTelemetry() {
     }
@@ -72,7 +80,21 @@ public final class NeroNotesTelemetry {
             return;
         }
         try {
-            Sentry.init(NeroNotesTelemetry::configure);
+            // Own client and scopes, never the global hub: every Nero mod bundles the same Sentry jar, so
+            // a global Sentry.init would replace (and silence) every other mod's client.
+            SentryOptions options = baseOptions(Services.platform().getModVersion(),
+                    Services.platform().isDevelopment() ? "development" : "production");
+            options.setTracesSampleRate(0.05);
+            options.setBeforeSend((event, hint) -> ForeignMixinFailure.matches(event) ? null : filterAndScrub(event));
+            IScopes own = isolatedScopes(options, NeroNotesCommon.MOD_ID);
+            scopes = own;
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    own.flush(2000L);
+                } catch (RuntimeException ignored) {
+                    // best-effort flush on shutdown
+                }
+            }, "neronotes-sentry-shutdown"));
             active = true;
             NeroNotesCommon.LOGGER.info("[NeroNotes] telemetry: error reporting enabled (opt out via telemetryEnabled=false in config/neronotes.properties; see PRIVACY.md)");
         } catch (RuntimeException | LinkageError e) {
@@ -80,15 +102,34 @@ public final class NeroNotesTelemetry {
         }
     }
 
-    private static void configure(SentryOptions options) {
+    /** Options for NeroNotes' own client: same privacy settings as before, never the global hub's. */
+    static SentryOptions baseOptions(String modVersion, String environment) {
+        SentryOptions options = new SentryOptions();
         options.setDsn(DSN);
-        options.setRelease(NeroNotesCommon.MOD_ID + "@" + Services.platform().getModVersion());
-        options.setEnvironment(Services.platform().isDevelopment() ? "development" : "production");
-        options.setSendDefaultPii(false);
-        options.setAttachServerName(false);
+        options.setRelease(NeroNotesCommon.MOD_ID + "@" + modVersion);
+        options.setEnvironment(environment);
+        options.setSendDefaultPii(false);          // POPIA/GDPR: never the sender's IP/identity
+        options.setAttachServerName(false);        // hostname is identifying
+        options.setEnableUncaughtExceptionHandler(true);
+        options.setEnableShutdownHook(false);      // flushed by our own hook; never close the global hub
         options.setEnableAutoSessionTracking(false);
-        options.setTracesSampleRate(0.05);
-        options.setBeforeSend((event, hint) -> ForeignMixinFailure.matches(event) ? null : filterAndScrub(event));
+        return options;
+    }
+
+    /**
+     * Builds isolated scopes bound to a client of our own: what {@code Sentry.init} does, minus the global
+     * hub. The uncaught-exception handler chains to the previous one, so every mod still sees crashes and
+     * keeps only its own through {@code beforeSend}.
+     */
+    static IScopes isolatedScopes(SentryOptions options, String creator) {
+        options.activate();                        // start Sentry's executors, as the global init would
+        Scopes own = new Scopes(new Scope(options), new Scope(options), new Scope(options), creator);
+        own.bindClient(new SentryClient(options));
+        if (options.isEnableUncaughtExceptionHandler()) {
+            uncaughtHandler = new UncaughtExceptionHandlerIntegration();
+            uncaughtHandler.register(own, options);
+        }
+        return own;
     }
 
     /**
@@ -99,11 +140,12 @@ public final class NeroNotesTelemetry {
     public static void captureHandled(String source, String operation, Throwable failure) {
         NeroNotesCommon.LOGGER.warn("[NeroNotes] handled failure in {} ({}): {}",
                 source, operation, scrub(String.valueOf(failure)));
-        if (!active) {
+        IScopes s = scopes;
+        if (!active || s == null) {
             return;
         }
         try {
-            Sentry.captureException(failure, scope -> {
+            s.captureException(failure, scope -> {
                 // ScopeCallback overload — Sentry 8.x withScope(...) tags never reach the event.
                 scope.setLevel(SentryLevel.WARNING);
                 scope.setTag("neronotes.source", source);

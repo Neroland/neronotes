@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-22
+
+### Added
+
+- Your NeroNotes record is now part of Neroland Core's `/neroland data exportme` (Core 1.20.1): the same document as `/neronotes data export`, returned in chat instead of written to the world folder, with scores listed by size. Nothing is logged.
+
+### Fixed
+
+- Crash reports no longer go silent when another mod starts Sentry. NeroNotes now reports through its own isolated Sentry client instead of the shared global one, with the same opt-out, filtering and scrubbing.
+
+### Changed
+
+- Requires Neroland Core 1.20.1 or newer.
+
 ## [0.6.2] - 2026-11-26
 
 ### Added

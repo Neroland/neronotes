@@ -63,6 +63,61 @@ public final class DataExport {
      * export for the same player). Server thread only.
      */
     public static Result export(MinecraftServer server, java.util.UUID subject) throws IOException {
+        JsonObject root = document(server, subject);
+
+        // Write under the world folder — the operator-controlled place the
+        // rest of this data already lives.
+        Path directory = server.getWorldPath(LevelResource.ROOT).resolve("neronotes").resolve("exports");
+        Files.createDirectories(directory);
+        Path file = directory.resolve(subject + ".json");
+        Files.writeString(file, GSON.toJson(root));
+
+        return new Result("neronotes/exports/" + subject + ".json",
+                root.getAsJsonArray("channels_owned").size(),
+                root.getAsJsonArray("channel_trust_memberships").size(),
+                root.getAsJsonArray("published_library_entries").size(),
+                root.getAsJsonObject("soundforge_session").get("present").getAsBoolean());
+    }
+
+    /**
+     * NeroNotes' section of Neroland Core's {@code /neroland data exportme}
+     * (Core 1.20.1): the same document as {@code /neronotes data export},
+     * built by the same code, but returned in memory instead of written to the
+     * world folder. Core adds its own envelope and caps the size, so the
+     * envelope fields and the subject's UUID are dropped and each score is
+     * given by size only ({@code /neronotes data export} keeps the full score
+     * bytes for portability). {@code null} when NeroNotes holds nothing for
+     * the player. Server thread only; writes and logs nothing.
+     */
+    public static JsonObject forCore(MinecraftServer server, java.util.UUID subject) {
+        return coreSection(document(server, subject));
+    }
+
+    /** {@link #forCore} on an already-built document (plain-JVM tests). */
+    static JsonObject coreSection(JsonObject document) {
+        JsonObject out = document.deepCopy();
+        out.remove("mod");
+        out.remove("format");
+        out.remove("exported_at");
+        out.remove("subject");
+        boolean empty = !out.getAsJsonObject("activity").get("recorded").getAsBoolean()
+                && out.getAsJsonArray("channels_owned").isEmpty()
+                && out.getAsJsonArray("channel_trust_memberships").isEmpty()
+                && !out.getAsJsonObject("soundforge_session").get("present").getAsBoolean()
+                && out.getAsJsonArray("published_library_entries").isEmpty();
+        if (empty) {
+            return null;
+        }
+        for (com.google.gson.JsonElement row : out.getAsJsonArray("published_library_entries")) {
+            row.getAsJsonObject().remove("score_nbt_base64");
+        }
+        out.addProperty("note", "Scores are listed by size here; '/neronotes data export' writes the full score "
+                + "bytes to the world folder for portability.");
+        return out;
+    }
+
+    /** The full export document for {@code subject}. Server thread only; writes nothing. */
+    static JsonObject document(MinecraftServer server, java.util.UUID subject) {
         JsonObject root = new JsonObject();
         root.addProperty("mod", NeroNotesCommon.MOD_ID);
         root.addProperty("format", FORMAT_VERSION);
@@ -134,7 +189,6 @@ public final class DataExport {
         // score for portability.
         LibraryStore library = LibraryStore.get(server);
         JsonArray entries = new JsonArray();
-        int libraryCount = 0;
         for (LibraryTable.Entry entry : library.allEntries()) {
             if (entry.author().filter(subject::equals).isEmpty()) {
                 continue;
@@ -151,7 +205,6 @@ public final class DataExport {
             row.addProperty("score_size_bytes", scoreBytes.length);
             row.addProperty("score_nbt_base64", Base64.getEncoder().encodeToString(scoreBytes));
             entries.add(row);
-            libraryCount++;
         }
         root.add("published_library_entries", entries);
 
@@ -170,15 +223,6 @@ public final class DataExport {
         policy.addProperty("downloads",
                 "Download counts are aggregate integers; who downloaded, and when, is never recorded.");
         root.add("policy_notes", policy);
-
-        // Write under the world folder — the operator-controlled place the
-        // rest of this data already lives.
-        Path directory = server.getWorldPath(LevelResource.ROOT).resolve("neronotes").resolve("exports");
-        Files.createDirectories(directory);
-        Path file = directory.resolve(subject + ".json");
-        Files.writeString(file, GSON.toJson(root));
-
-        return new Result("neronotes/exports/" + subject + ".json",
-                owned.size(), memberships.size(), libraryCount, sessionPresent);
+        return root;
     }
 }

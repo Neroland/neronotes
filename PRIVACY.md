@@ -17,7 +17,8 @@ code can be found and fixed. It is **on by default** and **opt-out** (see
 Reports are scrubbed before sending: your home directory path and operating-system username are
 removed. Reporting is hard-capped at 10 events per game session and duplicate errors are sent only
 once per session. No reporting occurs at all until a real reporting endpoint (DSN) is configured in
-the build.
+the build. NeroNotes reports through its own Sentry client, never a shared one, so another mod's crash
+reporter cannot receive or silence NeroNotes' reports.
 
 ## What is not collected
 
@@ -58,7 +59,9 @@ you — chat shows a summary, and the full record (including your published scor
 is written to `neronotes/exports/<your-uuid>.json` inside the world folder, under the server
 operator's control. Only your own data is ever included: other players appear at most as counts,
 never by name or UUID. Operators can run `/neronotes data export <uuid>` to serve an access
-request on a player's behalf.
+request on a player's behalf. The same record is also part of Neroland Core's combined export,
+`/neroland data exportme`, delivered in chat and never written to disk; there your scores are listed
+by size only, so use `/neronotes data export` for the full score bytes.
 
 **Erasure.** Run `/neronotes data erase-me` (then `... confirm`) to irreversibly erase your stored
 data. This goes through Neroland Core's shared player-data erasure hook, so one request purges you
