@@ -90,7 +90,11 @@ class SoundforgeResourcesTest {
 
     @Test
     void recipeUsesCoreMaterialTagsNotForeignItemIds() {
+        //? if >=1.21 {
         JsonObject recipe = readJson("/data/neronotes/recipe/harmonic_gate.json");
+        //?} else {
+        /*JsonObject recipe = readJson("/data/neronotes/recipes/harmonic_gate.json");
+        *///?}
         assertEquals("minecraft:crafting_shaped", recipe.get("type").getAsString());
         JsonObject key = recipe.getAsJsonObject("key");
         assertEquals("#c:plates/nero_alloy", ingredient(key.get("P")));

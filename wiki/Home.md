@@ -3,6 +3,9 @@
 Player- and contributor-facing documentation for **NeroNotes**, part of the
 Neroland ecosystem. Built on **Neroland Core**.
 
+NeroNotes requires **Neroland Core 1.23.0 or newer** (below 2.0). Minecraft 1.20.5 runs on
+Fabric, and 1.20.6 runs on Fabric, Forge and NeoForge.
+
 > **Status:** version `0.1.0-beta.1` — the full loop **compose → press → sync → play → publish →
 > download** ships: Resonant Blocks and Resonators with synchronised channel playback (load a
 > pressed disk onto a Resonator by right-clicking with it — the disk is read, not consumed), the

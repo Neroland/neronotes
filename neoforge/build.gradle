@@ -12,6 +12,7 @@ plugins {
 
 // MC version comes from the Stonecutter node (e.g. :neoforge:26.1.2), not a global property.
 def mc = stonecutter.current.version
+def economyApiMc = mc.startsWith('1.20.') ? '1.21.1' : mc
 // Minecraft range: 1.21.x cells are bounded to their API line (gradle.properties); 26.x keep [mc,).
 def mcCeiling = project.findProperty("mc_ceiling_${mc}")
 def mcFloor = project.findProperty("mc_floor_${mc}") ?: mc
@@ -76,7 +77,7 @@ dependencies {
 
     // NeroEconomy — OPTIONAL. API on the compile classpath only (the Disk Exchanger pricing bridge in
     // compat/neroeconomy, touched only behind isModLoaded("neroeconomy")). Never bundled, never required.
-    compileOnly "za.co.neroland.neroeconomy:neroeconomy-neoforge-${mc}:${rootProject.neroeconomy_version}"
+    compileOnly "za.co.neroland.neroeconomy:neroeconomy-neoforge-${economyApiMc}:${rootProject.neroeconomy_version}"
 
     // JUnit 5 for the shared common tests (see the test source-set wiring below).
     testImplementation platform('org.junit:junit-bom:6.1.3')

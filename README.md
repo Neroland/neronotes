@@ -52,10 +52,11 @@ no MIDI, no playlists, no light shows, no cross-dimension relays. The full list 
 
 ## Requirements
 
-- **Neroland Core `1.17.0` or newer** (required; loads before NeroNotes).
+- **Neroland Core 1.23.0 or newer** (below 2.0).
+- **Minecraft 1.20.5** on Fabric and **1.20.6** on Fabric, Forge and NeoForge.
 - **Minecraft 1.21.1, 1.21.4, 1.21.5, 1.21.7–1.21.8, 1.21.9–1.21.10, 1.21.11, 26.1.2, 26.2 or 26.3** on
-  **NeoForge, MinecraftForge/Forge, or Fabric** — the 27 cells.
-- **Java 21** for the 1.21.x builds, **Java 25** for 26.x.
+  **NeoForge, MinecraftForge/Forge, or Fabric**.
+- **Java 21** for the 1.20.5 through 1.21.x builds and **Java 25** for 26.x.
 
 ## Building
 
