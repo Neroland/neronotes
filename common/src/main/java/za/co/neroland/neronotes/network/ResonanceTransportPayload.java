@@ -41,9 +41,15 @@ public record ResonanceTransportPayload(UUID owner, String channelName, Transpor
                                         int tempoBpm, int ticksPerBeat)
         implements CustomPacketPayload {
 
+    //? if >=1.20.5 {
     public static final CustomPacketPayload.Type<ResonanceTransportPayload> TYPE =
             new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
                     NotesNetwork.CHANNEL_NAMESPACE, "resonance_transport"));
+    //?} else {
+    /*public static final CustomPacketPayload.Type<ResonanceTransportPayload> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
+                    NotesNetwork.CHANNEL_NAMESPACE, "resonance_transport"), ResonanceTransportPayload.class);
+    *///?}
 
     private static final StreamCodec<ByteBuf, String> CHANNEL_NAME_CODEC =
             ByteBufCodecs.stringUtf8(ChannelNames.MAX_LENGTH);

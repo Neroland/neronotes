@@ -33,7 +33,7 @@ public class NotesButton extends Button {
     protected void renderContents(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
     *///?} else {
     /*@Override
-    protected void renderWidget(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
+    public void renderWidget(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
     *///?}
         int x = getX();
         int y = getY();

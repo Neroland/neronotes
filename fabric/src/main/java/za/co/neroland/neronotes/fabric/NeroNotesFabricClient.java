@@ -48,7 +48,14 @@ public final class NeroNotesFabricClient implements ClientModInitializer {
 
     private static <T extends CustomPacketPayload> void registerReceiver(
             NotesNetwork.ClientboundPayloadSpec<T> spec) {
+        //? if >=1.20.5 {
         ClientPlayNetworking.registerGlobalReceiver(spec.type(),
                 (payload, context) -> spec.handler().accept(payload));
+        //?} else {
+        /*ClientPlayNetworking.registerGlobalReceiver(spec.type().id(), (client, handler, buffer, sender) -> {
+            T payload = spec.codec().decode(buffer);
+            client.execute(() -> spec.handler().accept(payload));
+        });
+        *///?}
     }
 }

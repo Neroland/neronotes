@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.minecraft.network.FriendlyByteBuf;
 
 import za.co.neroland.neronotes.item.DiskNames;
 import za.co.neroland.neronotes.library.LibraryTable;
@@ -32,7 +32,7 @@ class ExchangerPayloadsTest {
                 new ExchangerActionPayload(3, ExchangerActionPayload.Action.REQUEST_PAGE, 7),
                 new ExchangerActionPayload(3, ExchangerActionPayload.Action.COPY, 42),
                 new ExchangerActionPayload(3, ExchangerActionPayload.Action.DUPLICATE, 0))) {
-            ByteBuf buf = Unpooled.buffer();
+            FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             try {
                 ExchangerActionPayload.STREAM_CODEC.encode(buf, payload);
                 assertTrue(buf.readableBytes() <= TINY_PAYLOAD_CEILING_BYTES);
@@ -56,7 +56,7 @@ class ExchangerPayloadsTest {
                 new LibraryPagePayload.PageEntry(1, "Starlight Over Neroland", "Dario", "high_lead", 12),
                 new LibraryPagePayload.PageEntry(9, "Nameless Hum", "", "deep_bass", 0));
         LibraryPagePayload payload = new LibraryPagePayload(5, 2, 4, 180, rows);
-        ByteBuf buf = Unpooled.buffer();
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         try {
             LibraryPagePayload.STREAM_CODEC.encode(buf, payload);
             LibraryPagePayload decoded = LibraryPagePayload.STREAM_CODEC.decode(buf);

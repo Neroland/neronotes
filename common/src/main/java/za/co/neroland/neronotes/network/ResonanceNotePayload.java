@@ -54,9 +54,15 @@ public record ResonanceNotePayload(UUID owner, String channelName, boolean noteO
     /** The {@code scoreTick} value meaning "live note, no timeline position". */
     public static final long LIVE_NOTE = -1L;
 
+    //? if >=1.20.5 {
     public static final CustomPacketPayload.Type<ResonanceNotePayload> TYPE =
             new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
                     NotesNetwork.CHANNEL_NAMESPACE, "resonance_note"));
+    //?} else {
+    /*public static final CustomPacketPayload.Type<ResonanceNotePayload> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
+                    NotesNetwork.CHANNEL_NAMESPACE, "resonance_note"), ResonanceNotePayload.class);
+    *///?}
 
     private static final StreamCodec<ByteBuf, String> CHANNEL_NAME_CODEC =
             ByteBufCodecs.stringUtf8(ChannelNames.MAX_LENGTH);

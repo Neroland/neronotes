@@ -102,8 +102,13 @@ class SoundforgeResourcesTest {
         String centre = ingredient(key.get("A"));
         assertTrue(centre.startsWith("minecraft:") || centre.startsWith("#"),
                 "only tags or vanilla ids — never a hardcoded item id from another mod");
+        //? if >=1.20.5 {
+        String resultKey = "id";
+        //?} else {
+        /*String resultKey = "item";
+        *///?}
         assertEquals("neronotes:harmonic_gate",
-                recipe.getAsJsonObject("result").get("id").getAsString());
+                recipe.getAsJsonObject("result").get(resultKey).getAsString());
     }
 
     /**

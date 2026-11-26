@@ -63,7 +63,7 @@ public class ResonantBlockEntity extends BlockEntity {
      */
     public VoiceDefinition voice() {
         var inFamily = VoiceRegistry.shared().byFamily(family());
-        return inFamily.isEmpty() ? VoiceRegistry.shared().fallback() : inFamily.getFirst();
+        return inFamily.isEmpty() ? VoiceRegistry.shared().fallback() : inFamily.get(0);
     }
 
     /** Current pitch, clamped into the family voice's band. */

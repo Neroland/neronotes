@@ -3,8 +3,7 @@
 Player- and contributor-facing documentation for **NeroNotes**, part of the
 Neroland ecosystem. Built on **Neroland Core**.
 
-NeroNotes requires **Neroland Core 1.23.0 or newer** (below 2.0). Minecraft 1.20.5 runs on
-Fabric, and 1.20.6 runs on Fabric, Forge and NeoForge.
+NeroNotes requires **Neroland Core 1.24.0 or newer** (below 2.0). The 1.20 series is supported through 1.20.6 on Fabric, through 1.20.4 and on 1.20.6 on Forge, and on 1.20.4 through 1.20.6 on NeoForge. NeoForge 1.20.1 uses the Forge 1.20.1 jar.
 
 > **Status:** version `0.1.0-beta.1` — the full loop **compose → press → sync → play → publish →
 > download** ships: Resonant Blocks and Resonators with synchronised channel playback (load a
@@ -24,6 +23,8 @@ Fabric, and 1.20.6 runs on Fabric, Forge and NeoForge.
 > queues (hence no link `skip` action), no light-show blocks, no cross-dimension relays, and no
 > in-game channel trust/rename surface yet. The same list lives in the
 > [changelog](https://github.com/Neroland/neronotes/blob/main/CHANGELOG.md).
+
+Minecraft 1.20.5 on NeoForge requires loader 20.5.21-beta.
 
 ## Contents
 

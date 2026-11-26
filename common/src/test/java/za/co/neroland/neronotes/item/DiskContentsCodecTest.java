@@ -67,7 +67,7 @@ class DiskContentsCodecTest {
         CompoundTag bogus = new CompoundTag();
         bogus.putString("not", "a score");
         DataResult<Score> parsed = DiskContents.SCORE_CODEC.parse(NbtOps.INSTANCE, bogus);
-        assertTrue(parsed.isError(), "a malformed score must be a codec error, never a partial parse");
+        assertTrue(parsed.error().isPresent(), "a malformed score must be a codec error, never a partial parse");
     }
 
     @Test

@@ -1,6 +1,8 @@
 package za.co.neroland.neronotes.item;
 
+//? if >=1.20.5 {
 import net.minecraft.core.component.DataComponentType;
+//?}
 import net.minecraft.core.registries.Registries;
 
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
@@ -21,6 +23,7 @@ import za.co.neroland.neronotes.NeroNotesCommon;
  */
 public final class NeroNotesDataComponents {
 
+    //? if >=1.20.5 {
     private static final RegistrationProvider<DataComponentType<?>> COMPONENTS =
             RegistrationProvider.get(Registries.DATA_COMPONENT_TYPE, NeroNotesCommon.MOD_ID);
 
@@ -29,6 +32,25 @@ public final class NeroNotesDataComponents {
             COMPONENTS.register("disk_contents", key -> DataComponentType.<DiskContents>builder()
                     .persistent(DiskContents.CODEC)
                     .build());
+
+    //?} else {
+    /*private static final String DISK_CONTENTS_KEY = "neronotes:disk_contents";
+
+    static DiskContents read(net.minecraft.world.item.ItemStack stack) {
+        var tag = stack.getTag();
+        if (tag == null || !tag.contains(DISK_CONTENTS_KEY)) {
+            return null;
+        }
+        return DiskContents.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, tag.get(DISK_CONTENTS_KEY))
+                .result().orElse(null);
+    }
+
+    static void write(net.minecraft.world.item.ItemStack stack, DiskContents contents) {
+        var encoded = DiskContents.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, contents)
+                .result().orElseThrow(() -> new IllegalArgumentException("Cannot encode custom disk contents"));
+        stack.getOrCreateTag().put(DISK_CONTENTS_KEY, encoded);
+    }
+    *///?}
 
     private NeroNotesDataComponents() {
     }

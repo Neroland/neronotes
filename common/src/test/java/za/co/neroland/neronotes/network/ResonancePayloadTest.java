@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.minecraft.network.FriendlyByteBuf;
 
 import net.minecraft.core.BlockPos;
 
@@ -36,7 +36,7 @@ class ResonancePayloadTest {
     void notePayloadRoundTripsExactly() {
         ResonanceNotePayload payload = new ResonanceNotePayload(
                 OWNER, "atrium", true, "neronotes:void_bass", 64, 100, ORIGIN, 42L);
-        ByteBuf buf = Unpooled.buffer();
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         try {
             ResonanceNotePayload.STREAM_CODEC.encode(buf, payload);
             int size = buf.readableBytes();
@@ -55,7 +55,7 @@ class ResonancePayloadTest {
         ResonanceNotePayload payload = new ResonanceNotePayload(
                 OWNER, "atrium", true, "neronotes:void_bass", 64, 100,
                 ORIGIN, ResonanceNotePayload.LIVE_NOTE);
-        ByteBuf buf = Unpooled.buffer();
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         try {
             ResonanceNotePayload.STREAM_CODEC.encode(buf, payload);
             ResonanceNotePayload decoded = ResonanceNotePayload.STREAM_CODEC.decode(buf);
@@ -71,7 +71,7 @@ class ResonancePayloadTest {
         for (TransportAction action : TransportAction.values()) {
             ResonanceTransportPayload payload = new ResonanceTransportPayload(
                     OWNER, "atrium", action, 1234L, 987654321L, 7, 120, 10);
-            ByteBuf buf = Unpooled.buffer();
+            FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             try {
                 ResonanceTransportPayload.STREAM_CODEC.encode(buf, payload);
                 int size = buf.readableBytes();

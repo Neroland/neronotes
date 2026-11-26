@@ -105,8 +105,8 @@ public class SequencerMenu extends AbstractContainerMenu {
     @Override
     public void broadcastChanges() {
         if (serverPlayer != null) {
-            data.set(DATA_PREVIEWING, lectern() instanceof TransportLecternBlockEntity lectern
-                    && lectern.isPreviewingFor(serverPlayer.getUUID()) ? 1 : 0);
+            TransportLecternBlockEntity lectern = lectern();
+            data.set(DATA_PREVIEWING, lectern != null && lectern.isPreviewingFor(serverPlayer.getUUID()) ? 1 : 0);
         }
         super.broadcastChanges();
     }

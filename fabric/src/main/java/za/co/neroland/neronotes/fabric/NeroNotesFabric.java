@@ -4,7 +4,9 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+//? if >=1.20.5 {
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+//?}
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -29,9 +31,11 @@ public final class NeroNotesFabric implements ModInitializer {
         // Wire the declared payload types onto NeroNotes' own channel (both logical
         // sides need the type registered; the client receiver is registered in
         // NeroNotesFabricClient). Runs AFTER init(), so the declarations exist.
+        //? if >=1.20.5 {
         for (NotesNetwork.ClientboundPayloadSpec<?> spec : NotesNetwork.clientboundPayloads()) {
             registerClientboundType(spec);
         }
+        //?}
         // Stage 5: serverbound payloads (sequencer edits, Disk Press) — type
         // + receiver both register here (both logical sides need the type;
         // the receiver is a server-side API, safe in common init).
@@ -67,6 +71,7 @@ public final class NeroNotesFabric implements ModInitializer {
         ServerLifecycleEvents.SERVER_STOPPED.register(NeroNotesCommon::onServerStopped);
     }
 
+    //? if >=1.20.5 {
     private static <T extends CustomPacketPayload> void registerClientboundType(
             NotesNetwork.ClientboundPayloadSpec<T> spec) {
         PayloadTypeRegistry.clientboundPlay().register(spec.type(), spec.codec());
@@ -80,4 +85,13 @@ public final class NeroNotesFabric implements ModInitializer {
             player.level().getServer().execute(() -> spec.handler().accept(payload, player));
         });
     }
+    //?} else {
+    /*private static <T extends CustomPacketPayload> void registerServerbound(
+            NotesNetwork.ServerboundPayloadSpec<T> spec) {
+        ServerPlayNetworking.registerGlobalReceiver(spec.type().id(), (server, player, handler, buffer, sender) -> {
+            T payload = spec.codec().decode(buffer);
+            server.execute(() -> spec.handler().accept(payload, player));
+        });
+    }
+    *///?}
 }

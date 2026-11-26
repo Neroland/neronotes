@@ -42,9 +42,15 @@ public record ExchangerActionPayload(int containerId, Action action, int value)
         }
     }
 
+    //? if >=1.20.5 {
     public static final CustomPacketPayload.Type<ExchangerActionPayload> TYPE =
             new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
                     NotesNetwork.CHANNEL_NAMESPACE, "exchanger_action"));
+    //?} else {
+    /*public static final CustomPacketPayload.Type<ExchangerActionPayload> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
+                    NotesNetwork.CHANNEL_NAMESPACE, "exchanger_action"), ExchangerActionPayload.class);
+    *///?}
 
     public static final StreamCodec<ByteBuf, ExchangerActionPayload> STREAM_CODEC = StreamCodec.of(
             (buf, payload) -> {

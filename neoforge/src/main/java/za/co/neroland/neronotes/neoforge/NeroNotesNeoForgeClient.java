@@ -4,7 +4,11 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+//? if >=1.20.5 {
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+//?} else {
+/*import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+*///?}
 import net.neoforged.neoforge.common.NeoForge;
 
 import za.co.neroland.neronotes.NeroNotesCommon;
@@ -22,14 +26,20 @@ import za.co.neroland.neronotes.menu.NeroNotesMenus;
  * server. Installs the Stage 3 synchronised playback engine and the Stage 5
  * sequencer sink as the payload sinks, and registers the menu screens.
  */
+//? if >=1.20.6 {
 @Mod(value = NeroNotesCommon.MOD_ID, dist = Dist.CLIENT)
+//?}
 public final class NeroNotesNeoForgeClient {
 
     public NeroNotesNeoForgeClient(IEventBus modEventBus) {
         ClientPlaybackEngine.install();
         ClientSequencerState.install();
         ClientExchangerState.install();
+        //? if >=1.20.5 {
         modEventBus.addListener(NeroNotesNeoForgeClient::onRegisterScreens);
+        //?} else {
+        /*modEventBus.addListener((FMLClientSetupEvent event) -> event.enqueueWork(NeroNotesNeoForgeClient::onRegisterScreens));
+        *///?}
         // Leaving a world: drop every client-side cache (playheads, sequencer
         // session, exchanger page) so nothing from one world leaks into the next.
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> {
@@ -39,9 +49,17 @@ public final class NeroNotesNeoForgeClient {
         });
     }
 
+    //? if >=1.20.5 {
     private static void onRegisterScreens(RegisterMenuScreensEvent event) {
         event.register(NeroNotesMenus.SEQUENCER.get(), SequencerScreen::new);
         event.register(NeroNotesMenus.DISK_PRESS.get(), DiskPressScreen::new);
         event.register(NeroNotesMenus.DISK_EXCHANGER.get(), DiskExchangerScreen::new);
     }
+    //?} else {
+    /*private static void onRegisterScreens() {
+        net.minecraft.client.gui.screens.MenuScreens.register(NeroNotesMenus.SEQUENCER.get(), SequencerScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(NeroNotesMenus.DISK_PRESS.get(), DiskPressScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(NeroNotesMenus.DISK_EXCHANGER.get(), DiskExchangerScreen::new);
+    }
+    *///?}
 }

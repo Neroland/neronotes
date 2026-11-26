@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.minecraft.network.FriendlyByteBuf;
 
 import za.co.neroland.neronotes.item.DiskNames;
 import za.co.neroland.neronotes.score.Score;
@@ -33,7 +33,7 @@ class SequencerPayloadsTest {
     void editPayloadRoundTripsExactly() {
         SequencerEditPayload payload = new SequencerEditPayload(7,
                 SequencerEdit.toggleNote(2, 123, 64));
-        ByteBuf buf = Unpooled.buffer();
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         try {
             SequencerEditPayload.STREAM_CODEC.encode(buf, payload);
             assertTrue(buf.readableBytes() <= TINY_PAYLOAD_CEILING_BYTES);
@@ -48,7 +48,7 @@ class SequencerPayloadsTest {
     void editPayloadCarriesVoiceIdsBounded() {
         SequencerEditPayload payload = new SequencerEditPayload(1,
                 SequencerEdit.setLayerVoice(0, "neronotes:crystal_pluck"));
-        ByteBuf buf = Unpooled.buffer();
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         try {
             SequencerEditPayload.STREAM_CODEC.encode(buf, payload);
             assertEquals(payload, SequencerEditPayload.STREAM_CODEC.decode(buf));
@@ -63,7 +63,7 @@ class SequencerPayloadsTest {
     @Test
     void pressPayloadRoundTripsAndCapsTheTitle() {
         DiskPressPayload payload = new DiskPressPayload(3, "Starlight Over Neroland", true);
-        ByteBuf buf = Unpooled.buffer();
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         try {
             DiskPressPayload.STREAM_CODEC.encode(buf, payload);
             assertTrue(buf.readableBytes() <= TINY_PAYLOAD_CEILING_BYTES);
@@ -81,7 +81,7 @@ class SequencerPayloadsTest {
                 new Score.Layer("neronotes:void_bass", List.of(new Score.Note(0, 40, 100, 2)))));
         byte[] bytes = ScoreCodec.toBytes(score);
         SessionScorePayload payload = new SessionScorePayload(9, 0, bytes);
-        ByteBuf buf = Unpooled.buffer();
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         try {
             SessionScorePayload.STREAM_CODEC.encode(buf, payload);
             SessionScorePayload decoded = SessionScorePayload.STREAM_CODEC.decode(buf);

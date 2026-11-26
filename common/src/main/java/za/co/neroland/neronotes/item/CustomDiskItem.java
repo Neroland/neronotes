@@ -3,7 +3,9 @@ package za.co.neroland.neronotes.item;
 import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
+//? if >=1.20.5 {
 import net.minecraft.core.component.DataComponents;
+//?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.item.Item;
@@ -35,18 +37,36 @@ public class CustomDiskItem extends Item {
     /** Build the pressed disk stack: component + palette-coloured name + glowing label. */
     public static ItemStack createStack(Item diskItem, DiskContents contents) {
         ItemStack stack = new ItemStack(diskItem);
+        //? if >=1.20.5 {
         stack.set(NeroNotesDataComponents.DISK_CONTENTS.get(), contents);
         int rgb = contents.family().accentColour() & 0xFFFFFF;
         stack.set(DataComponents.ITEM_NAME, Component.literal(contents.title())
                 .withStyle(style -> style.withColor(TextColor.fromRgb(rgb)).withItalic(false)));
         stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+        //?} else {
+        /*NeroNotesDataComponents.write(stack, contents);
+        int rgb = contents.family().accentColour() & 0xFFFFFF;
+        stack.setHoverName(Component.literal(contents.title())
+                .withStyle(style -> style.withColor(TextColor.fromRgb(rgb)).withItalic(false)));
+        *///?}
         return stack;
     }
 
     /** The disk's contents, or {@code null} for a component-less stack. */
     public static DiskContents contentsOf(ItemStack stack) {
+        //? if >=1.20.5 {
         return stack.get(NeroNotesDataComponents.DISK_CONTENTS.get());
+        //?} else {
+        /*return NeroNotesDataComponents.read(stack);
+        *///?}
     }
+
+    //? if <1.20.5 {
+    /*@Override
+    public boolean isFoil(ItemStack stack) {
+        return contentsOf(stack) != null || super.isFoil(stack);
+    }
+    *///?}
 
     //? if >=1.21.5 {
     @Override

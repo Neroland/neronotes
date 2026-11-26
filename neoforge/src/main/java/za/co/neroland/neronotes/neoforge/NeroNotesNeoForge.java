@@ -9,9 +9,11 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+//? if >=1.20.5 {
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+//?}
 
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.neronotes.NeroNotesCommon;
@@ -31,8 +33,17 @@ public final class NeroNotesNeoForge {
         // Drain Core's registration provider queues (sound events, later blocks/items)
         // on this mod's event bus. Called AFTER init() so every registry class has queued.
         RegistrationProvider.attach(modEventBus);
+        //? if <1.20.6 {
+        /*if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+            new NeroNotesNeoForgeClient(modEventBus);
+        }
+        *///?}
         // Wire the declared neronotes:main payloads (declared during init() step 8).
+        //? if >=1.20.5 {
         modEventBus.addListener(NeroNotesNeoForge::onRegisterPayloadHandlers);
+        //?} else {
+        /*za.co.neroland.neronotes.platform.NeoForgeNetworkPlatform.register(modEventBus);
+        *///?}
         // Stage 4: Harmonic Gate energy on Core's shared capability.
         NeoForgeCapabilities.register(modEventBus);
         // Stage 4: /neronotes soundforge return (game-bus command registration).
@@ -46,10 +57,19 @@ public final class NeroNotesNeoForge {
         });
         // Stage 9: the same tick hook hands the link module its server handle
         // (Core's link SPI delivers only a UUID; the module needs the server).
+        //? if >=1.20.5 {
         NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post event) -> {
             NotesLinkModule.rememberServer(event.getServer());
             RetentionSweep.onServerTick(event.getServer());
         });
+        //?} else {
+        /*NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.TickEvent.ServerTickEvent event) -> {
+            if (event.phase == net.neoforged.neoforge.event.TickEvent.Phase.END) {
+                NotesLinkModule.rememberServer(event.getServer());
+                RetentionSweep.onServerTick(event.getServer());
+            }
+        });
+        *///?}
         // Logout housekeeping: drop the player's channel subscriptions so the
         // server-tracked subscriber map never accumulates departed players.
         NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedOutEvent event) -> {
@@ -66,6 +86,7 @@ public final class NeroNotesNeoForge {
                 NeroNotesCommon.onServerStopped(event.getServer()));
     }
 
+    //? if >=1.20.5 {
     private static void onRegisterPayloadHandlers(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar("1");
         for (NotesNetwork.ClientboundPayloadSpec<?> spec : NotesNetwork.clientboundPayloads()) {
@@ -91,4 +112,5 @@ public final class NeroNotesNeoForge {
                     }
                 }));
     }
+    //?}
 }

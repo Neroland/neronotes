@@ -95,40 +95,54 @@ public class ResonatorBlock extends Block implements EntityBlock {
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                           Player player, InteractionHand hand, BlockHitResult hitResult) {
-    //?} else {
+    //?} else if >=1.20.5 {
     /*@Override
     protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level,
             BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    *///?} else {
+    /*@Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos,
+            Player player, InteractionHand hand, BlockHitResult hitResult) {
+        ItemStack stack = player.getItemInHand(hand);
     *///?}
         DiskContents contents = CustomDiskItem.contentsOf(stack);
         if (contents == null) {
             //? if >=1.21.2 {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
-            //?} else {
+            //?} else if >=1.20.5 {
             /*return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            *///?} else {
+            /*return hand == InteractionHand.MAIN_HAND
+                    ? useDefault(state, level, pos, player, hitResult) : InteractionResult.PASS;
             *///?}
         }
         if (level.isClientSide()) {
             //? if >=1.21.2 {
             return InteractionResult.SUCCESS;
-            //?} else {
+            //?} else if >=1.20.5 {
             /*return net.minecraft.world.ItemInteractionResult.SUCCESS;
+            *///?} else {
+            /*return InteractionResult.SUCCESS;
             *///?}
         }
         if (!(level.getBlockEntity(pos) instanceof ResonatorBlockEntity resonator)
                 || !(player instanceof ServerPlayer serverPlayer)) {
             //? if >=1.21.2 {
             return InteractionResult.PASS;
-            //?} else {
+            //?} else if >=1.20.5 {
             /*return net.minecraft.world.ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+            *///?} else {
+            /*return InteractionResult.PASS;
             *///?}
         }
         if (!resonator.mayLoad(serverPlayer)) {
             serverPlayer.sendSystemMessage(Component.translatable("neronotes.resonator.denied"));
             //? if >=1.21.2 {
             return InteractionResult.SUCCESS;
-            //?} else {
+            //?} else if >=1.20.5 {
             /*return net.minecraft.world.ItemInteractionResult.SUCCESS;
+            *///?} else {
+            /*return InteractionResult.SUCCESS;
             *///?}
         }
         resonator.setScore(contents.score());
@@ -136,14 +150,21 @@ public class ResonatorBlock extends Block implements EntityBlock {
                 Component.translatable("neronotes.resonator.disk_loaded", contents.title()));
         //? if >=1.21.2 {
         return InteractionResult.SUCCESS;
-        //?} else {
+        //?} else if >=1.20.5 {
         /*return net.minecraft.world.ItemInteractionResult.SUCCESS;
+        *///?} else {
+        /*return InteractionResult.SUCCESS;
         *///?}
     }
 
+    //? if >=1.20.5 {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
                                                Player player, BlockHitResult hitResult) {
+    //?} else {
+    /*private InteractionResult useDefault(BlockState state, Level level, BlockPos pos,
+            Player player, BlockHitResult hitResult) {
+    *///?}
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }

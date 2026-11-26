@@ -15,6 +15,31 @@ final class FabricClientNetworkSender {
     }
 
     static void send(CustomPacketPayload payload) {
+        //? if >=1.20.5 {
         ClientPlayNetworking.send(payload);
+        //?} else {
+        /*var id = payload.type().id();
+        if (!ClientPlayNetworking.canSend(id)) {
+            return;
+        }
+        for (var spec : za.co.neroland.neronotes.network.NotesNetwork.serverboundPayloads()) {
+            if (spec.type().equals(payload.type())) {
+                ClientPlayNetworking.send(id, encode(spec, payload));
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Unregistered serverbound NeroNotes payload " + id);
+        *///?}
     }
+
+    //? if <1.20.5 {
+    /*private static <T extends CustomPacketPayload> net.minecraft.network.FriendlyByteBuf encode(
+            za.co.neroland.neronotes.network.NotesNetwork.ServerboundPayloadSpec<T> spec,
+            CustomPacketPayload payload) {
+        var buffer = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
+        spec.codec().encode(buffer, spec.type().payloadClass().cast(payload));
+        return buffer;
+    }
+    *///?}
+
 }

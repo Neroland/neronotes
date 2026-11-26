@@ -6,6 +6,8 @@
 progress. See [`CHANGELOG.md`](CHANGELOG.md) for exactly what shipped and what was deliberately
 cut.
 
+Minecraft 1.20.5 on NeoForge requires loader 20.5.21-beta.
+
 ## What it does
 
 **Music is data, not audio.** A composition is a compact, versioned score — notes, voices,
@@ -52,11 +54,11 @@ no MIDI, no playlists, no light shows, no cross-dimension relays. The full list 
 
 ## Requirements
 
-- **Neroland Core 1.23.0 or newer** (below 2.0).
-- **Minecraft 1.20.5** on Fabric and **1.20.6** on Fabric, Forge and NeoForge.
+- **Neroland Core 1.24.0 or newer** (below 2.0).
+- **Minecraft 1.20 through 1.20.6** on Fabric, **1.20 through 1.20.4 through 1.20.6** on Forge, and **1.20.4 through 1.20.6** on NeoForge. NeoForge 1.20.1 uses the Forge 1.20.1 jar.
 - **Minecraft 1.21.1, 1.21.4, 1.21.5, 1.21.7–1.21.8, 1.21.9–1.21.10, 1.21.11, 26.1.2, 26.2 or 26.3** on
   **NeoForge, MinecraftForge/Forge, or Fabric**.
-- **Java 21** for the 1.20.5 through 1.21.x builds and **Java 25** for 26.x.
+- **Java 17** for 1.20 through 1.20.4, **Java 21** for 1.20.5 through 1.21.x, and **Java 25** for 26.x.
 
 ## Building
 

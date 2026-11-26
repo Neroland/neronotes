@@ -25,9 +25,15 @@ import za.co.neroland.neronotes.item.DiskNames;
 public record DiskPressPayload(int containerId, String title, boolean anonymous)
         implements CustomPacketPayload {
 
+    //? if >=1.20.5 {
     public static final CustomPacketPayload.Type<DiskPressPayload> TYPE =
             new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
                     NotesNetwork.CHANNEL_NAMESPACE, "disk_press"));
+    //?} else {
+    /*public static final CustomPacketPayload.Type<DiskPressPayload> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
+                    NotesNetwork.CHANNEL_NAMESPACE, "disk_press"), DiskPressPayload.class);
+    *///?}
 
     private static final StreamCodec<ByteBuf, String> TITLE_CODEC =
             ByteBufCodecs.stringUtf8(DiskNames.HARD_MAX_LENGTH);

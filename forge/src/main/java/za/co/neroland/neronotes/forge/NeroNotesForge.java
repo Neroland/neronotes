@@ -18,9 +18,11 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+//? if >=1.20.5 {
 import net.minecraftforge.network.Channel;
 import net.minecraftforge.network.ChannelBuilder;
 import net.minecraftforge.network.payload.PayloadFlow;
+//?}
 
 import za.co.neroland.nerolandcore.registry.RegistrationProvider;
 import za.co.neroland.neronotes.NeroNotesCommon;
@@ -35,7 +37,12 @@ import za.co.neroland.neronotes.signal.ResonanceService;
 @Mod(NeroNotesCommon.MOD_ID)
 public final class NeroNotesForge {
 
+    //? if >=1.20.5 {
     public NeroNotesForge(FMLJavaModLoadingContext context) {
+    //?} else {
+    /*public NeroNotesForge() {
+        FMLJavaModLoadingContext context = FMLJavaModLoadingContext.get();
+    *///?}
         NeroNotesCommon.LOGGER.info("[NeroNotes] Forge bootstrap");
         NeroNotesCommon.init();
         //? if >=1.21.6 {
@@ -47,7 +54,11 @@ public final class NeroNotesForge {
         // on this mod's bus group. Called AFTER init() so every registry class has queued.
         RegistrationProvider.attach(modBusGroup);
         // Build the neronotes:main channel AFTER init() so the payload declarations exist.
+        //? if >=1.20.5 {
         ForgeNetworkPlatform.attachChannel(buildChannel());
+        //?} else {
+        /*ForgeNetworkPlatform.register();
+        *///?}
         // Stage 4: Harmonic Gate energy on Core's shared capability.
         ForgeCapabilities.register();
         // Stage 4: /neronotes soundforge return (game-bus command registration).
@@ -92,7 +103,14 @@ public final class NeroNotesForge {
         }
     }
 
+    //? if >=1.20.5 {
     private static void onServerTick(TickEvent.ServerTickEvent.Post event) {
+    //?} else {
+    /*private static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
+    *///?}
         //? if >=1.21.9 {
         net.minecraft.server.MinecraftServer server = event.server();
         //?} else {
@@ -112,6 +130,7 @@ public final class NeroNotesForge {
         NeroNotesCommon.onServerStopped(event.getServer());
     }
 
+    //? if >=1.20.5 {
     private static Channel<CustomPacketPayload> buildChannel() {
         // Bidirectional since Stage 5: clientbound resonance/session payloads
         // plus the serverbound sequencer-edit and Disk Press requests.
@@ -157,4 +176,5 @@ public final class NeroNotesForge {
                     context.setPacketHandled(true);
                 });
     }
+    //?}
 }

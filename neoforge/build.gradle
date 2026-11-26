@@ -12,7 +12,9 @@ plugins {
 
 // MC version comes from the Stonecutter node (e.g. :neoforge:26.1.2), not a global property.
 def mc = stonecutter.current.version
-def economyApiMc = mc.startsWith('1.20.') ? '1.21.1' : mc
+def nerolandcoreVersion = rootProject.property('nerolandcore_version')
+def preComponents = stonecutter.eval(mc, '<1.20.5')
+def economyApiMc = !preComponents && mc.startsWith('1.20.') ? '1.21.1' : mc
 // Minecraft range: 1.21.x cells are bounded to their API line (gradle.properties); 26.x keep [mc,).
 def mcCeiling = project.findProperty("mc_ceiling_${mc}")
 def mcFloor = project.findProperty("mc_floor_${mc}") ?: mc
@@ -73,11 +75,11 @@ dependencies {
 
     // Neroland Core — required foundation (resolved from mavenLocal or GitHub Packages; see the
     // root stonecutter.gradle repositories).
-    implementation "za.co.neroland.nerolandcore:nerolandcore-neoforge-${mc}:${rootProject.nerolandcore_version}"
+    implementation "za.co.neroland.nerolandcore:nerolandcore-neoforge-${mc}:${nerolandcoreVersion}"
 
     // NeroEconomy — OPTIONAL. API on the compile classpath only (the Disk Exchanger pricing bridge in
     // compat/neroeconomy, touched only behind isModLoaded("neroeconomy")). Never bundled, never required.
-    compileOnly "za.co.neroland.neroeconomy:neroeconomy-neoforge-${economyApiMc}:${rootProject.neroeconomy_version}"
+    compileOnly "za.co.neroland.neroeconomy:neroeconomy-neoforge-${economyApiMc}:${rootProject.property('neroeconomy_version')}"
 
     // JUnit 5 for the shared common tests (see the test source-set wiring below).
     testImplementation platform('org.junit:junit-bom:6.1.3')
@@ -118,14 +120,46 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
         mod_license            : rootProject.mod_license,
         minecraft_version_range: mcCeiling ? "[${mcFloor},${mcCeiling})" : "[${mc},)",
         // Core dependency floor DERIVED from the compiled-against version (never a hardcoded [1.0,2.0)).
-        nerolandcore_version_range: "[${rootProject.nerolandcore_version},2.0)",
+        nerolandcore_version_range: "[${nerolandcoreVersion},2.0)",
     ]
     inputs.properties(props)
     expand(props)
     from "${branchDir}/src/main/templates"
+    if (stonecutter.eval(mc, '<1.20.5')) {
+        filesMatching('META-INF/neoforge.mods.toml') {
+            name = 'mods.toml'
+            filter { line -> line.replace('type = "required"', 'mandatory = true')
+                                 .replace('type = "optional"', 'mandatory = false') }
+        }
+    }
     into layout.buildDirectory.dir('generated/sources/modMetadata')
 }
 sourceSets.main.resources.srcDir generateModMetadata
+
+// NeoForge 20.5's POM predates the ModDevGradle variants. The original userdev jar supplies the
+// game patches and the original POM supplies dependencies for the compile and test classpaths.
+if (mc == '1.20.5') {
+    dependencies.components.withModule('net.neoforged:neoforge') { details ->
+        if (details.id.version == neoVersion) {
+            details.withVariant('sources') {
+                withDependencies { clear() }
+            }
+            details.addVariant('legacyModDevBundle') {
+                withCapabilities { addCapability('net.neoforged', 'neoforge-moddev-bundle', neoVersion) }
+                withFiles { addFile("neoforge-${neoVersion}-userdev.jar") }
+            }
+            ['compile', 'runtime'].each { pomVariant ->
+                details.addVariant("legacyModDev-${pomVariant}", pomVariant) {
+                    withCapabilities {
+                        removeCapability('net.neoforged', 'neoforge')
+                        addCapability('net.neoforged', 'neoforge-dependencies', neoVersion)
+                    }
+                    withFiles { removeAllFiles() }
+                }
+            }
+        }
+    }
+}
 
 neoForge {
     version = neoVersion

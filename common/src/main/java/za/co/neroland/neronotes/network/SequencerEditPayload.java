@@ -23,9 +23,15 @@ import za.co.neroland.neronotes.soundforge.SequencerEdit;
  */
 public record SequencerEditPayload(int containerId, SequencerEdit edit) implements CustomPacketPayload {
 
+    //? if >=1.20.5 {
     public static final CustomPacketPayload.Type<SequencerEditPayload> TYPE =
             new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
                     NotesNetwork.CHANNEL_NAMESPACE, "sequencer_edit"));
+    //?} else {
+    /*public static final CustomPacketPayload.Type<SequencerEditPayload> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
+                    NotesNetwork.CHANNEL_NAMESPACE, "sequencer_edit"), SequencerEditPayload.class);
+    *///?}
 
     private static final StreamCodec<ByteBuf, String> VOICE_ID_CODEC =
             ByteBufCodecs.stringUtf8(SequencerEdit.MAX_VOICE_ID_LENGTH);

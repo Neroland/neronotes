@@ -71,9 +71,15 @@ public record LibraryPagePayload(int containerId, int page, int pageCount, int v
     /** Wire bound on a voice-family id. */
     public static final int MAX_FAMILY_LENGTH = 64;
 
+    //? if >=1.20.5 {
     public static final CustomPacketPayload.Type<LibraryPagePayload> TYPE =
             new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
                     NotesNetwork.CHANNEL_NAMESPACE, "library_page"));
+    //?} else {
+    /*public static final CustomPacketPayload.Type<LibraryPagePayload> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
+                    NotesNetwork.CHANNEL_NAMESPACE, "library_page"), LibraryPagePayload.class);
+    *///?}
 
     private static final StreamCodec<ByteBuf, String> TITLE_CODEC =
             ByteBufCodecs.stringUtf8(DiskNames.HARD_MAX_LENGTH);

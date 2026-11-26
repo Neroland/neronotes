@@ -26,9 +26,15 @@ import net.minecraft.resources.Identifier;
 public record SessionScorePayload(int containerId, int activeLayer, byte[] scoreBytes)
         implements CustomPacketPayload {
 
+    //? if >=1.20.5 {
     public static final CustomPacketPayload.Type<SessionScorePayload> TYPE =
             new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
                     NotesNetwork.CHANNEL_NAMESPACE, "session_score"));
+    //?} else {
+    /*public static final CustomPacketPayload.Type<SessionScorePayload> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(
+                    NotesNetwork.CHANNEL_NAMESPACE, "session_score"), SessionScorePayload.class);
+    *///?}
 
     public static final StreamCodec<ByteBuf, SessionScorePayload> STREAM_CODEC = StreamCodec.of(
             (buf, payload) -> {

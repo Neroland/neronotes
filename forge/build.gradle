@@ -4,13 +4,18 @@
 plugins {
     id 'net.minecraftforge.gradle'
     id 'net.minecraftforge.jarjar'
+    id 'net.minecraftforge.renamer' apply false
     id 'eclipse'
     id 'maven-publish'
 }
 
 // MC version comes from the Stonecutter node (e.g. :forge:26.1.2), not a global property.
 def mc = stonecutter.current.version
-def economyApiMc = mc.startsWith('1.20.') ? '1.21.1' : mc
+def preComponents = stonecutter.eval(mc, '<1.20.5')
+if (preComponents) {
+    apply plugin: 'net.minecraftforge.renamer'
+}
+def economyApiMc = !preComponents && mc.startsWith('1.20.') ? '1.21.1' : mc
 // Minecraft range: 1.21.x cells are bounded to their API line (gradle.properties); 26.x keep [mc,).
 def mcCeiling = project.findProperty("mc_ceiling_${mc}")
 def mcFloor = project.findProperty("mc_floor_${mc}") ?: mc
@@ -118,7 +123,7 @@ dependencies {
 
     // NeroEconomy — OPTIONAL. API on the compile classpath only (the Disk Exchanger pricing bridge in
     // compat/neroeconomy, touched only behind isModLoaded("neroeconomy")). Never bundled, never required.
-    compileOnly "za.co.neroland.neroeconomy:neroeconomy-forge-${economyApiMc}:${rootProject.neroeconomy_version}"
+    compileOnly "za.co.neroland.neroeconomy:neroeconomy-forge-${economyApiMc}:${rootProject.property('neroeconomy_version')}"
 
     // JEI common API only; Forge 26.x loader artifacts are not yet published on the pinned JEI lines.
     if (jeiVersion) {
@@ -134,6 +139,18 @@ dependencies {
 }
 
 // Expand mods.toml from src/main/templates into generated resources.
+if (preComponents) {
+    renamer.mappings.from minecraft.dependency.toSrgFile
+    def bundled = tasks.named('jarJar', Jar) {
+        archiveClassifier = 'dev-all'
+    }
+    renamer.classes('renameReleaseJar', bundled) {
+        archiveClassifier = 'all'
+    }
+    tasks.named('assemble') { dependsOn 'renameReleaseJar' }
+}
+
+
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     def props = [
         mod_id                    : rootProject.mod_id,
